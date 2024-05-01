@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001027592941",
+    "project_id": "dailymovie-d4480",
+    "storage_bucket": "dailymovie-d4480.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001027592941:android:1b6dfe80e845bbde7be2e4",
+        "android_client_info": {
+          "package_name": "com.example.dailymovie"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAErbsldlR_G88Xppx35os_DSSlS5Ec0z8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
