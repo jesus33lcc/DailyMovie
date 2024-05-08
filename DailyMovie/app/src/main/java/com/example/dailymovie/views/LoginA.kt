@@ -1,5 +1,6 @@
 package com.example.dailymovie.views
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -26,6 +27,11 @@ class LoginA : AppCompatActivity() {
 
         binding.loginIniciogoogleBtn.setOnClickListener {
             Toast.makeText(this, "XD", Toast.LENGTH_SHORT).show()
+        }
+        binding.loginSincuentaTxt.setOnClickListener {
+            val intent = Intent(this, RegistroA::class.java)
+            startActivity(intent)
+            finish()
         }
 
         viewModel.loginStatus.observe(this) { isSuccess ->

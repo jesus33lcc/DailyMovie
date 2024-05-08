@@ -38,5 +38,10 @@ class RegistroA : AppCompatActivity() {
                 Toast.makeText(this, "Error en el registro", Toast.LENGTH_SHORT).show()
             }
         }
+        binding.registroCuentacreadoTxt.setOnClickListener {
+            val intent = Intent(this, LoginA::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }
