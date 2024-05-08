@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/img_posterMovie"
+        android:layout_width="60dp"
+        android:layout_height="90dp"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/txt_titleMovie"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:layout_marginLeft="120dp"
+        android:layout_marginTop="8dp"
+        android:maxLines="1"
+        android:text="Title"
+        android:textSize="20sp"
+        tools:ignore="MissingConstraints" />
+    <TextView
+        android:id="@+id/txt_yearMovie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:layout_marginLeft="120dp"
+        android:layout_marginTop="40dp"
+        android:maxLines="1"
+        android:text="0000-0000"
+        android:textSize="15sp"
+        tools:ignore="MissingConstraints" />
+    <TextView
+        android:id="@+id/txt_actorsMovie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:layout_marginLeft="120dp"
+        android:layout_marginTop="65dp"
+        android:maxLines="1"
+        android:text="Actors"
+        android:textSize="15sp"
+        tools:ignore="MissingConstraints" />
+    <TextView
+    android:id="@+id/txt_tipoMovie"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="150dp"
+    android:layout_marginLeft="120dp"
+    android:layout_marginTop="40dp"
+    android:maxLines="1"
+    android:text="Serie de TV"
+    android:textSize="15sp"
+    tools:ignore="MissingConstraints" />
+
+</RelativeLayout>
