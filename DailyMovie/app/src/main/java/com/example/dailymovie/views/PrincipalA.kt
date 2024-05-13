@@ -2,19 +2,12 @@ package com.example.dailymovie.views
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.transaction
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.dailymovie.R
 import com.example.dailymovie.databinding.ActivityPrincipalBinding
-import com.example.dailymovie.fragments.ExplorarF
-import com.example.dailymovie.fragments.HomeF
-import com.example.dailymovie.fragments.ListasF
-import com.example.dailymovie.viewmodels.PrincipalViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class PrincipalA : AppCompatActivity() {

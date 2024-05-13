@@ -38,5 +38,9 @@ class MovieAdapter(
     override fun getItemCount(): Int {
         return listMovies.size
     }
-
+    fun updateMoviesList(newMoviesList: ArrayList<MovieModel>) {
+        listMovies.clear()
+        listMovies.addAll(newMoviesList)
+        notifyDataSetChanged()
+    }
 }
