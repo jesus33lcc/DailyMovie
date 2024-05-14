@@ -110,7 +110,7 @@ public class ExplorarF extends Fragment {
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             WebService webService = RetrofitClient.INSTANCE.getWebService();
-            Call<MoviesResponse> call = webService.searchMovies(query, Constantes.API_KEY, true, "en_US", 1);
+            Call<MoviesResponse> call = webService.searchMovies(query, Constantes.API_KEY, true, "es", 1);
             call.enqueue(new Callback<MoviesResponse>() {
                 @Override
                 public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
