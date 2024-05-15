@@ -1,6 +1,7 @@
 package com.example.dailymovie.adapters
 
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.example.dailymovie.R
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.views.MovieA
 
 class MovieAdapter(
     var listMovies:ArrayList<MovieModel>
@@ -33,10 +35,21 @@ class MovieAdapter(
         holder.year.text=movie.releaseDate.take(4)
         holder.tipo.text=""
         Glide.with(holder.itemView.context).load(Constantes.IMAGE_URL+movie.posterPath).placeholder(R.drawable.ic_baseline_image_24).error(R.drawable.ic_baseline_image_24).into(holder.poster)
+        holder.itemView.setOnClickListener {
+            val context = holder.itemView.context
+            val intent = Intent(context, MovieA::class.java).apply {
+                putExtra("MOVIE", movie)
+            }
+            context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int {
         return listMovies.size
     }
-
+    fun updateMoviesList(newMoviesList: ArrayList<MovieModel>) {
+        listMovies.clear()
+        listMovies.addAll(newMoviesList)
+        notifyDataSetChanged()
+    }
 }
