@@ -2,59 +2,62 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="wrap_content"
     android:padding="8dp">
 
     <ImageView
         android:id="@+id/img_posterMovie"
         android:layout_width="60dp"
         android:layout_height="90dp"
-        tools:ignore="MissingConstraints" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginEnd="8dp"
+        tools:src="@drawable/ic_baseline_image_24" />
 
     <TextView
         android:id="@+id/txt_titleMovie"
-        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="70dp"
-        android:layout_marginLeft="120dp"
-        android:layout_marginTop="8dp"
-        android:maxLines="1"
+        android:layout_toEndOf="@id/img_posterMovie"
+        android:layout_toRightOf="@id/img_posterMovie"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:text="Title"
         android:textSize="20sp"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="end"
         tools:ignore="MissingConstraints" />
+
     <TextView
         android:id="@+id/txt_yearMovie"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="70dp"
-        android:layout_marginLeft="120dp"
-        android:layout_marginTop="40dp"
-        android:maxLines="1"
-        android:text="0000-0000"
+        android:layout_below="@id/txt_titleMovie"
+        android:layout_toEndOf="@id/img_posterMovie"
+        android:layout_toRightOf="@id/img_posterMovie"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="4dp"
+        android:text="0000-00-00"
         android:textSize="15sp"
+        android:maxLines="1"
+        android:ellipsize="end"
         tools:ignore="MissingConstraints" />
+
     <TextView
-        android:id="@+id/txt_actorsMovie"
+        android:id="@+id/txt_voteAverageMovie"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="70dp"
-        android:layout_marginLeft="120dp"
-        android:layout_marginTop="65dp"
-        android:maxLines="1"
-        android:text="Actors"
+        android:layout_below="@id/txt_yearMovie"
+        android:layout_toEndOf="@id/img_posterMovie"
+        android:layout_toRightOf="@id/img_posterMovie"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="4dp"
+        android:text="Rating: 0.0"
         android:textSize="15sp"
         tools:ignore="MissingConstraints" />
-    <TextView
-    android:id="@+id/txt_tipoMovie"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="150dp"
-    android:layout_marginLeft="120dp"
-    android:layout_marginTop="40dp"
-    android:maxLines="1"
-    android:text="Serie de TV"
-    android:textSize="15sp"
-    tools:ignore="MissingConstraints" />
 
 </RelativeLayout>

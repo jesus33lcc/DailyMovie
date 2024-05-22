@@ -1,13 +1,15 @@
 package com.example.dailymovie.views
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.client.response.MovieDetailsResponse
 import com.example.dailymovie.databinding.ActivityMovieBinding
+import com.example.dailymovie.models.MovieDetailsModel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.viewmodels.MovieViewModel
@@ -21,18 +23,57 @@ class MovieA : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMovieBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val movie = intent.getParcelableExtra<MovieModel>("MOVIE")
 
-        movie?.let {
-            movieViewModel.setMovie(it)
-            displayMovieDetails(it)
-            setupButtons(it)
+        val movieModel = intent.getParcelableExtra<MovieModel>("MOVIE")
+        val movieId = movieModel?.id ?: -1
+
+        if (movieId != -1) {
+            movieViewModel.setCurrentMovieModel(movieModel!!)
+            movieViewModel.fetchMovieDetails(movieId, Constantes.API_KEY, "es")
+            movieViewModel.movieDetails.observe(this, Observer { movieDetailsResponse ->
+                movieDetailsResponse?.let {
+                    val movieDetails = convertToMovieDetailsModel(it)
+                    displayMovieDetails(movieDetails)
+                    setupButtons()
+                }
+            })
+        } else {
+            showToast("Error: Movie ID is not valid.")
         }
     }
 
-    private fun displayMovieDetails(movie: MovieModel) {
+    private fun convertToMovieDetailsModel(response: MovieDetailsResponse): MovieDetailsModel {
+        return MovieDetailsModel(
+            adult = response.adult,
+            backdropPath = response.backdropPath,
+            belongsToCollection = response.belongsToCollection,
+            budget = response.budget,
+            genres = response.genres,
+            homepage = response.homepage,
+            id = response.id,
+            imdbId = response.imdbId,
+            originCountry = response.originCountry,
+            originalLanguage = response.originalLanguage,
+            originalTitle = response.originalTitle,
+            overview = response.overview,
+            popularity = response.popularity,
+            posterPath = response.posterPath,
+            productionCompanies = response.productionCompanies,
+            releaseDate = response.releaseDate,
+            revenue = response.revenue,
+            runtime = response.runtime,
+            status = response.status,
+            tagline = response.tagline,
+            title = response.title,
+            video = response.video,
+            voteAverage = response.voteAverage,
+            voteCount = response.voteCount
+        )
+    }
+
+    private fun displayMovieDetails(movie: MovieDetailsModel) {
         binding.txtTituloMovie.text = movie.title
-        binding.txtDirectorMovie.text = movie.originalTitle // Cambiado a originalTitle
+        binding.txtDirectorMovie.text = movie.originalTitle
         binding.txtAnioMovie.text = movie.releaseDate.take(4)
         binding.txtValoracionMovie.text = movie.voteAverage.toString()
         binding.textDescripcion.text = movie.overview
@@ -42,12 +83,11 @@ class MovieA : AppCompatActivity() {
             .error(R.drawable.ic_baseline_image_24)
             .into(binding.imgPosterMovie)
     }
-    private fun setupButtons(movie: MovieModel) {
-        val movieId = movie.id
 
+    private fun setupButtons() {
         binding.tBtnLikeMovie.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                movieViewModel.addToFavorites(movieId) { success ->
+                movieViewModel.addToFavorites { success ->
                     if (success) {
                         showToast("Añadido a Favoritos")
                     } else {
@@ -55,7 +95,7 @@ class MovieA : AppCompatActivity() {
                     }
                 }
             } else {
-                movieViewModel.removeFromFavorites(movieId) { success ->
+                movieViewModel.removeFromFavorites { success ->
                     if (success) {
                         showToast("Eliminado de Favoritos")
                     } else {
@@ -67,7 +107,7 @@ class MovieA : AppCompatActivity() {
 
         binding.tBtnViewMovie.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                movieViewModel.addToWatched(movieId) { success ->
+                movieViewModel.addToWatched { success ->
                     if (success) {
                         showToast("Añadido a Vistos")
                     } else {
@@ -75,7 +115,7 @@ class MovieA : AppCompatActivity() {
                     }
                 }
             } else {
-                movieViewModel.removeFromWatched(movieId) { success ->
+                movieViewModel.removeFromWatched { success ->
                     if (success) {
                         showToast("Eliminado de Vistos")
                     } else {
