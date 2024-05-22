@@ -61,7 +61,6 @@ public class ExplorarF extends Fragment {
         moviesRecyclerView = view.findViewById(R.id.rvListaBusqueda);
         moviesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        // Insertar Libros en lista.
         //List<MovieModel> listMoviewEmpty = new ArrayList<>();
         //initialize_ListFillMovie(listMoviewEmpty);
         //buscar();
@@ -85,17 +84,16 @@ public class ExplorarF extends Fragment {
         searchViewExplorar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Cuando el usuario confirma la búsqueda, esconder el teclado virtual podría ser útil.
                 searchViewExplorar.clearFocus();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (!newText.isEmpty() && newText.length() > 2) { // Considerar la búsqueda después de 2 caracteres.
+                if (!newText.isEmpty() && newText.length() > 2) {
                     buscar(newText);
                 } else if (newText.isEmpty()) {
-                    clearResults(); // Limpiar resultados si el texto de búsqueda está vacío.
+                    clearResults();
                 }
                 return true;
             }

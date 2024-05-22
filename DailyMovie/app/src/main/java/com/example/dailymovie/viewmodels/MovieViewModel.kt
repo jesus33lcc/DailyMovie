@@ -3,30 +3,66 @@ package com.example.dailymovie.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.dailymovie.client.FirebaseClient
+import com.example.dailymovie.client.RetrofitClient
+import com.example.dailymovie.client.response.MovieDetailsResponse
+import com.example.dailymovie.models.MovieDetailsModel
 import com.example.dailymovie.models.MovieModel
+import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MovieViewModel : ViewModel() {
 
-    private val _movie = MutableLiveData<MovieModel>()
-    val movie: LiveData<MovieModel> get() = _movie
+    private val _movieDetails = MutableLiveData<MovieDetailsResponse>()
+    val movieDetails: LiveData<MovieDetailsResponse> get() = _movieDetails
+    private var currentMovieModel: MovieModel? = null
 
-    fun setMovie(movie: MovieModel) {
-        _movie.value = movie
-    }
-    fun addToFavorites(movieId: Int, onComplete: (Boolean) -> Unit) {
-        FirebaseClient.addToFavorites(movieId, onComplete)
+    fun setCurrentMovieModel(movieModel: MovieModel) {
+        currentMovieModel = movieModel
     }
 
-    fun removeFromFavorites(movieId: Int, onComplete: (Boolean) -> Unit) {
-        FirebaseClient.removeFromFavorites(movieId, onComplete)
+    fun fetchMovieDetails(movieId: Int, apiKey: String, language: String) {
+        viewModelScope.launch {
+            RetrofitClient.webService.getMovieDetails(movieId, apiKey, language)
+                .enqueue(object : Callback<MovieDetailsResponse> {
+                    override fun onResponse(call: Call<MovieDetailsResponse>, response: Response<MovieDetailsResponse>) {
+                        if (response.isSuccessful) {
+                            _movieDetails.value = response.body()
+                        } else {
+                            // Manejar error
+                        }
+                    }
+                    override fun onFailure(call: Call<MovieDetailsResponse>, t: Throwable) {
+                        // Manejar fallo
+                    }
+                })
+        }
     }
 
-    fun addToWatched(movieId: Int, onComplete: (Boolean) -> Unit) {
-        FirebaseClient.addToWatched(movieId, onComplete)
+    fun addToFavorites(onComplete: (Boolean) -> Unit) {
+        currentMovieModel?.let { movie ->
+            FirebaseClient.addToFavorites(movie, onComplete)
+        } ?: onComplete(false)
     }
 
-    fun removeFromWatched(movieId: Int, onComplete: (Boolean) -> Unit) {
-        FirebaseClient.removeFromWatched(movieId, onComplete)
+    fun removeFromFavorites(onComplete: (Boolean) -> Unit) {
+        currentMovieModel?.let { movie ->
+            FirebaseClient.removeFromFavorites(movie, onComplete)
+        } ?: onComplete(false)
+    }
+
+    fun addToWatched(onComplete: (Boolean) -> Unit) {
+        currentMovieModel?.let { movie ->
+            FirebaseClient.addToWatched(movie, onComplete)
+        } ?: onComplete(false)
+    }
+
+    fun removeFromWatched(onComplete: (Boolean) -> Unit) {
+        currentMovieModel?.let { movie ->
+            FirebaseClient.removeFromWatched(movie, onComplete)
+        } ?: onComplete(false)
     }
 }

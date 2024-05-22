@@ -7,21 +7,29 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.client.RetrofitClient
+import com.example.dailymovie.client.response.MovieDetailsResponse
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.views.MovieA
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.concurrent.Executors
 
 class MovieAdapter(
-    var listMovies:ArrayList<MovieModel>
-): RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
+    var listMovies: ArrayList<MovieModel>
+) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
+
     class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.txt_titleMovie)
         val year: TextView = itemView.findViewById(R.id.txt_yearMovie)
         val poster: ImageView = itemView.findViewById(R.id.img_posterMovie)
-        val tipo: TextView = itemView.findViewById(R.id.txt_tipoMovie)
+        val rating: TextView = itemView.findViewById(R.id.txt_voteAverageMovie)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
@@ -31,10 +39,15 @@ class MovieAdapter(
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie = listMovies[position]
-        holder.title.text=movie.title
-        holder.year.text=movie.releaseDate.take(4)
-        holder.tipo.text=""
-        Glide.with(holder.itemView.context).load(Constantes.IMAGE_URL+movie.posterPath).placeholder(R.drawable.ic_baseline_image_24).error(R.drawable.ic_baseline_image_24).into(holder.poster)
+        holder.title.text = movie.title
+        holder.year.text = movie.releaseDate.take(4)
+        holder.rating.text = "Rating: ${movie.voteAverage}"
+        Glide.with(holder.itemView.context)
+            .load(Constantes.IMAGE_URL + movie.posterPath)
+            .placeholder(R.drawable.ic_baseline_image_24)
+            .error(R.drawable.ic_baseline_image_24)
+            .into(holder.poster)
+
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, MovieA::class.java).apply {
@@ -47,6 +60,7 @@ class MovieAdapter(
     override fun getItemCount(): Int {
         return listMovies.size
     }
+
     fun updateMoviesList(newMoviesList: ArrayList<MovieModel>) {
         listMovies.clear()
         listMovies.addAll(newMoviesList)
