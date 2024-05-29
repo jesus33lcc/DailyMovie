@@ -1,12 +1,20 @@
 package com.example.dailymovie.client
 
+import android.util.Log
 import com.example.dailymovie.models.MovieModel
+import com.example.dailymovie.models.MovieOfTheDay
+import com.example.dailymovie.models.ReviewModel
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 object FirebaseClient {
 
@@ -173,5 +181,37 @@ object FirebaseClient {
                 onComplete(emptyList())
             }
     }
+    fun getMovieOfTheDay(onComplete: (MovieOfTheDay?) -> Unit) {
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
+        db.collection("dailymovie").get()
+            .addOnSuccessListener { querySnapshot ->
+                for (document in querySnapshot.documents) {
+                    val documentDate = document.getDate("date")
+                    val formattedDocumentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(documentDate)
+                    if (formattedDocumentDate == today) {
+                        val id = document.getLong("id")?.toInt()
+                        val personName = document.getString("person_name")
+                        val review = document.getString("review")
+                        val date = document.getDate("date")
+                        val title = document.getString("title")
+                        val rating = document.getDouble("voteAverage")
+                        val posterPath = document.getString("posterPath")
+
+                        if (id == null || personName == null || review == null || date == null || title == null || rating == null || posterPath == null) {
+                            Log.e("FirebaseClient", "Missing fields in daily movie document")
+                            onComplete(null)
+                            return@addOnSuccessListener
+                        }
+
+                        onComplete(MovieOfTheDay(title, rating, review, date.toString(), personName, posterPath))
+                        return@addOnSuccessListener
+                    }
+                }
+                onComplete(null)
+            }
+            .addOnFailureListener {
+                onComplete(null)
+            }
+    }
 }
