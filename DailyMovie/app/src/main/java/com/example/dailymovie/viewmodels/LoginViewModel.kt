@@ -3,24 +3,26 @@ package com.example.dailymovie.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
+import com.example.dailymovie.client.FirebaseClient
 
-class LoginViewModel : ViewModel (){
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+class LoginViewModel : ViewModel() {
     private val _loginStatus = MutableLiveData<Boolean>()
     val loginStatus: LiveData<Boolean> = _loginStatus
 
+    private val _resetPasswordStatus = MutableLiveData<Boolean>()
+    val resetPasswordStatus: LiveData<Boolean> = _resetPasswordStatus
+
     fun loginUser(email: String, password: String) {
-        if (email.isBlank() || password.isBlank()) {
-            _loginStatus.value = false
-            return
+        FirebaseClient.loginUser(email, password) { success ->
+            _loginStatus.value = success
         }
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                _loginStatus.value = task.isSuccessful
-            }
-            .addOnFailureListener {
-                _loginStatus.value = false
-            }
     }
+
+    fun resetPassword(email: String) {
+        FirebaseClient.resetPassword(email) { success ->
+            _resetPasswordStatus.value = success
+        }
+    }
+
+    fun getCurrentUser() = FirebaseClient.getCurrentUser()
 }
