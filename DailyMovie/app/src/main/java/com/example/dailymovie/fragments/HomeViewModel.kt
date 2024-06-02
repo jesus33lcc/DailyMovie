@@ -1,4 +1,4 @@
-package com.example.dailymovie.fragments
+package com.example.dailymovie.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.dailymovie.client.FirebaseClient
 import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.response.MoviesResponse
-import com.example.dailymovie.client.response.NowPlayingMoviesResponse
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.MovieOfTheDay
 import kotlinx.coroutines.Dispatchers
@@ -28,12 +27,10 @@ class HomeViewModel : ViewModel() {
     val upcomingMovies: LiveData<List<MovieModel>> get() = _upcomingMovies
     private val _movieOfTheDay = MutableLiveData<MovieOfTheDay>()
     val movieOfTheDay: LiveData<MovieOfTheDay> get() = _movieOfTheDay
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> get() = _error
 
-    fun fetchNowPlayingMovies(apiKey: String) {
+    fun fetchNowPlayingMovies(apiKey: String, language: String = "es", page: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
-            RetrofitClient.webService.getNowPlayingMovies(apiKey).enqueue(object :
+            RetrofitClient.webService.getNowPlayingMovies(apiKey, language, page).enqueue(object :
                 Callback<MoviesResponse> {
                 override fun onResponse(
                     call: Call<MoviesResponse>,
@@ -51,9 +48,9 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun fetchPopularMovies(apiKey: String) {
+    fun fetchPopularMovies(apiKey: String, language: String = "es", page: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
-            RetrofitClient.webService.getPopularMovies(apiKey).enqueue(object : Callback<MoviesResponse> {
+            RetrofitClient.webService.getPopularMovies(apiKey, language, page).enqueue(object : Callback<MoviesResponse> {
                 override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
                     if (response.isSuccessful) {
                         _popularMovies.postValue(response.body()?.results ?: emptyList())
@@ -66,9 +63,9 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun fetchTopRatedMovies(apiKey: String) {
+    fun fetchTopRatedMovies(apiKey: String, language: String = "es", page: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
-            RetrofitClient.webService.getTopRatedMovies(apiKey).enqueue(object : Callback<MoviesResponse> {
+            RetrofitClient.webService.getTopRatedMovies(apiKey, language, page).enqueue(object : Callback<MoviesResponse> {
                 override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
                     if (response.isSuccessful) {
                         _topRatedMovies.postValue(response.body()?.results ?: emptyList())
@@ -81,9 +78,9 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun fetchUpcomingMovies(apiKey: String) {
+    fun fetchUpcomingMovies(apiKey: String, language: String = "es", page: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
-            RetrofitClient.webService.getUpcomingMovies(apiKey).enqueue(object : Callback<MoviesResponse> {
+            RetrofitClient.webService.getUpcomingMovies(apiKey, language, page).enqueue(object : Callback<MoviesResponse> {
                 override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
                     if (response.isSuccessful) {
                         _upcomingMovies.postValue(response.body()?.results ?: emptyList())

@@ -20,4 +20,9 @@
         android:name="com.example.dailymovie.fragments.ListasF"
         android:label="fragment_listas"
         tools:layout="@layout/fragment_listas" />
+    <fragment
+        android:id="@+id/menu_ajustes"
+        android:name="com.example.dailymovie.fragments.Settings"
+        android:label="fragment_listas"
+        tools:layout="@layout/fragment_settings" />
 </navigation>

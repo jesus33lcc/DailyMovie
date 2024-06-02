@@ -1,18 +1,28 @@
 package com.example.dailymovie.views
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.children
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.dailymovie.R
-import com.example.dailymovie.client.response.MovieDetailsResponse
-import com.example.dailymovie.databinding.ActivityMovieBinding
+import com.example.dailymovie.adapters.*
+import com.example.dailymovie.client.FirebaseClient
+import com.example.dailymovie.client.response.*
 import com.example.dailymovie.models.MovieDetailsModel
 import com.example.dailymovie.models.MovieModel
+import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.viewmodels.MovieViewModel
+import com.example.dailymovie.databinding.ActivityMovieBinding
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 class MovieA : AppCompatActivity() {
 
@@ -24,21 +34,143 @@ class MovieA : AppCompatActivity() {
         binding = ActivityMovieBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val movieModel = intent.getParcelableExtra<MovieModel>("MOVIE")
-        val movieId = movieModel?.id ?: -1
+        val movieId = intent.getIntExtra("MOVIE_ID", -1)
 
         if (movieId != -1) {
-            movieViewModel.setCurrentMovieModel(movieModel!!)
             movieViewModel.fetchMovieDetails(movieId, Constantes.API_KEY, "es")
+            movieViewModel.fetchMovieProviders(movieId, Constantes.API_KEY)
+            movieViewModel.fetchMovieCredits(movieId, Constantes.API_KEY)
+            movieViewModel.fetchMovieVideos(movieId, Constantes.API_KEY)
+            movieViewModel.fetchSimilarMovies(movieId, Constantes.API_KEY, "es")
+            movieViewModel.fetchRecommendedMovies(movieId, Constantes.API_KEY, "es")
+
             movieViewModel.movieDetails.observe(this, Observer { movieDetailsResponse ->
                 movieDetailsResponse?.let {
                     val movieDetails = convertToMovieDetailsModel(it)
                     displayMovieDetails(movieDetails)
-                    setupButtons()
+                    setupButtons(movieDetails)
+                }
+            })
+
+            movieViewModel.movieProviders.observe(this, Observer { providerResponse ->
+                providerResponse?.let {
+                    displayProviders(it)
+                }
+            })
+
+            movieViewModel.movieCredits.observe(this, Observer { creditResponse ->
+                creditResponse?.let {
+                    displayCredits(it)
+                    binding.txtDirectorMovie.text = getDirectorName(it)
+                }
+            })
+
+            movieViewModel.movieVideos.observe(this, Observer { videoList ->
+                videoList?.let {
+                    displayVideos(it)
+                }
+            })
+
+            movieViewModel.similarMovies.observe(this, Observer { similarMovies ->
+                similarMovies?.let {
+                    displaySimilarMovies(it)
+                }
+            })
+
+            movieViewModel.recommendedMovies.observe(this, Observer { recommendedMovies ->
+                recommendedMovies?.let {
+                    displayRecommendedMovies(it)
                 }
             })
         } else {
             showToast("Error: Movie ID is not valid.")
+        }
+    }
+
+    private fun setupButtons(movie: MovieDetailsModel) {
+        val movieModel = MovieModel(
+            id = movie.id,
+            title = movie.title,
+            releaseDate = movie.releaseDate,
+            voteAverage = movie.voteAverage,
+            posterPath = movie.posterPath
+        )
+
+        val btnFavorite: ImageButton = findViewById(R.id.btnFavorite)
+        val btnWatched: ImageButton = findViewById(R.id.btnWatched)
+        val btnAddList: ImageButton = findViewById(R.id.btnAddList)
+        val btnShare: ImageButton = findViewById(R.id.btnShare)
+
+        updateFavoriteButtonIcon(movie.id, btnFavorite)
+        updateWatchedButtonIcon(movie.id, btnWatched)
+
+        btnFavorite.setOnClickListener {
+            movieViewModel.toggleFavorite(movieModel) { isFavorite ->
+                updateFavoriteButtonIcon(movie.id, btnFavorite)
+            }
+        }
+
+        btnWatched.setOnClickListener {
+            movieViewModel.toggleWatched(movieModel) { isWatched ->
+                updateWatchedButtonIcon(movie.id, btnWatched)
+            }
+        }
+        btnAddList.setOnClickListener {
+            showListSelectionDialog(movieModel)
+        }
+        btnShare.setOnClickListener {
+            shareMovie(movieModel)
+        }
+    }
+
+    private fun shareMovie(movie: MovieModel) {
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, "Te recomiendo esta pelicula: ${movie.title}\n${Constantes.BASE_MOVIE_URL}${movie.id}")
+            type = "text/plain"
+        }
+        startActivity(Intent.createChooser(shareIntent, "Compartir pelicula via"))
+    }
+
+    private fun updateFavoriteButtonIcon(movieId: Int, button: ImageButton) {
+        FirebaseClient.isMovieInFavorites(movieId) { isFavorite ->
+            runOnUiThread {
+                val icon = if (isFavorite) R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
+                button.setImageResource(icon)
+            }
+        }
+    }
+
+    private fun updateWatchedButtonIcon(movieId: Int, button: ImageButton) {
+        FirebaseClient.isMovieInWatched(movieId) { isWatched ->
+            runOnUiThread {
+                val icon = if (isWatched) R.drawable.ic_baseline_visibility_24 else R.drawable.ic_baseline_visibility_off_24
+                button.setImageResource(icon)
+            }
+        }
+    }
+
+    private fun showListSelectionDialog(movie: MovieModel) {
+        movieViewModel.getCustomLists { listNames ->
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Seleccionar lista")
+
+            builder.setItems(listNames.toTypedArray()) { dialog, which ->
+                val selectedList = listNames[which]
+                movieViewModel.addMovieToList(selectedList, movie) { success ->
+                    if (success) {
+                        showToast("Película añadida a $selectedList")
+                    } else {
+                        showToast("La película ya está en la lista $selectedList")
+                    }
+                }
+            }
+
+            builder.setNegativeButton("Cancelar") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+            builder.show()
         }
     }
 
@@ -73,10 +205,40 @@ class MovieA : AppCompatActivity() {
 
     private fun displayMovieDetails(movie: MovieDetailsModel) {
         binding.txtTituloMovie.text = movie.title
-        binding.txtDirectorMovie.text = movie.originalTitle
-        binding.txtAnioMovie.text = movie.releaseDate.take(4)
+        binding.txtTaglineMovie.text = movie.tagline
+        binding.txtTaglineMovie.visibility = if (movie.tagline.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+        binding.txtDirectorMovie.text = getDirectorName(movieViewModel.movieCredits.value)
+
+        val releaseYear = movie.releaseDate.take(4)
+        binding.txtAnioLabel.visibility = if (releaseYear.isEmpty()) View.GONE else View.VISIBLE
+        binding.txtAnioMovie.text = releaseYear
+        binding.txtAnioMovie.visibility = if (releaseYear.isEmpty()) View.GONE else View.VISIBLE
+
+        binding.txtValoracionLabel.visibility = if (movie.voteAverage == 0.0) View.GONE else View.VISIBLE
         binding.txtValoracionMovie.text = movie.voteAverage.toString()
-        binding.textDescripcion.text = movie.overview
+        binding.txtValoracionMovie.visibility = if (movie.voteAverage == 0.0) View.GONE else View.VISIBLE
+
+        binding.txtOverviewLabel.visibility = if (movie.overview.isNullOrEmpty()) View.GONE else View.VISIBLE
+        binding.txtOverviewMovie.text = movie.overview
+        binding.txtOverviewMovie.visibility = if (movie.overview.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+        binding.txtGenresLabel.visibility = if (movie.genres.isEmpty()) View.GONE else View.VISIBLE
+        binding.txtGenresMovie.text = movie.genres.joinToString { it.name }
+        binding.txtGenresMovie.visibility = if (movie.genres.isEmpty()) View.GONE else View.VISIBLE
+
+        binding.txtRuntimeLabel.visibility = if (movie.runtime == 0) View.GONE else View.VISIBLE
+        binding.txtRuntimeMovie.text = "${movie.runtime} min"
+        binding.txtRuntimeMovie.visibility = if (movie.runtime == 0) View.GONE else View.VISIBLE
+
+        binding.txtBudgetLabel.visibility = if (movie.budget == 0) View.GONE else View.VISIBLE
+        binding.txtBudgetMovie.text = "${movie.budget} USD"
+        binding.txtBudgetMovie.visibility = if (movie.budget == 0) View.GONE else View.VISIBLE
+
+        binding.txtRevenueLabel.visibility = if (movie.revenue == 0L) View.GONE else View.VISIBLE
+        binding.txtRevenueMovie.text = "${movie.revenue} USD"
+        binding.txtRevenueMovie.visibility = if (movie.revenue == 0L) View.GONE else View.VISIBLE
+
         Glide.with(this)
             .load(Constantes.IMAGE_URL + movie.posterPath)
             .placeholder(R.drawable.ic_baseline_image_24)
@@ -84,49 +246,100 @@ class MovieA : AppCompatActivity() {
             .into(binding.imgPosterMovie)
     }
 
-    private fun setupButtons() {
-        binding.tBtnLikeMovie.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                movieViewModel.addToFavorites { success ->
-                    if (success) {
-                        showToast("Añadido a Favoritos")
-                    } else {
-                        showToast("Ya existe en Favoritos")
-                    }
+    private fun getDirectorName(credits: CreditResponse?): String {
+        credits?.let {
+            it.crew.forEach { crewMember ->
+                if (crewMember.job == "Director") {
+                    return crewMember.name
                 }
-            } else {
-                movieViewModel.removeFromFavorites { success ->
-                    if (success) {
-                        showToast("Eliminado de Favoritos")
-                    } else {
-                        showToast("Error al eliminar de Favoritos")
-                    }
+            }
+            it.cast.forEach { castMember ->
+                if (castMember.character == "Director") {
+                    return castMember.name
                 }
             }
         }
+        return ""
+    }
 
-        binding.tBtnViewMovie.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                movieViewModel.addToWatched { success ->
-                    if (success) {
-                        showToast("Añadido a Vistos")
-                    } else {
-                        showToast("Ya existe en Vistos")
-                    }
-                }
-            } else {
-                movieViewModel.removeFromWatched { success ->
-                    if (success) {
-                        showToast("Eliminado de Vistos")
-                    } else {
-                        showToast("Error al eliminar de Vistos")
-                    }
-                }
-            }
+    private fun displayProviders(providerResponse: ProviderResponse) {
+        val providers = providerResponse.results["ES"]?.flatrate ?: emptyList()
+        if (providers.isNotEmpty()) {
+            val adapter = ProviderAdapter(providers)
+            binding.recyclerViewProviders.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            binding.recyclerViewProviders.adapter = adapter
+            binding.txtProvidersLabel.visibility = View.VISIBLE
+            binding.recyclerViewProviders.visibility = View.VISIBLE
+        } else {
+            binding.txtProvidersLabel.visibility = View.GONE
+            binding.recyclerViewProviders.visibility = View.GONE
+        }
+    }
+
+    private fun displayCredits(creditResponse: CreditResponse) {
+        val cast = creditResponse.cast
+        if (cast.isNotEmpty()) {
+            val adapter = CreditAdapter(cast)
+            binding.recyclerViewCredits.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            binding.recyclerViewCredits.adapter = adapter
+            binding.txtCreditsLabel.visibility = View.VISIBLE
+            binding.recyclerViewCredits.visibility = View.VISIBLE
+        } else {
+            binding.txtCreditsLabel.visibility = View.GONE
+            binding.recyclerViewCredits.visibility = View.GONE
+        }
+    }
+
+    private fun displayVideos(videoList: List<VideoModel>) {
+        if (videoList.isNotEmpty()) {
+            val adapter = VideoAdapter(this, videoList)
+            binding.viewPagerVideos.adapter = adapter
+            binding.txtVideosLabel.visibility = View.VISIBLE
+            binding.viewPagerVideos.visibility = View.VISIBLE
+            binding.txtNoVideos.visibility = View.GONE
+        } else {
+            binding.txtVideosLabel.visibility = View.GONE
+            binding.viewPagerVideos.visibility = View.GONE
+            binding.txtNoVideos.visibility = View.GONE
+        }
+    }
+
+    private fun displaySimilarMovies(similarMovies: List<MovieModel>) {
+        if (similarMovies.isNotEmpty()) {
+            val adapter = NowPlayingAdapter(ArrayList(similarMovies))
+            binding.recyclerViewSimilarMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            binding.recyclerViewSimilarMovies.adapter = adapter
+            binding.txtSimilarMoviesLabel.visibility = View.VISIBLE
+            binding.recyclerViewSimilarMovies.visibility = View.VISIBLE
+        } else {
+            binding.txtSimilarMoviesLabel.visibility = View.GONE
+            binding.recyclerViewSimilarMovies.visibility = View.GONE
+        }
+    }
+
+    private fun displayRecommendedMovies(recommendedMovies: List<MovieModel>) {
+        if (recommendedMovies.isNotEmpty()) {
+            val adapter = NowPlayingAdapter(ArrayList(recommendedMovies))
+            binding.recyclerViewRecommendedMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            binding.recyclerViewRecommendedMovies.adapter = adapter
+            binding.txtRecommendedMoviesLabel.visibility = View.VISIBLE
+            binding.recyclerViewRecommendedMovies.visibility = View.VISIBLE
+        } else {
+            binding.txtRecommendedMoviesLabel.visibility = View.GONE
+            binding.recyclerViewRecommendedMovies.visibility = View.GONE
         }
     }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.viewPagerVideos.children.forEach {
+            if (it is YouTubePlayerView) {
+                it.release()
+            }
+        }
     }
 }

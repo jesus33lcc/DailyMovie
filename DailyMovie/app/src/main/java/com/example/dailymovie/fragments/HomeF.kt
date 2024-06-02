@@ -1,5 +1,6 @@
 package com.example.dailymovie.fragments
 
+import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
@@ -15,12 +16,21 @@ import com.example.dailymovie.adapters.NowPlayingAdapter
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.viewmodels.HomeViewModel
+import com.example.dailymovie.views.MovieA
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class HomeF : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+    private lateinit var youTubePlayerView: YouTubePlayerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,18 +75,32 @@ class HomeF : Fragment() {
         homeViewModel.fetchTopRatedMovies(Constantes.API_KEY)
         homeViewModel.fetchUpcomingMovies(Constantes.API_KEY)
         homeViewModel.fetchMovieOfTheDay()
+
+        youTubePlayerView = binding.youtubePlayerView
+        lifecycle.addObserver(youTubePlayerView)
     }
 
     private fun displayMovieOfTheDay(movie: MovieOfTheDay) {
         binding.movieTitle.text = movie.title
         binding.movieRating.text = "Rating: ${movie.rating}"
         binding.movieReview.text = movie.review
-        binding.movieDate.text = "Fecha: ${movie.date}"
+
+        val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+        binding.movieDate.text = "Fecha: $currentDate"
+
         binding.movieAuthor.text = "Autor: ${movie.author}"
 
-        Glide.with(this)
-            .load(Constantes.IMAGE_URL + movie.posterPath)
-            .into(binding.moviePoster)
+        binding.youtubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+            override fun onReady(youTubePlayer: YouTubePlayer) {
+                youTubePlayer.cueVideo(movie.videoId, 0f)
+            }
+        })
+
+        binding.btnViewFullDetails.setOnClickListener {
+            val intent = Intent(context, MovieA::class.java)
+            intent.putExtra("MOVIE_ID", movie.id)
+            startActivity(intent)
+        }
     }
 
     override fun onDestroyView() {

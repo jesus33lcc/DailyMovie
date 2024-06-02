@@ -18,8 +18,7 @@
             android:minHeight="?attr/actionBarSize"
             android:theme="?attr/actionBarTheme"
             app:title="Explorar"
-            app:titleTextColor="@color/black"
-            app:menu="@menu/toolbar_search_explorar" />
+            app:titleTextColor="@color/black" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvListaBusqueda"
