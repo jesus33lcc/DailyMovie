@@ -13,6 +13,7 @@ import com.example.dailymovie.R
 import com.example.dailymovie.adapters.CustomMovieListAdapter
 import com.example.dailymovie.adapters.ImmutableMovieListAdapter
 import com.example.dailymovie.databinding.ActivityListMoviesBinding
+import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.viewmodels.MovieViewModel
 
@@ -30,6 +31,9 @@ class ListMoviesA : AppCompatActivity() {
         setContentView(binding.root)
 
         listName = intent.getStringExtra("LIST_NAME") ?: ""
+
+        // Set the list name in the TextView
+        binding.listTitle.text = listName
 
         movieList = intent.getParcelableArrayListExtra("MOVIE_LIST") ?: arrayListOf()
         if (listName == "Favoritos" || listName == "Vistos") {
@@ -54,6 +58,7 @@ class ListMoviesA : AppCompatActivity() {
 
         binding.recyclerViewMovies.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewMovies.adapter = movieListAdapter
+        binding.recyclerViewMovies.addItemDecoration(SpacingItemDecoration(spacing = 8))
 
         // Habilitar el swipe para todas las listas
         setupSwipeToDelete(binding.recyclerViewMovies)
