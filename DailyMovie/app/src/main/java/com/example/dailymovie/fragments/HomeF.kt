@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import com.example.dailymovie.R
 import com.example.dailymovie.adapters.NowPlayingAdapter
 import com.example.dailymovie.databinding.FragmentHomeBinding
+import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.viewmodels.HomeViewModel
@@ -46,9 +47,13 @@ class HomeF : Fragment() {
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
         binding.recyclerViewNowPlaying.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewNowPlaying.addItemDecoration(SpacingItemDecoration(spacing = 8))
         binding.recyclerViewPopular.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewPopular.addItemDecoration(SpacingItemDecoration(spacing = 8))
         binding.recyclerViewTopRated.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewTopRated.addItemDecoration(SpacingItemDecoration(spacing = 8))
         binding.recyclerViewUpcoming.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewUpcoming.addItemDecoration(SpacingItemDecoration(spacing = 8))
 
         homeViewModel.nowPlayingMovies.observe(viewLifecycleOwner, Observer { movies ->
             binding.recyclerViewNowPlaying.adapter = NowPlayingAdapter(movies)
@@ -82,13 +87,12 @@ class HomeF : Fragment() {
 
     private fun displayMovieOfTheDay(movie: MovieOfTheDay) {
         binding.movieTitle.text = movie.title
-        binding.movieRating.text = "Rating: ${movie.rating}"
         binding.movieReview.text = movie.review
 
         val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-        binding.movieDate.text = "Fecha: $currentDate"
+        binding.movieDate.text = currentDate
 
-        binding.movieAuthor.text = "Autor: ${movie.author}"
+        binding.movieAuthor.text = movie.author
 
         binding.youtubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
             override fun onReady(youTubePlayer: YouTubePlayer) {
