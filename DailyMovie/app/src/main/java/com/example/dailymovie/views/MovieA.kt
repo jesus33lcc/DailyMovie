@@ -22,6 +22,7 @@ import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.viewmodels.MovieViewModel
 import com.example.dailymovie.databinding.ActivityMovieBinding
+import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 class MovieA : AppCompatActivity() {
@@ -244,6 +245,18 @@ class MovieA : AppCompatActivity() {
             .placeholder(R.drawable.ic_baseline_image_24)
             .error(R.drawable.ic_baseline_image_24)
             .into(binding.imgPosterMovie)
+
+        // Update the visibility of the details section
+        val hasContent = binding.txtDirectorMovie.text.isNotEmpty() ||
+                binding.txtRuntimeMovie.text.isNotEmpty() ||
+                binding.txtAnioMovie.text.isNotEmpty() ||
+                binding.txtValoracionMovie.text.isNotEmpty() ||
+                binding.txtOverviewMovie.text.isNotEmpty() ||
+                binding.txtGenresMovie.text.isNotEmpty() ||
+                binding.txtBudgetMovie.text.isNotEmpty() ||
+                binding.txtRevenueMovie.text.isNotEmpty()
+
+        binding.sectionDetails.visibility = if (hasContent) View.VISIBLE else View.GONE
     }
 
     private fun getDirectorName(credits: CreditResponse?): String {
@@ -268,11 +281,10 @@ class MovieA : AppCompatActivity() {
             val adapter = ProviderAdapter(providers)
             binding.recyclerViewProviders.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewProviders.adapter = adapter
-            binding.txtProvidersLabel.visibility = View.VISIBLE
-            binding.recyclerViewProviders.visibility = View.VISIBLE
+            binding.sectionProviders.visibility = View.VISIBLE
+            binding.recyclerViewProviders.addItemDecoration(SpacingItemDecoration(spacing = 8))
         } else {
-            binding.txtProvidersLabel.visibility = View.GONE
-            binding.recyclerViewProviders.visibility = View.GONE
+            binding.sectionProviders.visibility = View.GONE
         }
     }
 
@@ -282,11 +294,10 @@ class MovieA : AppCompatActivity() {
             val adapter = CreditAdapter(cast)
             binding.recyclerViewCredits.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewCredits.adapter = adapter
-            binding.txtCreditsLabel.visibility = View.VISIBLE
-            binding.recyclerViewCredits.visibility = View.VISIBLE
+            binding.sectionCredits.visibility = View.VISIBLE
+            binding.recyclerViewCredits.addItemDecoration(SpacingItemDecoration(spacing = 8))
         } else {
-            binding.txtCreditsLabel.visibility = View.GONE
-            binding.recyclerViewCredits.visibility = View.GONE
+            binding.sectionCredits.visibility = View.GONE
         }
     }
 
@@ -294,13 +305,9 @@ class MovieA : AppCompatActivity() {
         if (videoList.isNotEmpty()) {
             val adapter = VideoAdapter(this, videoList)
             binding.viewPagerVideos.adapter = adapter
-            binding.txtVideosLabel.visibility = View.VISIBLE
-            binding.viewPagerVideos.visibility = View.VISIBLE
-            binding.txtNoVideos.visibility = View.GONE
+            binding.sectionVideos.visibility = View.VISIBLE
         } else {
-            binding.txtVideosLabel.visibility = View.GONE
-            binding.viewPagerVideos.visibility = View.GONE
-            binding.txtNoVideos.visibility = View.GONE
+            binding.sectionVideos.visibility = View.GONE
         }
     }
 
@@ -309,11 +316,10 @@ class MovieA : AppCompatActivity() {
             val adapter = NowPlayingAdapter(ArrayList(similarMovies))
             binding.recyclerViewSimilarMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewSimilarMovies.adapter = adapter
-            binding.txtSimilarMoviesLabel.visibility = View.VISIBLE
-            binding.recyclerViewSimilarMovies.visibility = View.VISIBLE
+            binding.sectionSimilarMovies.visibility = View.VISIBLE
+            binding.recyclerViewSimilarMovies.addItemDecoration(SpacingItemDecoration(spacing = 8))
         } else {
-            binding.txtSimilarMoviesLabel.visibility = View.GONE
-            binding.recyclerViewSimilarMovies.visibility = View.GONE
+            binding.sectionSimilarMovies.visibility = View.GONE
         }
     }
 
@@ -322,11 +328,10 @@ class MovieA : AppCompatActivity() {
             val adapter = NowPlayingAdapter(ArrayList(recommendedMovies))
             binding.recyclerViewRecommendedMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewRecommendedMovies.adapter = adapter
-            binding.txtRecommendedMoviesLabel.visibility = View.VISIBLE
-            binding.recyclerViewRecommendedMovies.visibility = View.VISIBLE
+            binding.sectionRecommendedMovies.visibility = View.VISIBLE
+            binding.recyclerViewRecommendedMovies.addItemDecoration(SpacingItemDecoration(spacing = 8))
         } else {
-            binding.txtRecommendedMoviesLabel.visibility = View.GONE
-            binding.recyclerViewRecommendedMovies.visibility = View.GONE
+            binding.sectionRecommendedMovies.visibility = View.GONE
         }
     }
 

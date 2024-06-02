@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.adapters.MovieListAdapter
 import com.example.dailymovie.databinding.FragmentListasBinding
+import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.ListaModel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.views.ListMoviesA
@@ -75,6 +76,7 @@ class ListasF : Fragment() {
             }
         }
         binding.misListasCheckFav.adapter = movieListAdapter
+        binding.misListasCheckFav.addItemDecoration(SpacingItemDecoration(spacing = 8))
     }
 
     private fun initializeCustomLists(customLists: MutableList<ListaModel>) {
@@ -84,6 +86,7 @@ class ListasF : Fragment() {
             }
         }
         binding.misListaPersonalizadas.adapter = customListsAdapter
+        binding.misListaPersonalizadas.addItemDecoration(SpacingItemDecoration(spacing = 8))
     }
 
     private fun navigateToMovieList(movieList: List<MovieModel>, listName: String) {
@@ -137,25 +140,23 @@ class ListasF : Fragment() {
                 val position = viewHolder.adapterPosition
                 val list = customListsAdapter.getList()[position]
 
-                // Mostrar dialogo de confirmación
                 val builder = AlertDialog.Builder(requireContext())
                 builder.setTitle("Eliminar lista")
                 builder.setMessage("¿Estás seguro de que deseas eliminar la lista ${list.nombre}?")
                 builder.setPositiveButton("Eliminar") { dialog, which ->
-                    // Eliminar lista de Firebase
                     viewModel.deleteCustomList(list.nombre) { success ->
                         if (success) {
                             customListsAdapter.removeItem(position)
                             Toast.makeText(context, "Lista eliminada exitosamente", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(context, "Error al eliminar la lista", Toast.LENGTH_SHORT).show()
-                            customListsAdapter.notifyItemChanged(position) // Restaurar elemento si la eliminación falla
+                            customListsAdapter.notifyItemChanged(position)
                         }
                     }
                 }
                 builder.setNegativeButton("Cancelar") { dialog, which ->
                     dialog.dismiss()
-                    customListsAdapter.notifyItemChanged(position) // Restaurar elemento si se cancela
+                    customListsAdapter.notifyItemChanged(position)
                 }
                 builder.show()
             }

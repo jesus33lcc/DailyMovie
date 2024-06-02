@@ -1,16 +1,16 @@
 package com.example.dailymovie.fragments
 
 import android.content.Intent
-import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.*
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dailymovie.R
 import com.example.dailymovie.adapters.SearchMovieAdapter
 import com.example.dailymovie.databinding.FragmentExplorarBinding
+import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.viewmodels.ExplorarViewModel
 import com.example.dailymovie.views.MovieA
@@ -29,8 +30,6 @@ class ExplorarF : Fragment() {
     private var _binding: FragmentExplorarBinding? = null
     private val binding get() = _binding!!
     private lateinit var movieAdapter: SearchMovieAdapter
-    private lateinit var toolbarSearch: Toolbar
-    private lateinit var searchViewExplorar: SearchView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentExplorarBinding.inflate(inflater, container, false)
@@ -50,36 +49,21 @@ class ExplorarF : Fragment() {
         }
         binding.rvListaBusqueda.layoutManager = LinearLayoutManager(activity)
         binding.rvListaBusqueda.adapter = movieAdapter
+        binding.rvListaBusqueda.addItemDecoration(SpacingItemDecoration(spacing = 8))
 
-        // Setup Toolbar and SearchView
-        toolbarSearch = binding.myToolbarExplorer
-        toolbarSearch.inflateMenu(R.menu.toolbar_search_explorar)
-        val searchItem: MenuItem = toolbarSearch.menu.findItem(R.id.action_searchExplore)
-        searchViewExplorar = searchItem.actionView as SearchView
-        searchViewExplorar.queryHint = "Buscar titulo..."
-
-        val colorNegro = ContextCompat.getColor(requireContext(), android.R.color.black)
-        val searchEditText: EditText = searchViewExplorar.findViewById(androidx.appcompat.R.id.search_src_text)
-        searchEditText.setTextColor(colorNegro)
-        searchEditText.setHintTextColor(colorNegro)
-        val iconoSearch: Drawable? = searchItem.icon
-        iconoSearch?.setColorFilter(colorNegro, PorterDuff.Mode.SRC_ATOP)
-
-        searchViewExplorar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                searchViewExplorar.clearFocus()
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                if (!newText.isNullOrEmpty() && newText.length > 2) {
-                    buscar(newText)
-                } else if (newText.isNullOrEmpty()) {
+        // Setup Search EditText
+        val searchInput: EditText = binding.searchInput
+        searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!s.isNullOrEmpty() && s.length > 2) {
+                    buscar(s.toString())
+                } else if (s.isNullOrEmpty()) {
                     clearResults()
                     loadHistory()
                 }
-                return true
             }
+            override fun afterTextChanged(s: Editable?) {}
         })
 
         explorarViewModel.movies.observe(viewLifecycleOwner, Observer { movies ->

@@ -10,13 +10,16 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_border_box_big"
+        android:clipToOutline="true"/>
 
     <TextView
         android:id="@+id/txtVideoName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Video Name"
+        android:textStyle="bold"
         android:textAlignment="center"
         android:paddingTop="8dp"
         android:ellipsize="end"

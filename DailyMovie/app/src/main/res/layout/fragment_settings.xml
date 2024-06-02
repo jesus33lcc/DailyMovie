@@ -1,37 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
+    android:background="@color/colorBackground"
     tools:context=".fragments.Settings">
 
-    <Button
-        android:id="@+id/btnClearHistory"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Borrar historial"
-        android:layout_marginBottom="16dp" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/btnChangePassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Cambiar contraseña"
-        android:layout_marginBottom="16dp" />
+        <!-- Encabezado de Ajustes -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="8dp"
+            android:background="@drawable/rounded_border_box_big"
+            android:clipToOutline="true"
+            android:layout_marginBottom="16dp"
+            android:gravity="center">
 
-    <Button
-        android:id="@+id/btnRegion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Región"
-        android:layout_marginBottom="16dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ajustes"
+                android:textSize="24sp"
+                android:fontFamily="@font/courier_bold"
+                android:textAlignment="center"
+                android:textColor="@color/black"/>
+        </LinearLayout>
 
-    <Button
-        android:id="@+id/btnLogout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Cerrar sesión" />
+        <!-- Botones de Ajustes -->
+        <Button
+            android:id="@+id/btnClearHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Borrar historial"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_border_button"
+            android:textColor="@color/white"
+            android:paddingVertical="12dp"
+            android:textStyle="bold"
+            android:textSize="16sp" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btnChangePassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cambiar contraseña"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_border_button"
+            android:textColor="@color/white"
+            android:paddingVertical="12dp"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnRegion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Región"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_border_button"
+            android:textColor="@color/white"
+            android:paddingVertical="12dp"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cerrar sesión"
+            android:background="@drawable/rounded_border_button"
+            android:textColor="@color/white"
+            android:paddingVertical="12dp"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</ScrollView>

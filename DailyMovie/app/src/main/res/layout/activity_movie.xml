@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.MovieA">
+    tools:context=".views.MovieA"
+    android:background="@color/colorBackground">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,35 +18,48 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="0dp">
 
-            <ImageView
-                android:id="@+id/img_poster_movie"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:contentDescription="Póster de la película" />
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true">
 
-            <TextView
-                android:id="@+id/txt_titulo_movie"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textAlignment="center"
-                android:paddingTop="8dp"
-                android:text="" />
+                <ImageView
+                    android:id="@+id/img_poster_movie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="Póster de la película"
+                    android:background="@drawable/image_rounded_border"
+                    android:clipToOutline="true" />
 
-            <TextView
-                android:id="@+id/txt_tagline_movie"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textStyle="italic"
-                android:textAlignment="center"
-                android:paddingTop="4dp"
-                android:text="" />
+                <TextView
+                    android:id="@+id/txt_titulo_movie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:fontFamily="@font/courier_bold"
+                    android:textAlignment="center"
+                    android:paddingTop="8dp"
+                    android:textColor="@color/black"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/txt_tagline_movie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="italic"
+                    android:textAlignment="center"
+                    android:paddingTop="4dp"
+                    android:textColor="@color/black"
+                    android:text="" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -60,279 +74,418 @@
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:background="@drawable/button_background"
+                    android:background="@drawable/rounded_button"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_baseline_favorite_border_24"
                     android:scaleType="centerInside"
                     android:padding="2dp"
-                    android:contentDescription="Favoritos" />
+                    android:contentDescription="Favoritos"
+                    app:tint="@color/white" />
 
                 <ImageButton
                     android:id="@+id/btnWatched"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:background="@drawable/button_background"
+                    android:background="@drawable/rounded_button"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_baseline_visibility_off_24"
                     android:scaleType="centerInside"
                     android:padding="2dp"
-                    android:contentDescription="Vistos" />
+                    android:contentDescription="Vistos"
+                    app:tint="@color/white" />
 
                 <ImageButton
                     android:id="@+id/btnAddList"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:background="@drawable/button_background"
+                    android:background="@drawable/rounded_button"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_baseline_playlist_add_24"
                     android:scaleType="centerInside"
                     android:padding="2dp"
-                    android:contentDescription="Añadir a lista" />
+                    android:contentDescription="Añadir a lista"
+                    app:tint="@color/white" />
 
                 <ImageButton
                     android:id="@+id/btnShare"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:background="@drawable/button_background"
+                    android:background="@drawable/rounded_button"
                     android:src="@drawable/ic_baseline_share_24"
                     android:scaleType="centerInside"
                     android:padding="2dp"
-                    android:contentDescription="Compartir" />
+                    android:contentDescription="Compartir"
+                    app:tint="@color/white" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/txt_director_label"
+            <LinearLayout
+                android:id="@+id/sectionDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Director: "
-                android:paddingTop="8dp" />
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/txt_director_movie"
+                <!-- Director -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:id="@+id/txt_director_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Director: "
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:fontFamily="@font/courier_bold"/>
+
+                    <TextView
+                        android:id="@+id/txt_director_movie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:text=""
+                        android:layout_marginStart="8dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black" />
+                </LinearLayout>
+
+                <!-- Duración y Año -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:id="@+id/txt_runtime_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Duración: "
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_runtime_movie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="16sp"
+                        android:layout_marginStart="8dp"
+                        android:textColor="@color/black" />
+
+                    <TextView
+                        android:id="@+id/txt_anio_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Año: "
+                        android:textSize="16sp"
+                        android:layout_marginStart="24dp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_anio_movie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="16sp"
+                        android:layout_marginStart="8dp"
+                        android:textColor="@color/black" />
+                </LinearLayout>
+
+                <!-- Valoración -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:id="@+id/txt_valoracion_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Valoración: "
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_valoracion_movie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="16sp"
+                        android:layout_marginStart="8dp"
+                        android:textColor="@color/black" />
+                </LinearLayout>
+
+                <!-- Descripción -->
+                <TextView
+                    android:id="@+id/txt_overview_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Descripción: "
+                    android:textSize="20sp"
+                    android:paddingTop="8dp"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/courier_bold"/>
+
+                <TextView
+                    android:id="@+id/txt_overview_movie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="15sp"
+                    android:paddingTop="8dp"
+                    android:justificationMode="inter_word"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"/>
+
+                <!-- Géneros -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:id="@+id/txt_genres_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Géneros: "
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_genres_movie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:layout_marginStart="8dp"
+                        android:textColor="@color/black" />
+                </LinearLayout>
+
+                <!-- Presupuesto -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:id="@+id/txt_budget_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Presupuesto: "
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_budget_movie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="16sp"
+                        android:layout_marginStart="8dp"
+                        android:textColor="@color/black" />
+                </LinearLayout>
+
+                <!-- Recaudación -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:id="@+id/txt_revenue_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Recaudación: "
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_revenue_movie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:layout_marginStart="8dp"
+                        android:textColor="@color/black" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Sección Proveedores -->
+            <LinearLayout
+                android:id="@+id/sectionProviders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:paddingTop="8dp" />
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/txt_anio_label"
+                <TextView
+                    android:id="@+id/txtProvidersLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Proveedores"
+                    android:fontFamily="@font/courier_bold"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="6dp"
+                    android:visibility="visible"
+                    android:textColor="@color/black" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewProviders"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:scrollbars="horizontal"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+            <!-- Sección Reparto -->
+            <LinearLayout
+                android:id="@+id/sectionCredits"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Año: "
-                android:paddingTop="4dp" />
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/txt_anio_movie"
+                <TextView
+                    android:id="@+id/txtCreditsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reparto"
+                    android:fontFamily="@font/courier_bold"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="6dp"
+                    android:visibility="visible"
+                    android:textColor="@color/black" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewCredits"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:scrollbars="horizontal"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+            <!-- Sección Videos -->
+            <LinearLayout
+                android:id="@+id/sectionVideos"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:paddingTop="4dp" />
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/txt_valoracion_label"
+                <TextView
+                    android:id="@+id/txtVideoTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Videos"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="6dp"
+                    android:fontFamily="@font/courier_bold"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:textColor="@color/black" />
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/viewPagerVideos"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+            <!-- Sección Películas Similares -->
+            <LinearLayout
+                android:id="@+id/sectionSimilarMovies"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Valoración: "
-                android:paddingTop="4dp" />
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/txt_valoracion_movie"
+                <TextView
+                    android:id="@+id/txtSimilarMoviesLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Similares"
+                    android:fontFamily="@font/courier_bold"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="6dp"
+                    android:visibility="visible"
+                    android:textColor="@color/black" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewSimilarMovies"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:scrollbars="horizontal"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+            <!-- Sección Películas Recomendadas -->
+            <LinearLayout
+                android:id="@+id/sectionRecommendedMovies"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:paddingTop="4dp" />
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/txt_overview_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Descripción: "
-                android:paddingTop="8dp" />
+                <TextView
+                    android:id="@+id/txtRecommendedMoviesLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recomendadas"
+                    android:fontFamily="@font/courier_bold"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="6dp"
+                    android:visibility="visible"
+                    android:textColor="@color/black" />
 
-            <TextView
-                android:id="@+id/txt_overview_movie"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:paddingTop="8dp"
-                android:justificationMode="inter_word" />
-
-            <TextView
-                android:id="@+id/txt_genres_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Géneros: "
-                android:paddingTop="4dp" />
-
-            <TextView
-                android:id="@+id/txt_genres_movie"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:paddingTop="4dp" />
-
-            <TextView
-                android:id="@+id/txt_runtime_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Duración: "
-                android:paddingTop="4dp" />
-
-            <TextView
-                android:id="@+id/txt_runtime_movie"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:paddingTop="4dp" />
-
-            <TextView
-                android:id="@+id/txt_budget_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Presupuesto: "
-                android:paddingTop="4dp" />
-
-            <TextView
-                android:id="@+id/txt_budget_movie"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:paddingTop="4dp" />
-
-            <TextView
-                android:id="@+id/txt_revenue_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Recaudación: "
-                android:paddingTop="4dp" />
-
-            <TextView
-                android:id="@+id/txt_revenue_movie"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:paddingTop="4dp" />
-
-            <TextView
-                android:id="@+id/txtProvidersLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Proveedores"
-                android:textSize="24sp"
-                android:paddingTop="16dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewProviders"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:scrollbars="horizontal"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/txtNoProviders"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Actualmente no hay proveedores"
-                android:textAlignment="center"
-                android:visibility="gone"
-                android:textSize="18sp"
-                android:paddingTop="16dp" />
-
-            <TextView
-                android:id="@+id/txtCreditsLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Reparto"
-                android:textSize="24sp"
-                android:paddingTop="16dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewCredits"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:scrollbars="horizontal"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/txtNoCredits"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Actualmente no hay créditos"
-                android:textAlignment="center"
-                android:visibility="gone"
-                android:textSize="18sp"
-                android:paddingTop="16dp" />
-
-            <TextView
-                android:id="@+id/txtVideosLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Videos"
-                android:textSize="24sp"
-                android:paddingTop="16dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone" />
-
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewPagerVideos"
-                android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/txtNoVideos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Actualmente no hay videos"
-                android:textAlignment="center"
-                android:visibility="gone"
-                android:textSize="18sp"
-                android:paddingTop="16dp" />
-
-            <TextView
-                android:id="@+id/txtSimilarMoviesLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Películas Similares"
-                android:textSize="24sp"
-                android:paddingTop="16dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewSimilarMovies"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:scrollbars="horizontal"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/txtRecommendedMoviesLabel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Películas Recomendadas"
-                android:textSize="24sp"
-                android:paddingTop="16dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewRecommendedMovies"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:scrollbars="horizontal"
-                android:visibility="gone" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewRecommendedMovies"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:scrollbars="horizontal"
+                    android:visibility="visible" />
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

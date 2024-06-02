@@ -199,16 +199,15 @@ object FirebaseClient {
                         val review = document.getString("review")
                         val date = document.getDate("date")
                         val title = document.getString("title")
-                        val rating = document.getDouble("voteAverage")
                         val videoId = document.getString("videoId")
 
-                        if (id == null || personName == null || review == null || date == null || title == null || rating == null || videoId == null) {
+                        if (id == null || personName == null || review == null || date == null || title == null || videoId == null) {
                             Log.e("FirebaseClient", "Missing fields in daily movie document")
                             onComplete(null)
                             return@addOnSuccessListener
                         }
 
-                        onComplete(MovieOfTheDay(id, title, rating, review, date.toString(), personName, videoId))
+                        onComplete(MovieOfTheDay(id, title, review, date.toString(), personName, videoId))
                         return@addOnSuccessListener
                     }
                 }
