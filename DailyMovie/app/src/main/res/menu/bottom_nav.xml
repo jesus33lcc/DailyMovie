@@ -14,4 +14,8 @@
         android:id="@+id/menu_listas"
         android:icon="@drawable/ic_baseline_format_list_bulleted_24"
         android:title="Listas" />
+    <item
+        android:id="@+id/menu_ajustes"
+        android:icon="@drawable/ic_baseline_settings_24"
+        android:title="Ajustes" />
 </menu>

@@ -12,7 +12,20 @@
           "package_name": "com.example.dailymovie"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1001027592941-ebo6aa3ls6nptdeh84uj7vaemruh59vn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dailymovie",
+            "certificate_hash": "b8c27d6cfd838d6718aecc84e629c0aff9e3965d"
+          }
+        },
+        {
+          "client_id": "1001027592941-h0uj8ubjvu43js3q9a6kntc0lbkmemje.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAErbsldlR_G88Xppx35os_DSSlS5Ec0z8"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1001027592941-h0uj8ubjvu43js3q9a6kntc0lbkmemje.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

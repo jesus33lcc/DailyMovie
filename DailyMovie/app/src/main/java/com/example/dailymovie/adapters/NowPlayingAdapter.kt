@@ -36,7 +36,7 @@ class NowPlayingAdapter(private val movies: List<MovieModel>) :
             binding.root.setOnClickListener {
                 val context = binding.root.context
                 val intent = Intent(context, MovieA::class.java).apply {
-                    putExtra("MOVIE", movie)
+                    putExtra("MOVIE_ID", movie.id)
                 }
                 context.startActivity(intent)
             }

@@ -70,8 +70,10 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment:2.7.7")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
-
-    runtimeOnly("org.jetbrains.kotlin:kotlin-parcelize-runtime:1.9.24")
+    // YouTube
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
+    // Imagenes
+    implementation("com.davemorrissey.labs:subsampling-scale-image-view:3.10.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

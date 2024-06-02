@@ -1,6 +1,5 @@
 package com.example.dailymovie.adapters
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,12 +10,11 @@ import com.bumptech.glide.Glide
 import com.example.dailymovie.R
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.utils.Constantes
-import com.example.dailymovie.views.MovieA
 
-class MovieAdapter(
+class SearchMovieAdapter(
     var listMovies: ArrayList<MovieModel>,
     private val onMovieClick: (MovieModel) -> Unit
-) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
+) : RecyclerView.Adapter<SearchMovieAdapter.MovieViewHolder>() {
 
     class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.txt_titleMovie)
@@ -50,7 +48,7 @@ class MovieAdapter(
         return listMovies.size
     }
 
-    fun updateMoviesList(newMoviesList: ArrayList<MovieModel>) {
+    fun updateMoviesList(newMoviesList: List<MovieModel>) {
         listMovies.clear()
         listMovies.addAll(newMoviesList)
         notifyDataSetChanged()

@@ -1,6 +1,5 @@
 package com.example.dailymovie.adapters
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,12 +10,12 @@ import com.bumptech.glide.Glide
 import com.example.dailymovie.R
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.utils.Constantes
-import com.example.dailymovie.views.MovieA
 
-class MovieAdapter(
-    var listMovies: ArrayList<MovieModel>,
-    private val onMovieClick: (MovieModel) -> Unit
-) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
+class ImmutableMovieListAdapter(
+    private val movies: MutableList<MovieModel>,
+    private val onMovieClick: (MovieModel) -> Unit,
+    private val onMovieDelete: (MovieModel) -> Unit
+) : RecyclerView.Adapter<ImmutableMovieListAdapter.MovieViewHolder>() {
 
     class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.txt_titleMovie)
@@ -31,7 +30,7 @@ class MovieAdapter(
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
-        val movie = listMovies[position]
+        val movie = movies[position]
         holder.title.text = movie.title
         holder.year.text = movie.releaseDate.take(4)
         holder.rating.text = "Rating: ${movie.voteAverage}"
@@ -44,15 +43,23 @@ class MovieAdapter(
         holder.itemView.setOnClickListener {
             onMovieClick(movie)
         }
+
+        holder.itemView.setOnLongClickListener {
+            onMovieDelete(movie)
+            true
+        }
     }
 
     override fun getItemCount(): Int {
-        return listMovies.size
+        return movies.size
     }
 
-    fun updateMoviesList(newMoviesList: ArrayList<MovieModel>) {
-        listMovies.clear()
-        listMovies.addAll(newMoviesList)
-        notifyDataSetChanged()
+    fun getMovieAt(position: Int): MovieModel {
+        return movies[position]
+    }
+
+    fun removeItem(position: Int) {
+        movies.removeAt(position)
+        notifyItemRemoved(position)
     }
 }

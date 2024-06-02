@@ -14,8 +14,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="DailyMovie"
-            android:textSize="24sp"
-            android:padding="16dp" />
+            android:textSize="33sp"
+            android:paddingTop="16dp"
+            android:paddingHorizontal="16dp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:id="@+id/movieOfTheDayContainer"
@@ -24,24 +26,25 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <ImageView
-                android:id="@+id/moviePoster"
+            <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+                android:id="@+id/youtubePlayerView"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop" />
+                android:layout_height="250dp"
+                android:layout_marginBottom="16dp"/>
 
             <TextView
                 android:id="@+id/movieTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:padding="8dp" />
+                android:textSize="24sp"
+                android:padding="8dp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/movieRating"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:padding="8dp" />
 
             <TextView
@@ -49,7 +52,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:padding="8dp" />
+                android:padding="8dp"
+                android:justificationMode="inter_word" />
 
             <TextView
                 android:id="@+id/movieDate"
@@ -64,15 +68,29 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:padding="8dp" />
-        </LinearLayout>
 
+            <Button
+                android:id="@+id/btnViewFullDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:backgroundTint="@color/black"
+                android:text="Ver ficha completa"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:background="@drawable/rounded_button" />
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Películas en cartelera"
             android:textSize="20sp"
-            android:padding="16dp" />
+            android:padding="16dp"
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewNowPlaying"
@@ -87,7 +105,8 @@
             android:layout_height="wrap_content"
             android:text="Películas populares"
             android:textSize="20sp"
-            android:padding="16dp" />
+            android:padding="16dp"
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewPopular"
@@ -102,7 +121,8 @@
             android:layout_height="wrap_content"
             android:text="Películas mejor valoradas"
             android:textSize="20sp"
-            android:padding="16dp" />
+            android:padding="16dp"
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewTopRated"
@@ -117,7 +137,8 @@
             android:layout_height="wrap_content"
             android:text="Próximamente"
             android:textSize="20sp"
-            android:padding="16dp" />
+            android:padding="16dp"
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewUpcoming"
