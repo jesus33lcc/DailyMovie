@@ -45,7 +45,7 @@ class Settings : Fragment() {
         }
 
         binding.btnRegion.setOnClickListener {
-            // Acción para cambiar la región
+
         }
 
         binding.btnLogout.setOnClickListener {

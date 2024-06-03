@@ -42,7 +42,19 @@
                 android:paddingEnd="8dp"
                 android:textStyle="bold"
                 android:layout_gravity="center_vertical"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:inputType="text"
+                android:imeOptions="actionSearch" />
+
+            <ImageView
+                android:id="@+id/clear_search_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_clear_24"
+                android:layout_gravity="center_vertical"
+                android:visibility="gone"
+                android:paddingStart="8dp"
+                app:tint="@color/black" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

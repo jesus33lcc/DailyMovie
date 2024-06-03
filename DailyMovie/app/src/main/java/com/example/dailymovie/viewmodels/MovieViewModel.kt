@@ -9,6 +9,7 @@ import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.response.*
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
+import com.example.dailymovie.utils.LocaleUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -47,12 +48,12 @@ class MovieViewModel : ViewModel() {
                         if (response.isSuccessful) {
                             _movieDetails.value = response.body()
                         } else {
-                            // Manejar error
+
                         }
                     }
 
                     override fun onFailure(call: Call<MovieDetailsResponse>, t: Throwable) {
-                        // Manejar fallo
+
                     }
                 })
         }
@@ -66,12 +67,12 @@ class MovieViewModel : ViewModel() {
                         if (response.isSuccessful) {
                             _movieProviders.value = response.body()
                         } else {
-                            // Manejar error
+
                         }
                     }
 
                     override fun onFailure(call: Call<ProviderResponse>, t: Throwable) {
-                        // Manejar fallo
+
                     }
                 })
         }
@@ -85,19 +86,19 @@ class MovieViewModel : ViewModel() {
                         if (response.isSuccessful) {
                             _movieCredits.value = response.body()
                         } else {
-                            // Manejar error
+
                         }
                     }
 
                     override fun onFailure(call: Call<CreditResponse>, t: Throwable) {
-                        // Manejar fallo
+
                     }
                 })
         }
     }
 
     fun fetchMovieVideos(movieId: Int, apiKey: String) {
-        RetrofitClient.webService.getMovieVideos(movieId, apiKey, "es").enqueue(object : Callback<VideoResponse> {
+        RetrofitClient.webService.getMovieVideos(movieId, apiKey, LocaleUtil.getLanguageAndCountry()).enqueue(object : Callback<VideoResponse> {
             override fun onResponse(call: Call<VideoResponse>, response: Response<VideoResponse>) {
                 val spanishVideos = response.body()?.results ?: emptyList()
                 val sortedSpanishVideos = sortVideos(spanishVideos)
@@ -118,7 +119,7 @@ class MovieViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<VideoResponse>, t: Throwable) {
-                // Handle failure for Spanish videos
+
             }
         })
     }
@@ -139,7 +140,7 @@ class MovieViewModel : ViewModel() {
                 }
 
                 override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-                    // Handle failure
+
                 }
             })
         }
@@ -155,7 +156,7 @@ class MovieViewModel : ViewModel() {
                 }
 
                 override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-                    // Handle failure
+
                 }
             })
         }

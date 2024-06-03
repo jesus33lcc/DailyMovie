@@ -17,7 +17,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Caja para listas fijas -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -54,7 +53,6 @@
                     tools:listitem="@layout/item_lista_list" />
             </LinearLayout>
 
-            <!-- Caja para listas personalizadas -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

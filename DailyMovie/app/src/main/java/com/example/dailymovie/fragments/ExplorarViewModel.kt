@@ -8,6 +8,7 @@ import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.response.MoviesResponse
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.utils.LocaleUtil
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,7 +22,7 @@ class ExplorarViewModel : ViewModel() {
     val history: LiveData<List<MovieModel>> get() = _history
 
     fun searchMovies(query: String) {
-        RetrofitClient.webService.searchMovies(query, Constantes.API_KEY, true, "es", 1)
+        RetrofitClient.webService.searchMovies(query, Constantes.API_KEY, true, LocaleUtil.getLanguageAndCountry(), 1)
             .enqueue(object : Callback<MoviesResponse> {
                 override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
                     if (response.isSuccessful) {
@@ -39,7 +40,6 @@ class ExplorarViewModel : ViewModel() {
 
     fun addToHistory(movie: MovieModel) {
         FirebaseClient.addToHistory(movie) { success ->
-            // Handle the result if needed
         }
     }
 
