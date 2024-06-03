@@ -48,7 +48,7 @@ object FirebaseClient {
                         .addOnSuccessListener { onComplete(true) }
                         .addOnFailureListener { onComplete(false) }
                 } else {
-                    onComplete(false) // La película ya está en favoritos
+                    onComplete(false)
                 }
             } else {
                 userDocRef.set(mapOf("favorites" to listOf(movie)))
@@ -72,10 +72,10 @@ object FirebaseClient {
                         .addOnSuccessListener { onComplete(true) }
                         .addOnFailureListener { onComplete(false) }
                 } else {
-                    onComplete(false) // La película no está en favoritos
+                    onComplete(false)
                 }
             } else {
-                onComplete(false) // El documento no existe
+                onComplete(false)
             }
         }.addOnFailureListener {
             onComplete(false)
@@ -94,7 +94,7 @@ object FirebaseClient {
                         .addOnSuccessListener { onComplete(true) }
                         .addOnFailureListener { onComplete(false) }
                 } else {
-                    onComplete(false) // La película ya está en vistos
+                    onComplete(false)
                 }
             } else {
                 userDocRef.set(mapOf("watched" to listOf(movie)))
@@ -118,10 +118,10 @@ object FirebaseClient {
                         .addOnSuccessListener { onComplete(true) }
                         .addOnFailureListener { onComplete(false) }
                 } else {
-                    onComplete(false) // La película no está en vistos
+                    onComplete(false)
                 }
             } else {
-                onComplete(false) // El documento no existe
+                onComplete(false)
             }
         }.addOnFailureListener {
             onComplete(false)
@@ -202,7 +202,7 @@ object FirebaseClient {
                         val videoId = document.getString("videoId")
 
                         if (id == null || personName == null || review == null || date == null || title == null || videoId == null) {
-                            Log.e("FirebaseClient", "Missing fields in daily movie document")
+                            Log.e("FirebaseClient", "Faltan Datos")
                             onComplete(null)
                             return@addOnSuccessListener
                         }
@@ -317,7 +317,7 @@ object FirebaseClient {
                         .addOnSuccessListener { onComplete(true) }
                         .addOnFailureListener { onComplete(false) }
                 } else {
-                    onComplete(false) // La película ya está en la lista
+                    onComplete(false)
                 }
             } else {
                 listRef.set(mapOf("movies" to listOf(movie)))
@@ -350,7 +350,7 @@ object FirebaseClient {
 
         listRef.get().addOnSuccessListener { document ->
             if (document.exists()) {
-                onComplete(false) // La lista ya existe
+                onComplete(false)
             } else {
                 listRef.set(mapOf("movies" to emptyList<MovieModel>()))
                     .addOnSuccessListener { onComplete(true) }
@@ -370,7 +370,7 @@ object FirebaseClient {
                         .addOnSuccessListener { onComplete(true) }
                         .addOnFailureListener { onComplete(false) }
                 } else {
-                    onComplete(true) // La película ya está en el historial, no es un error
+                    onComplete(true)
                 }
             } else {
                 userDocRef.set(mapOf("history" to listOf(movie)))

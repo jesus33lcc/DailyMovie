@@ -1,15 +1,21 @@
 package com.example.dailymovie.fragments
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -39,7 +45,6 @@ class ExplorarF : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Setup RecyclerView
         movieAdapter = SearchMovieAdapter(arrayListOf()) { movie ->
             explorarViewModel.addToHistory(movie)
             val intent = Intent(activity, MovieA::class.java).apply {
@@ -51,11 +56,13 @@ class ExplorarF : Fragment() {
         binding.rvListaBusqueda.adapter = movieAdapter
         binding.rvListaBusqueda.addItemDecoration(SpacingItemDecoration(spacing = 8))
 
-        // Setup Search EditText
         val searchInput: EditText = binding.searchInput
+        val clearSearchIcon: ImageView = binding.clearSearchIcon
+
         searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                clearSearchIcon.visibility = if (!s.isNullOrEmpty()) View.VISIBLE else View.GONE
                 if (!s.isNullOrEmpty() && s.length > 2) {
                     buscar(s.toString())
                 } else if (s.isNullOrEmpty()) {
@@ -65,6 +72,26 @@ class ExplorarF : Fragment() {
             }
             override fun afterTextChanged(s: Editable?) {}
         })
+
+        searchInput.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || event?.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER) {
+                val query = searchInput.text.toString()
+                if (query.isNotEmpty()) {
+                    buscar(query)
+                    hideKeyboard()
+                }
+                true
+            } else {
+                false
+            }
+        }
+
+        clearSearchIcon.setOnClickListener {
+            searchInput.text.clear()
+            clearResults()
+            loadHistory()
+            hideKeyboard()
+        }
 
         explorarViewModel.movies.observe(viewLifecycleOwner, Observer { movies ->
             updateUIWithResults(movies)
@@ -93,14 +120,13 @@ class ExplorarF : Fragment() {
         }
     }
 
-    private fun showToast(message: String) {
-        Handler(Looper.getMainLooper()).post {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-        }
-    }
-
     private fun clearResults() {
         movieAdapter.updateMoviesList(emptyList())
+    }
+
+    private fun hideKeyboard() {
+        val imm = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.searchInput.windowToken, 0)
     }
 
     override fun onDestroyView() {
