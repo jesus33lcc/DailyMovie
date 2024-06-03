@@ -23,7 +23,6 @@ import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.viewmodels.MovieViewModel
 import com.example.dailymovie.databinding.ActivityMovieBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
-import com.example.dailymovie.utils.LocaleUtil
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 class MovieA : AppCompatActivity() {
@@ -39,12 +38,12 @@ class MovieA : AppCompatActivity() {
         val movieId = intent.getIntExtra("MOVIE_ID", -1)
 
         if (movieId != -1) {
-            movieViewModel.fetchMovieDetails(movieId, Constantes.API_KEY, LocaleUtil.getLanguageAndCountry())
+            movieViewModel.fetchMovieDetails(movieId, Constantes.API_KEY, "es")
             movieViewModel.fetchMovieProviders(movieId, Constantes.API_KEY)
             movieViewModel.fetchMovieCredits(movieId, Constantes.API_KEY)
             movieViewModel.fetchMovieVideos(movieId, Constantes.API_KEY)
-            movieViewModel.fetchSimilarMovies(movieId, Constantes.API_KEY, LocaleUtil.getLanguageAndCountry())
-            movieViewModel.fetchRecommendedMovies(movieId, Constantes.API_KEY, LocaleUtil.getLanguageAndCountry())
+            movieViewModel.fetchSimilarMovies(movieId, Constantes.API_KEY, "es")
+            movieViewModel.fetchRecommendedMovies(movieId, Constantes.API_KEY, "es")
 
             movieViewModel.movieDetails.observe(this, Observer { movieDetailsResponse ->
                 movieDetailsResponse?.let {
@@ -85,7 +84,7 @@ class MovieA : AppCompatActivity() {
                 }
             })
         } else {
-            showToast("Error: El Id de la pelicula no es valido.")
+            showToast("Error: Movie ID is not valid.")
         }
     }
 
@@ -247,6 +246,7 @@ class MovieA : AppCompatActivity() {
             .error(R.drawable.ic_baseline_image_24)
             .into(binding.imgPosterMovie)
 
+        // Update the visibility of the details section
         val hasContent = binding.txtDirectorMovie.text.isNotEmpty() ||
                 binding.txtRuntimeMovie.text.isNotEmpty() ||
                 binding.txtAnioMovie.text.isNotEmpty() ||

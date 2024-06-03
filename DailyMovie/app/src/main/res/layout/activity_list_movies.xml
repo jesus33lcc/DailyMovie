@@ -7,6 +7,7 @@
     android:background="@color/colorBackground"
     tools:context=".views.ListMoviesA">
 
+    <!-- Caja para el título -->
     <LinearLayout
         android:id="@+id/titleContainer"
         android:layout_width="match_parent"
@@ -30,6 +31,7 @@
             android:text="Nombre de la Lista" />
     </LinearLayout>
 
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewMovies"
         android:layout_width="0dp"

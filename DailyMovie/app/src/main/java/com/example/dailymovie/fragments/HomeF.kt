@@ -70,9 +70,9 @@ class HomeF : Fragment() {
 
         homeViewModel.movieOfTheDay.observe(viewLifecycleOwner, Observer { movie ->
             movie?.let {
-                Log.d("HomeF", "La pelicula del dia es: ${it.title}")
+                Log.d("HomeF", "Movie of the day: ${it.title}")
                 displayMovieOfTheDay(it)
-            } ?: Log.d("HomeF", "No hay pelicula del dia")
+            } ?: Log.d("HomeF", "Movie of the day is null")
         })
 
         homeViewModel.fetchNowPlayingMovies(Constantes.API_KEY)

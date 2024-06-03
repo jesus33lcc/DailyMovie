@@ -21,7 +21,7 @@ class ListMoviesA : AppCompatActivity() {
 
     private val movieViewModel: MovieViewModel by viewModels()
     private lateinit var binding: ActivityListMoviesBinding
-    private lateinit var movieListAdapter: CustomMovieListAdapter
+    private lateinit var movieListAdapter: RecyclerView.Adapter<*>
     private lateinit var listName: String
     private var movieList: ArrayList<MovieModel> = arrayListOf()
 
@@ -32,17 +32,18 @@ class ListMoviesA : AppCompatActivity() {
 
         listName = intent.getStringExtra("LIST_NAME") ?: ""
 
+        // Set the list name in the TextView
         binding.listTitle.text = listName
 
         movieList = intent.getParcelableArrayListExtra("MOVIE_LIST") ?: arrayListOf()
         if (listName == "Favoritos" || listName == "Vistos") {
-            movieListAdapter = CustomMovieListAdapter(movieList.toMutableList(), { movie ->
+            movieListAdapter = ImmutableMovieListAdapter(movieList.toMutableList(), { movie ->
                 val intent = Intent(this, MovieA::class.java).apply {
                     putExtra("MOVIE_ID", movie.id)
                 }
                 startActivity(intent)
-            }, { movie, position ->
-                showDeleteConfirmationDialog(movie, position)
+            }, { movie ->
+                showDeleteConfirmationDialog(movie)
             })
         } else {
             movieListAdapter = CustomMovieListAdapter(movieList.toMutableList(), { movie ->
@@ -50,8 +51,8 @@ class ListMoviesA : AppCompatActivity() {
                     putExtra("MOVIE_ID", movie.id)
                 }
                 startActivity(intent)
-            }, { movie, position ->
-                showDeleteConfirmationDialog(movie, position)
+            }, { movie ->
+                showDeleteConfirmationDialog(movie)
             })
         }
 
@@ -59,6 +60,7 @@ class ListMoviesA : AppCompatActivity() {
         binding.recyclerViewMovies.adapter = movieListAdapter
         binding.recyclerViewMovies.addItemDecoration(SpacingItemDecoration(spacing = 8))
 
+        // Habilitar el swipe para todas las listas
         setupSwipeToDelete(binding.recyclerViewMovies)
     }
 
@@ -91,8 +93,8 @@ class ListMoviesA : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val movie = movieListAdapter.getMovieAt(position)
-                showDeleteConfirmationDialog(movie, position)
+                val movie = movieList[position]
+                showDeleteConfirmationDialog(movie)
             }
         }
 
@@ -100,7 +102,7 @@ class ListMoviesA : AppCompatActivity() {
         itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
-    private fun showDeleteConfirmationDialog(movie: MovieModel, position: Int) {
+    private fun showDeleteConfirmationDialog(movie: MovieModel) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Eliminar película")
         builder.setMessage("¿Estás seguro de que deseas eliminar la película ${movie.title} de la lista $listName?")
@@ -109,40 +111,40 @@ class ListMoviesA : AppCompatActivity() {
                 movieViewModel.toggleFavorite(movie) { success ->
                     if (success) {
                         movieList.remove(movie)
-                        movieListAdapter.removeItem(position)
+                        movieListAdapter.notifyDataSetChanged()
                         Toast.makeText(this, "Película eliminada de Favoritos", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(this, "Error al eliminar la película", Toast.LENGTH_SHORT).show()
-                        movieListAdapter.notifyItemChanged(position)
+                        movieListAdapter.notifyItemChanged(movieList.indexOf(movie))
                     }
                 }
             } else if (listName == "Vistos") {
                 movieViewModel.toggleWatched(movie) { success ->
                     if (success) {
                         movieList.remove(movie)
-                        movieListAdapter.removeItem(position)
+                        movieListAdapter.notifyDataSetChanged()
                         Toast.makeText(this, "Película eliminada de Vistos", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(this, "Error al eliminar la película", Toast.LENGTH_SHORT).show()
-                        movieListAdapter.notifyItemChanged(position)
+                        movieListAdapter.notifyItemChanged(movieList.indexOf(movie))
                     }
                 }
             } else {
                 movieViewModel.removeMovieFromList(listName, movie) { success ->
                     if (success) {
                         movieList.remove(movie)
-                        movieListAdapter.removeItem(position)
+                        movieListAdapter.notifyDataSetChanged()
                         Toast.makeText(this, "Película eliminada de $listName", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(this, "Error al eliminar la película", Toast.LENGTH_SHORT).show()
-                        movieListAdapter.notifyItemChanged(position)
+                        movieListAdapter.notifyItemChanged(movieList.indexOf(movie))
                     }
                 }
             }
         }
         builder.setNegativeButton("Cancelar") { dialog, _ ->
             dialog.dismiss()
-            movieListAdapter.notifyItemChanged(position)
+            movieListAdapter.notifyItemChanged(movieList.indexOf(movie))
         }
         builder.show()
     }
