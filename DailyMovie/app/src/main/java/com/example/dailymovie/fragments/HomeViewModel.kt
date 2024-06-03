@@ -9,6 +9,7 @@ import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.response.MoviesResponse
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.MovieOfTheDay
+import com.example.dailymovie.utils.LocaleUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -28,7 +29,7 @@ class HomeViewModel : ViewModel() {
     private val _movieOfTheDay = MutableLiveData<MovieOfTheDay>()
     val movieOfTheDay: LiveData<MovieOfTheDay> get() = _movieOfTheDay
 
-    fun fetchNowPlayingMovies(apiKey: String, language: String = "es", page: Int = 1) {
+    fun fetchNowPlayingMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
             RetrofitClient.webService.getNowPlayingMovies(apiKey, language, page).enqueue(object :
                 Callback<MoviesResponse> {
@@ -42,13 +43,13 @@ class HomeViewModel : ViewModel() {
                 }
 
                 override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-                    // Handle failure
+
                 }
             })
         }
     }
 
-    fun fetchPopularMovies(apiKey: String, language: String = "es", page: Int = 1) {
+    fun fetchPopularMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
             RetrofitClient.webService.getPopularMovies(apiKey, language, page).enqueue(object : Callback<MoviesResponse> {
                 override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
@@ -57,13 +58,13 @@ class HomeViewModel : ViewModel() {
                     }
                 }
                 override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-                    // Handle failure
+
                 }
             })
         }
     }
 
-    fun fetchTopRatedMovies(apiKey: String, language: String = "es", page: Int = 1) {
+    fun fetchTopRatedMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
             RetrofitClient.webService.getTopRatedMovies(apiKey, language, page).enqueue(object : Callback<MoviesResponse> {
                 override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
@@ -72,13 +73,13 @@ class HomeViewModel : ViewModel() {
                     }
                 }
                 override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-                    // Handle failure
+
                 }
             })
         }
     }
 
-    fun fetchUpcomingMovies(apiKey: String, language: String = "es", page: Int = 1) {
+    fun fetchUpcomingMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
             RetrofitClient.webService.getUpcomingMovies(apiKey, language, page).enqueue(object : Callback<MoviesResponse> {
                 override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
@@ -87,7 +88,7 @@ class HomeViewModel : ViewModel() {
                     }
                 }
                 override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-                    // Handle failure
+
                 }
             })
         }

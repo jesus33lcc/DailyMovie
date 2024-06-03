@@ -1,3 +1,4 @@
+// ImmutableMovieListAdapter
 package com.example.dailymovie.adapters
 
 import android.view.LayoutInflater
@@ -14,7 +15,7 @@ import com.example.dailymovie.utils.Constantes
 class ImmutableMovieListAdapter(
     private val movies: MutableList<MovieModel>,
     private val onMovieClick: (MovieModel) -> Unit,
-    private val onMovieDelete: (MovieModel) -> Unit
+    private val onMovieDelete: (MovieModel, Int) -> Unit
 ) : RecyclerView.Adapter<ImmutableMovieListAdapter.MovieViewHolder>() {
 
     class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -45,7 +46,7 @@ class ImmutableMovieListAdapter(
         }
 
         holder.itemView.setOnLongClickListener {
-            onMovieDelete(movie)
+            onMovieDelete(movie, position)
             true
         }
     }

@@ -14,7 +14,7 @@ import com.example.dailymovie.utils.Constantes
 class CustomMovieListAdapter(
     private val movies: MutableList<MovieModel>,
     private val onMovieClick: (MovieModel) -> Unit,
-    private val onMovieDelete: (MovieModel) -> Unit
+    private val onMovieDelete: (MovieModel, Int) -> Unit
 ) : RecyclerView.Adapter<CustomMovieListAdapter.MovieViewHolder>() {
 
     class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -45,7 +45,7 @@ class CustomMovieListAdapter(
         }
 
         holder.itemView.setOnLongClickListener {
-            onMovieDelete(movie)
+            onMovieDelete(movie, position)
             true
         }
     }
