@@ -132,6 +132,7 @@
                 android:layout_marginTop="16dp"
                 android:visibility="gone">
 
+                <!-- Director -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -158,6 +159,7 @@
                         android:textColor="@color/black" />
                 </LinearLayout>
 
+                <!-- Duración y Año -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -202,6 +204,7 @@
                         android:textColor="@color/black" />
                 </LinearLayout>
 
+                <!-- Valoración -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -227,6 +230,7 @@
                         android:textColor="@color/black" />
                 </LinearLayout>
 
+                <!-- Descripción -->
                 <TextView
                     android:id="@+id/txt_overview_label"
                     android:layout_width="match_parent"
@@ -248,6 +252,7 @@
                     android:textColor="@color/black"
                     android:textStyle="bold"/>
 
+                <!-- Géneros -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -271,6 +276,7 @@
                         android:textColor="@color/black" />
                 </LinearLayout>
 
+                <!-- Presupuesto -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -296,6 +302,7 @@
                         android:textColor="@color/black" />
                 </LinearLayout>
 
+                <!-- Recaudación -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -321,6 +328,7 @@
 
             </LinearLayout>
 
+            <!-- Sección Proveedores -->
             <LinearLayout
                 android:id="@+id/sectionProviders"
                 android:layout_width="match_parent"
@@ -352,6 +360,7 @@
                     android:visibility="visible" />
             </LinearLayout>
 
+            <!-- Sección Reparto -->
             <LinearLayout
                 android:id="@+id/sectionCredits"
                 android:layout_width="match_parent"
@@ -383,6 +392,7 @@
                     android:visibility="visible" />
             </LinearLayout>
 
+            <!-- Sección Videos -->
             <LinearLayout
                 android:id="@+id/sectionVideos"
                 android:layout_width="match_parent"
@@ -413,6 +423,7 @@
                     android:visibility="visible" />
             </LinearLayout>
 
+            <!-- Sección Películas Similares -->
             <LinearLayout
                 android:id="@+id/sectionSimilarMovies"
                 android:layout_width="match_parent"
@@ -444,6 +455,7 @@
                     android:visibility="visible" />
             </LinearLayout>
 
+            <!-- Sección Películas Recomendadas -->
             <LinearLayout
                 android:id="@+id/sectionRecommendedMovies"
                 android:layout_width="match_parent"
