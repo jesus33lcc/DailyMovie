@@ -44,7 +44,7 @@ class ListasViewModel : ViewModel() {
     fun createNewList(listName: String, onComplete: (Boolean) -> Unit) {
         FirebaseClient.createCustomList(listName) { success ->
             if (success) {
-                loadCustomLists()
+                loadCustomLists()  // Refresh the lists
             }
             onComplete(success)
         }
@@ -73,7 +73,7 @@ class ListasViewModel : ViewModel() {
     fun deleteCustomList(listName: String, onComplete: (Boolean) -> Unit) {
         FirebaseClient.deleteCustomList(listName) { success ->
             if (success) {
-                loadCustomLists()
+                loadCustomLists()  // Refresh the lists
             }
             onComplete(success)
         }
