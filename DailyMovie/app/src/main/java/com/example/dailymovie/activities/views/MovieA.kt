@@ -1,4 +1,4 @@
-package com.example.dailymovie.views
+package com.example.dailymovie.activities.views
 
 import android.content.Intent
 import android.os.Bundle
@@ -20,7 +20,7 @@ import com.example.dailymovie.models.MovieDetailsModel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Constantes
-import com.example.dailymovie.viewmodels.MovieViewModel
+import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.databinding.ActivityMovieBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView

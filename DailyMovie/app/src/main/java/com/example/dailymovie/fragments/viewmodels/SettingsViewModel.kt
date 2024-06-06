@@ -1,4 +1,4 @@
-package com.example.dailymovie.fragments
+package com.example.dailymovie.fragments.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

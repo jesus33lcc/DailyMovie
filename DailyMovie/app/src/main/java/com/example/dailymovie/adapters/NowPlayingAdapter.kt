@@ -2,15 +2,13 @@ package com.example.dailymovie.adapters
 
 import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.dailymovie.R
 import com.example.dailymovie.databinding.ItemMovieCardBinding
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.utils.Constantes
-import com.example.dailymovie.views.MovieA
+import com.example.dailymovie.activities.views.MovieA
 
 class NowPlayingAdapter(private val movies: List<MovieModel>) :
     RecyclerView.Adapter<NowPlayingAdapter.MovieViewHolder>() {

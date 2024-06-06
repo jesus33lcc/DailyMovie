@@ -1,4 +1,4 @@
-package com.example.dailymovie.viewmodels
+package com.example.dailymovie.fragments.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
