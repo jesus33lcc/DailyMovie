@@ -313,7 +313,7 @@ class MovieA : AppCompatActivity() {
 
     private fun displaySimilarMovies(similarMovies: List<MovieModel>) {
         if (similarMovies.isNotEmpty()) {
-            val adapter = NowPlayingAdapter(ArrayList(similarMovies))
+            val adapter = MovieAdapter(ArrayList(similarMovies))
             binding.recyclerViewSimilarMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewSimilarMovies.adapter = adapter
             binding.sectionSimilarMovies.visibility = View.VISIBLE
@@ -325,7 +325,7 @@ class MovieA : AppCompatActivity() {
 
     private fun displayRecommendedMovies(recommendedMovies: List<MovieModel>) {
         if (recommendedMovies.isNotEmpty()) {
-            val adapter = NowPlayingAdapter(ArrayList(recommendedMovies))
+            val adapter = MovieAdapter(ArrayList(recommendedMovies))
             binding.recyclerViewRecommendedMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewRecommendedMovies.adapter = adapter
             binding.sectionRecommendedMovies.visibility = View.VISIBLE

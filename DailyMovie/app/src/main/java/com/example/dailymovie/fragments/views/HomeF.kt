@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dailymovie.adapters.NowPlayingAdapter
+import com.example.dailymovie.adapters.MovieAdapter
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieOfTheDay
@@ -54,23 +54,23 @@ class HomeF : Fragment() {
         binding.recyclerViewUpcoming.addItemDecoration(SpacingItemDecoration(spacing = 8))
 
         homeViewModel.nowPlayingMovies.observe(viewLifecycleOwner, Observer { movies ->
-            binding.recyclerViewNowPlaying.adapter = NowPlayingAdapter(movies)
+            binding.recyclerViewNowPlaying.adapter = MovieAdapter(movies)
         })
         homeViewModel.popularMovies.observe(viewLifecycleOwner, Observer { movies ->
-            binding.recyclerViewPopular.adapter = NowPlayingAdapter(movies)
+            binding.recyclerViewPopular.adapter = MovieAdapter(movies)
         })
         homeViewModel.topRatedMovies.observe(viewLifecycleOwner, Observer { movies ->
-            binding.recyclerViewTopRated.adapter = NowPlayingAdapter(movies)
+            binding.recyclerViewTopRated.adapter = MovieAdapter(movies)
         })
         homeViewModel.upcomingMovies.observe(viewLifecycleOwner, Observer { movies ->
-            binding.recyclerViewUpcoming.adapter = NowPlayingAdapter(movies)
+            binding.recyclerViewUpcoming.adapter = MovieAdapter(movies)
         })
 
         homeViewModel.movieOfTheDay.observe(viewLifecycleOwner, Observer { movie ->
             movie?.let {
-                Log.d("HomeF", "Movie of the day: ${it.title}")
+                Log.d("HomeF", "La pelicula del dia es: ${it.title}")
                 displayMovieOfTheDay(it)
-            } ?: Log.d("HomeF", "Movie of the day is null")
+            } ?: Log.d("HomeF", "No hay pelicula del dia")
         })
 
         homeViewModel.fetchNowPlayingMovies(Constantes.API_KEY)
