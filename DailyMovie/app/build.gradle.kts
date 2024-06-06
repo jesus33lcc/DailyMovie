@@ -67,13 +67,12 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     // Glide
     implementation("com.github.bumptech.glide:glide:5.0.0-rc01")
+
     implementation("androidx.navigation:navigation-fragment:2.7.7")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     // YouTube
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
-    // Imagenes
-    implementation("com.davemorrissey.labs:subsampling-scale-image-view:3.10.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

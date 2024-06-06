@@ -13,19 +13,19 @@
         android:theme="@style/Theme.DailyMovie"
         tools:targetApi="31">
         <activity
-            android:name=".views.ListMoviesA"
+            android:name=".activities.views.ListMoviesA"
             android:exported="false" />
         <activity
-            android:name=".views.MovieA"
+            android:name=".activities.views.MovieA"
             android:exported="false" />
         <activity
-            android:name=".views.PrincipalA"
+            android:name=".activities.views.PrincipalA"
             android:exported="false" />
         <activity
-            android:name=".views.LoginA"
+            android:name=".activities.views.LoginA"
             android:exported="false" />
         <activity
-            android:name=".views.RegistroA"
+            android:name=".activities.views.RegistroA"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

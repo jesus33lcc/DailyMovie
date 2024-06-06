@@ -4,31 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    tools:context=".views.RegistroA">
+    tools:context=".activities.views.RegistroA">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/register_logo_card"
+        <ImageView
+            android:id="@+id/register_logo_img"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_marginTop="40dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
+            android:scaleType="fitCenter"
+            android:background="@android:color/transparent"
+            android:src="@mipmap/ic_launcher_2_foreground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/register_logo_img"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@mipmap/ic_launcher"
-                android:scaleType="fitCenter" />
-
-        </androidx.cardview.widget.CardView>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/register_email_edittxt"
@@ -44,7 +36,7 @@
             android:background="@drawable/rounded_border_edittext"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/register_logo_card" />
+            app:layout_constraintTop_toBottomOf="@+id/register_logo_img" />
 
         <EditText
             android:id="@+id/register_password_edittxt"
