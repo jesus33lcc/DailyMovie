@@ -12,8 +12,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.dailymovie.R
 import com.example.dailymovie.databinding.FragmentSettingsBinding
-import com.example.dailymovie.activities.views.LoginA
 import com.example.dailymovie.fragments.viewmodels.SettingsViewModel
+import com.example.dailymovie.activities.views.LoginA
+import com.example.dailymovie.utils.LocaleUtil
 import java.util.Locale
 
 class Settings : Fragment() {
@@ -46,7 +47,7 @@ class Settings : Fragment() {
         }
 
         binding.btnRegion.setOnClickListener {
-            // Acción para cambiar la región
+
         }
 
         binding.btnLogout.setOnClickListener {
@@ -133,9 +134,6 @@ class Settings : Fragment() {
     }
 
     private fun getUserLocale(): Pair<String, String> {
-        val locale = Locale.getDefault()
-        val languageCode = locale.language
-        val countryCode = locale.country
-        return Pair(languageCode, countryCode)
+        return Pair(LocaleUtil.getDeviceLanguage(), LocaleUtil.getDeviceCountry())
     }
 }
