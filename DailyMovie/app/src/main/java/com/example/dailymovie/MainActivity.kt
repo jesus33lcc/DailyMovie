@@ -3,8 +3,8 @@ package com.example.dailymovie
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.dailymovie.views.PrincipalA
-import com.example.dailymovie.views.RegistroA
+import com.example.dailymovie.activities.views.PrincipalA
+import com.example.dailymovie.activities.views.RegistroA
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
