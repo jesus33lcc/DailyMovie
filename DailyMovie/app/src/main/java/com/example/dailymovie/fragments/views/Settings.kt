@@ -1,4 +1,4 @@
-package com.example.dailymovie.fragments
+package com.example.dailymovie.fragments.views
 
 import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
@@ -12,7 +12,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.dailymovie.R
 import com.example.dailymovie.databinding.FragmentSettingsBinding
-import com.example.dailymovie.views.LoginA
+import com.example.dailymovie.activities.views.LoginA
+import com.example.dailymovie.fragments.viewmodels.SettingsViewModel
 import java.util.Locale
 
 class Settings : Fragment() {

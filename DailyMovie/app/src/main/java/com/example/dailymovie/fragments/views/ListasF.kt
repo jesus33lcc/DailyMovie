@@ -1,4 +1,4 @@
-package com.example.dailymovie.fragments
+package com.example.dailymovie.fragments.views
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -19,8 +19,8 @@ import com.example.dailymovie.databinding.FragmentListasBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.ListaModel
 import com.example.dailymovie.models.MovieModel
-import com.example.dailymovie.views.ListMoviesA
-import com.example.dailymovie.viewmodels.ListasViewModel
+import com.example.dailymovie.activities.views.ListMoviesA
+import com.example.dailymovie.fragments.viewmodels.ListasViewModel
 
 class ListasF : Fragment() {
 

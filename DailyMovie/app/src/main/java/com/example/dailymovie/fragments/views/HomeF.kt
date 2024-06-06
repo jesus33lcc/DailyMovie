@@ -1,4 +1,4 @@
-package com.example.dailymovie.fragments
+package com.example.dailymovie.fragments.views
 
 import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
@@ -10,15 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
-import com.example.dailymovie.R
 import com.example.dailymovie.adapters.NowPlayingAdapter
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.utils.Constantes
-import com.example.dailymovie.viewmodels.HomeViewModel
-import com.example.dailymovie.views.MovieA
+import com.example.dailymovie.fragments.viewmodels.HomeViewModel
+import com.example.dailymovie.activities.views.MovieA
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView

@@ -1,4 +1,4 @@
-package com.example.dailymovie.views
+package com.example.dailymovie.activities.views
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.example.dailymovie.databinding.ActivityLoginBinding
-import com.example.dailymovie.viewmodels.LoginViewModel
+import com.example.dailymovie.activities.viewmodels.LoginViewModel
 
 class LoginA : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding

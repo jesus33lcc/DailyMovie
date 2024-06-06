@@ -1,4 +1,4 @@
-package com.example.dailymovie.fragments
+package com.example.dailymovie.fragments.views
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,18 +11,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dailymovie.R
 import com.example.dailymovie.adapters.SearchMovieAdapter
 import com.example.dailymovie.databinding.FragmentExplorarBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieModel
-import com.example.dailymovie.viewmodels.ExplorarViewModel
-import com.example.dailymovie.views.MovieA
+import com.example.dailymovie.fragments.viewmodels.ExplorarViewModel
+import com.example.dailymovie.activities.views.MovieA
 
 class ExplorarF : Fragment() {
 

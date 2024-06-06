@@ -1,4 +1,4 @@
-package com.example.dailymovie.views
+package com.example.dailymovie.activities.views
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dailymovie.databinding.ActivityRegistroBinding
-import com.example.dailymovie.viewmodels.RegistroViewModel
+import com.example.dailymovie.activities.viewmodels.RegistroViewModel
 
 class RegistroA : AppCompatActivity() {
     private lateinit var binding: ActivityRegistroBinding

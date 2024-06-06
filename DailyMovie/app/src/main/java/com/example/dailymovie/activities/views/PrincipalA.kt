@@ -1,4 +1,4 @@
-package com.example.dailymovie.views
+package com.example.dailymovie.activities.views
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

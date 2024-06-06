@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-    tools:context=".views.RegistroA">
+    tools:context=".activities.views.RegistroA">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
