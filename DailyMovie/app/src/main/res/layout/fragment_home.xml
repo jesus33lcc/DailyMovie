@@ -1,259 +1,265 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
     tools:context=".fragments.views.HomeF">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:background="@color/colorBackground">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingVertical="8dp"
-            android:background="@drawable/rounded_border_box_big"
-            android:clipToOutline="true"
-            android:gravity="center">
+            android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="DAILYMOVIE"
-                android:textSize="40sp"
-                android:fontFamily="@font/courier_bold"
-                android:textAlignment="center"
-                android:textColor="@color/black"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/movieOfTheDayContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:background="@drawable/rounded_border_box_big"
-            android:clipToOutline="true"
-            android:layout_marginTop="16dp">
-
-            <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-                android:id="@+id/youtubePlayerView"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="230dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/rounded_border"
-                android:clipToOutline="true"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="8dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DAILYMOVIE"
+                    android:textSize="40sp"
+                    android:fontFamily="@font/courier_bold"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/movieOfTheDayContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp">
+
+                <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+                    android:id="@+id/youtubePlayerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="230dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/rounded_border"
+                    android:clipToOutline="true"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:background="@drawable/rounded_border_box"
+                    android:clipToOutline="true">
+
+                    <TextView
+                        android:id="@+id/movieTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:paddingHorizontal="8dp"
+                        android:fontFamily="@font/courier_bold"
+                        android:textColor="@color/colorTextPrimary"/>
+
+                    <TextView
+                        android:id="@+id/movieReview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:padding="8dp"
+                        android:justificationMode="inter_word"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorTextPrimary"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Fecha: "
+                                android:textSize="18sp"
+                                android:fontFamily="@font/courier_bold"
+                                android:textColor="@color/colorTextPrimary"/>
+
+                            <TextView
+                                android:id="@+id/movieDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="18sp"
+                                android:textColor="@color/colorTextPrimary"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Autor: "
+                                android:textSize="18sp"
+                                android:fontFamily="@font/courier_bold"
+                                android:textColor="@color/colorTextPrimary"/>
+
+                            <TextView
+                                android:id="@+id/movieAuthor"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="18sp"
+                                android:textColor="@color/colorTextPrimary"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnViewFullDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
+                    android:backgroundTint="@color/colorAccent"
+                    android:text="Ver ficha completa"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:background="@drawable/rounded_button"
+                    android:fontFamily="@font/courier_bold"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp"
-                android:background="@drawable/rounded_border_box"
-                android:clipToOutline="true">
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp">
 
                 <TextView
-                    android:id="@+id/movieTitle"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="30sp"
-                    android:paddingHorizontal="8dp"
+                    android:text="En Cartelera"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="16dp"
                     android:fontFamily="@font/courier_bold"
-                    android:textColor="@color/colorTextPrimary"/>
+                    android:textAlignment="center"
+                    android:textColor="@color/black"/>
 
-                <TextView
-                    android:id="@+id/movieReview"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewNowPlaying"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    android:orientation="horizontal"
                     android:padding="8dp"
-                    android:justificationMode="inter_word"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorTextPrimary"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Fecha: "
-                            android:textSize="18sp"
-                            android:fontFamily="@font/courier_bold"
-                            android:textColor="@color/colorTextPrimary"/>
-
-                        <TextView
-                            android:id="@+id/movieDate"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="18sp"
-                            android:textColor="@color/colorTextPrimary"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Autor: "
-                            android:textSize="18sp"
-                            android:fontFamily="@font/courier_bold"
-                            android:textColor="@color/colorTextPrimary"/>
-
-                        <TextView
-                            android:id="@+id/movieAuthor"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="18sp"
-                            android:textColor="@color/colorTextPrimary"/>
-                    </LinearLayout>
-                </LinearLayout>
-
+                    android:scrollbars="horizontal"/>
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btnViewFullDetails"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:backgroundTint="@color/colorAccent"
-                android:text="Ver ficha completa"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:background="@drawable/rounded_button"
-                android:fontFamily="@font/courier_bold"/>
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Populares"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="16dp"
+                    android:fontFamily="@font/courier_bold"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:background="@drawable/rounded_border_box_big"
-            android:clipToOutline="true"
-            android:layout_marginTop="16dp">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewPopular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:scrollbars="horizontal"/>
+            </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="En Cartelera"
-                android:textSize="25sp"
-                android:paddingHorizontal="16dp"
-                android:fontFamily="@font/courier_bold"
-                android:textAlignment="center"
-                android:textColor="@color/black"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewNowPlaying"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp"
-                android:scrollbars="horizontal"/>
-        </LinearLayout>
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:background="@drawable/rounded_border_box_big"
-            android:clipToOutline="true"
-            android:layout_marginTop="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mejor Valoradas"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="16dp"
+                    android:fontFamily="@font/courier_bold"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Populares"
-                android:textSize="25sp"
-                android:paddingHorizontal="16dp"
-                android:fontFamily="@font/courier_bold"
-                android:textAlignment="center"
-                android:textColor="@color/black"/>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewTopRated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:scrollbars="horizontal"/>
+            </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewPopular"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp"
-                android:scrollbars="horizontal"/>
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Próximamente"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="16dp"
+                    android:fontFamily="@font/courier_bold"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewUpcoming"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:scrollbars="horizontal"/>
+            </LinearLayout>
+
         </LinearLayout>
+    </ScrollView>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:background="@drawable/rounded_border_box_big"
-            android:clipToOutline="true"
-            android:layout_marginTop="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mejor Valoradas"
-                android:textSize="25sp"
-                android:paddingHorizontal="16dp"
-                android:fontFamily="@font/courier_bold"
-                android:textAlignment="center"
-                android:textColor="@color/black"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewTopRated"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp"
-                android:scrollbars="horizontal"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:background="@drawable/rounded_border_box_big"
-            android:clipToOutline="true"
-            android:layout_marginTop="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Próximamente"
-                android:textSize="25sp"
-                android:paddingHorizontal="16dp"
-                android:fontFamily="@font/courier_bold"
-                android:textAlignment="center"
-                android:textColor="@color/black"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewUpcoming"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp"
-                android:scrollbars="horizontal"/>
-        </LinearLayout>
-
-    </LinearLayout>
-</ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

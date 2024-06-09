@@ -113,7 +113,7 @@ class MovieViewModel : ViewModel() {
                     }
 
                     override fun onFailure(call: Call<VideoResponse>, t: Throwable) {
-                        _movieVideos.postValue(sortedSpanishVideos)  // Show Spanish videos even if English request fails
+                        _movieVideos.postValue(sortedSpanishVideos)
                     }
                 })
             }

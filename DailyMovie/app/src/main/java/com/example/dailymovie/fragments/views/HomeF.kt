@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.dailymovie.adapters.MovieAdapter
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
@@ -81,6 +82,20 @@ class HomeF : Fragment() {
 
         youTubePlayerView = binding.youtubePlayerView
         lifecycle.addObserver(youTubePlayerView)
+
+        setupSwipeRefreshLayout()
+    }
+
+    private fun setupSwipeRefreshLayout() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            homeViewModel.fetchNowPlayingMovies(Constantes.API_KEY)
+            homeViewModel.fetchPopularMovies(Constantes.API_KEY)
+            homeViewModel.fetchTopRatedMovies(Constantes.API_KEY)
+            homeViewModel.fetchUpcomingMovies(Constantes.API_KEY)
+            homeViewModel.fetchMovieOfTheDay()
+
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
     }
 
     private fun displayMovieOfTheDay(movie: MovieOfTheDay) {

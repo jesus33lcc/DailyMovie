@@ -276,7 +276,7 @@ class MovieA : AppCompatActivity() {
     }
 
     private fun displayProviders(providerResponse: ProviderResponse) {
-        val providers = providerResponse.results["ES"]?.flatrate ?: emptyList()
+        val providers = providerResponse.results[LocaleUtil.getDeviceCountry()]?.flatrate ?: emptyList()
         if (providers.isNotEmpty()) {
             val adapter = ProviderAdapter(providers)
             binding.recyclerViewProviders.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
