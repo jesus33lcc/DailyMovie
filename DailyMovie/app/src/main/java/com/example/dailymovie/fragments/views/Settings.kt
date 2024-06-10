@@ -64,7 +64,7 @@ class Settings : Fragment() {
                 if (success) {
                     Toast.makeText(requireContext(), "Historial borrado", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(requireContext(), "Error al borrar el historial", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "No se ha podido borrar el historial", Toast.LENGTH_SHORT).show()
                 }
             }
         }

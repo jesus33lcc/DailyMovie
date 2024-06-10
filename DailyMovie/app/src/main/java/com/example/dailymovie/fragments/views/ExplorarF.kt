@@ -59,10 +59,12 @@ class ExplorarF : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 clearSearchIcon.visibility = if (!s.isNullOrEmpty()) View.VISIBLE else View.GONE
-                if (!s.isNullOrEmpty() && s.length > 2) {
+                if (!s.isNullOrEmpty()) {
+                    explorarViewModel.setSearchMode(true)
                     buscar(s.toString())
-                } else if (s.isNullOrEmpty()) {
+                } else {
                     clearResults()
+                    explorarViewModel.setSearchMode(false)
                     loadHistory()
                 }
             }
@@ -73,6 +75,7 @@ class ExplorarF : Fragment() {
             if (actionId == EditorInfo.IME_ACTION_SEARCH || event?.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER) {
                 val query = searchInput.text.toString()
                 if (query.isNotEmpty()) {
+                    explorarViewModel.setSearchMode(true)
                     buscar(query)
                     hideKeyboard()
                 }
@@ -85,6 +88,7 @@ class ExplorarF : Fragment() {
         clearSearchIcon.setOnClickListener {
             searchInput.text.clear()
             clearResults()
+            explorarViewModel.setSearchMode(false)
             loadHistory()
             hideKeyboard()
         }
@@ -93,13 +97,15 @@ class ExplorarF : Fragment() {
             updateUIWithResults(movies)
         })
 
-        explorarViewModel.history.observe(viewLifecycleOwner, Observer { history ->
-            if (history.isNotEmpty()) {
-                movieAdapter.updateMoviesList(history.reversed())
-            }
-        })
-
         loadHistory()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (binding.searchInput.text.isNullOrEmpty()) {
+            explorarViewModel.setSearchMode(false)
+            loadHistory()
+        }
     }
 
     private fun buscar(query: String) {

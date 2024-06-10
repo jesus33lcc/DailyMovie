@@ -19,4 +19,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/white</item>
     </style>
+    <style name="SplashTheme" parent="Base.Theme.DailyMovie">
+        <item name="android:windowBackground">@drawable/splashscreen</item>
+    </style>
 </resources>

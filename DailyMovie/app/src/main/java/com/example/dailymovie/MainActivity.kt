@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseUser
 class MainActivity : AppCompatActivity() {
     private lateinit var mAuth: FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.Theme_DailyMovie)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 

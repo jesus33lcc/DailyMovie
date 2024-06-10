@@ -18,10 +18,10 @@ class ExplorarViewModel : ViewModel() {
     private val _movies = MutableLiveData<List<MovieModel>>()
     val movies: LiveData<List<MovieModel>> get() = _movies
 
-    private val _history = MutableLiveData<List<MovieModel>>()
-    val history: LiveData<List<MovieModel>> get() = _history
+    private var isSearching = false
 
     fun searchMovies(query: String) {
+        isSearching = true
         RetrofitClient.webService.searchMovies(query, Constantes.API_KEY, true, LocaleUtil.getLanguageAndCountry(), 1)
             .enqueue(object : Callback<MoviesResponse> {
                 override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
@@ -44,8 +44,18 @@ class ExplorarViewModel : ViewModel() {
     }
 
     fun loadHistory() {
-        FirebaseClient.getHistory { movies ->
-            _history.value = movies
+        if (!isSearching) {
+            FirebaseClient.getHistory { movies ->
+                _movies.value = movies
+            }
         }
+    }
+
+    fun clearMovies() {
+        _movies.value = emptyList()
+    }
+
+    fun setSearchMode(searching: Boolean) {
+        isSearching = searching
     }
 }
