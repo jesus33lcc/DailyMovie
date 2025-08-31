@@ -19,6 +19,10 @@
 *.tar.gz
 *.rar
 
+# El wrapper de Gradle SI tiene que ir al repo: sin este jar, un "./gradlew" recien
+# clonado falla con ClassNotFoundException y el proyecto no compila de fabrica.
+!**/gradle/wrapper/gradle-wrapper.jar
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
