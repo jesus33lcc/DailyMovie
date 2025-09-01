@@ -5,13 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dailymovie.client.FirebaseClient
 import com.example.dailymovie.client.RetrofitClient
-import com.example.dailymovie.client.response.MoviesResponse
+import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.utils.ErrorCarga
 import com.example.dailymovie.utils.LocaleUtil
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class ExplorarViewModel : ViewModel() {
 
@@ -21,21 +19,21 @@ class ExplorarViewModel : ViewModel() {
     private val _history = MutableLiveData<List<MovieModel>>()
     val history: LiveData<List<MovieModel>> get() = _history
 
-    fun searchMovies(query: String) {
-        RetrofitClient.webService.searchMovies(query, Constantes.API_KEY, true, LocaleUtil.getLanguageAndCountry(), 1)
-            .enqueue(object : Callback<MoviesResponse> {
-                override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-                    if (response.isSuccessful) {
-                        _movies.value = response.body()?.results ?: emptyList()
-                    } else {
-                        _movies.value = emptyList()
-                    }
-                }
+    private val _error = MutableLiveData<ErrorCarga?>()
+    val error: LiveData<ErrorCarga?> get() = _error
 
-                override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
+    fun searchMovies(query: String) {
+        RetrofitClient.webService
+            .searchMovies(query, Constantes.API_KEY, true, LocaleUtil.getLanguageAndCountry(), 1)
+            .enqueueSimple(
+                onExito = { _movies.value = it.results },
+                onError = {
+                    // Antes se vaciaba la lista sin decir nada, asi que un fallo de red se
+                    // veia igual que una busqueda sin resultados.
                     _movies.value = emptyList()
+                    _error.value = it
                 }
-            })
+            )
     }
 
     fun addToHistory(movie: MovieModel) {
@@ -47,5 +45,10 @@ class ExplorarViewModel : ViewModel() {
         FirebaseClient.getHistory { movies ->
             _history.value = movies
         }
+    }
+
+    /** La vista avisa de que ya ha enseñado el aviso, para que no vuelva a salir solo. */
+    fun errorMostrado() {
+        _error.value = null
     }
 }
