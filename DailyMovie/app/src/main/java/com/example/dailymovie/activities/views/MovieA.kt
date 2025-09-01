@@ -24,6 +24,7 @@ import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.databinding.ActivityMovieBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.utils.LocaleUtil
+import com.example.dailymovie.utils.mensaje
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 class MovieA : AppCompatActivity() {
@@ -82,6 +83,13 @@ class MovieA : AppCompatActivity() {
             movieViewModel.recommendedMovies.observe(this, Observer { recommendedMovies ->
                 recommendedMovies?.let {
                     displayRecommendedMovies(it)
+                }
+            })
+
+            movieViewModel.error.observe(this, Observer { error ->
+                error?.let {
+                    showToast(getString(it.mensaje()))
+                    movieViewModel.errorMostrado()
                 }
             })
         } else {

@@ -3,18 +3,14 @@ package com.example.dailymovie.activities.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.dailymovie.client.FirebaseClient
 import com.example.dailymovie.client.RetrofitClient
+import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.*
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
+import com.example.dailymovie.utils.ErrorCarga
 import com.example.dailymovie.utils.LocaleUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MovieViewModel : ViewModel() {
 
@@ -36,92 +32,55 @@ class MovieViewModel : ViewModel() {
 
     private val _watched = MutableLiveData<List<MovieModel>>()
     val watched: LiveData<List<MovieModel>> get() = _watched
+
+    private val _error = MutableLiveData<ErrorCarga?>()
+    val error: LiveData<ErrorCarga?> get() = _error
+
     fun setCurrentMovieModel(movieModel: MovieModel) {
         currentMovieModel = movieModel
     }
 
     fun fetchMovieDetails(movieId: Int, apiKey: String, language: String) {
-        viewModelScope.launch {
-            RetrofitClient.webService.getMovieDetails(movieId, apiKey, language)
-                .enqueue(object : Callback<MovieDetailsResponse> {
-                    override fun onResponse(call: Call<MovieDetailsResponse>, response: Response<MovieDetailsResponse>) {
-                        if (response.isSuccessful) {
-                            _movieDetails.value = response.body()
-                        } else {
-
-                        }
-                    }
-
-                    override fun onFailure(call: Call<MovieDetailsResponse>, t: Throwable) {
-
-                    }
-                })
-        }
+        RetrofitClient.webService.getMovieDetails(movieId, apiKey, language).enqueueSimple(
+            onExito = { _movieDetails.value = it },
+            onError = { _error.value = it }
+        )
     }
 
     fun fetchMovieProviders(movieId: Int, apiKey: String) {
-        viewModelScope.launch {
-            RetrofitClient.webService.getMovieProviders(movieId, apiKey)
-                .enqueue(object : Callback<ProviderResponse> {
-                    override fun onResponse(call: Call<ProviderResponse>, response: Response<ProviderResponse>) {
-                        if (response.isSuccessful) {
-                            _movieProviders.value = response.body()
-                        } else {
-
-                        }
-                    }
-
-                    override fun onFailure(call: Call<ProviderResponse>, t: Throwable) {
-
-                    }
-                })
-        }
+        // Las secciones de abajo (plataformas, reparto, videos...) son un extra: si fallan
+        // solo se ocultan, y no se avisa para no llenar la pantalla de mensajes. El aviso
+        // se reserva para los datos principales de la pelicula.
+        RetrofitClient.webService.getMovieProviders(movieId, apiKey).enqueueSimple(
+            onExito = { _movieProviders.value = it },
+            onError = { }
+        )
     }
 
     fun fetchMovieCredits(movieId: Int, apiKey: String) {
-        viewModelScope.launch {
-            RetrofitClient.webService.getMovieCredits(movieId, apiKey)
-                .enqueue(object : Callback<CreditResponse> {
-                    override fun onResponse(call: Call<CreditResponse>, response: Response<CreditResponse>) {
-                        if (response.isSuccessful) {
-                            _movieCredits.value = response.body()
-                        } else {
-
-                        }
-                    }
-
-                    override fun onFailure(call: Call<CreditResponse>, t: Throwable) {
-
-                    }
-                })
-        }
+        RetrofitClient.webService.getMovieCredits(movieId, apiKey).enqueueSimple(
+            onExito = { _movieCredits.value = it },
+            onError = { }
+        )
     }
 
     fun fetchMovieVideos(movieId: Int, apiKey: String) {
-        RetrofitClient.webService.getMovieVideos(movieId, apiKey, LocaleUtil.getLanguageAndCountry()).enqueue(object : Callback<VideoResponse> {
-            override fun onResponse(call: Call<VideoResponse>, response: Response<VideoResponse>) {
-                val spanishVideos = response.body()?.results ?: emptyList()
-                val sortedSpanishVideos = sortVideos(spanishVideos)
-
-                RetrofitClient.webService.getMovieVideos(movieId, apiKey, "en-US").enqueue(object : Callback<VideoResponse> {
-                    override fun onResponse(call: Call<VideoResponse>, response: Response<VideoResponse>) {
-                        val englishVideos = response.body()?.results ?: emptyList()
-                        val sortedEnglishVideos = sortVideos(englishVideos)
-                        val combinedVideos = sortedSpanishVideos + sortedEnglishVideos
-
-                        _movieVideos.postValue(combinedVideos)
-                    }
-
-                    override fun onFailure(call: Call<VideoResponse>, t: Throwable) {
-                        _movieVideos.postValue(sortedSpanishVideos)
-                    }
-                })
-            }
-
-            override fun onFailure(call: Call<VideoResponse>, t: Throwable) {
-
-            }
-        })
+        // Se piden dos veces: primero en el idioma del movil y luego en ingles, porque
+        // TMDB tiene muchos mas trailers en ingles. Si la segunda falla nos quedamos con
+        // los del idioma local en vez de dejar la seccion vacia.
+        RetrofitClient.webService.getMovieVideos(movieId, apiKey, LocaleUtil.getLanguageAndCountry())
+            .enqueueSimple(
+                onExito = { respuestaLocal ->
+                    val videosLocales = sortVideos(respuestaLocal.results)
+                    RetrofitClient.webService.getMovieVideos(movieId, apiKey, "en-US").enqueueSimple(
+                        onExito = { respuestaIngles ->
+                            _movieVideos.value = videosLocales + sortVideos(respuestaIngles.results)
+                        },
+                        onError = { _movieVideos.value = videosLocales }
+                    )
+                },
+                onError = { }
+            )
     }
 
     private fun sortVideos(videos: List<VideoModel>): List<VideoModel> {
@@ -131,35 +90,22 @@ class MovieViewModel : ViewModel() {
     }
 
     fun fetchSimilarMovies(movieId: Int, apiKey: String, language: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            RetrofitClient.webService.getSimilarMovies(movieId, apiKey, language).enqueue(object : Callback<MoviesResponse> {
-                override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-                    if (response.isSuccessful) {
-                        _similarMovies.postValue(response.body()?.results ?: emptyList())
-                    }
-                }
-
-                override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-
-                }
-            })
-        }
+        RetrofitClient.webService.getSimilarMovies(movieId, apiKey, language).enqueueSimple(
+            onExito = { _similarMovies.value = it.results },
+            onError = { }
+        )
     }
 
     fun fetchRecommendedMovies(movieId: Int, apiKey: String, language: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            RetrofitClient.webService.getRecommendedMovies(movieId, apiKey, language).enqueue(object : Callback<MoviesResponse> {
-                override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-                    if (response.isSuccessful) {
-                        _recommendedMovies.postValue(response.body()?.results ?: emptyList())
-                    }
-                }
+        RetrofitClient.webService.getRecommendedMovies(movieId, apiKey, language).enqueueSimple(
+            onExito = { _recommendedMovies.value = it.results },
+            onError = { }
+        )
+    }
 
-                override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-
-                }
-            })
-        }
+    /** La vista avisa de que ya ha enseñado el aviso, para que no vuelva a salir solo. */
+    fun errorMostrado() {
+        _error.value = null
     }
 
     fun toggleFavorite(movie: MovieModel, onComplete: (Boolean) -> Unit) {

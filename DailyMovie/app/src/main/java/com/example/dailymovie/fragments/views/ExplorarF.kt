@@ -15,6 +15,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -23,6 +24,7 @@ import com.example.dailymovie.adapters.SearchMovieAdapter
 import com.example.dailymovie.databinding.FragmentExplorarBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieModel
+import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.fragments.viewmodels.ExplorarViewModel
 import com.example.dailymovie.activities.views.MovieA
 
@@ -96,6 +98,13 @@ class ExplorarF : Fragment() {
         explorarViewModel.history.observe(viewLifecycleOwner, Observer { history ->
             if (history.isNotEmpty()) {
                 movieAdapter.updateMoviesList(history.reversed())
+            }
+        })
+
+        explorarViewModel.error.observe(viewLifecycleOwner, Observer { error ->
+            error?.let {
+                Toast.makeText(context, getString(it.mensaje()), Toast.LENGTH_SHORT).show()
+                explorarViewModel.errorMostrado()
             }
         })
 

@@ -3,18 +3,13 @@ package com.example.dailymovie.fragments.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.dailymovie.client.FirebaseClient
 import com.example.dailymovie.client.RetrofitClient
-import com.example.dailymovie.client.response.MoviesResponse
+import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.MovieOfTheDay
+import com.example.dailymovie.utils.ErrorCarga
 import com.example.dailymovie.utils.LocaleUtil
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class HomeViewModel : ViewModel() {
 
@@ -26,79 +21,50 @@ class HomeViewModel : ViewModel() {
     val topRatedMovies: LiveData<List<MovieModel>> get() = _topRatedMovies
     private val _upcomingMovies = MutableLiveData<List<MovieModel>>()
     val upcomingMovies: LiveData<List<MovieModel>> get() = _upcomingMovies
-    private val _movieOfTheDay = MutableLiveData<MovieOfTheDay>()
-    val movieOfTheDay: LiveData<MovieOfTheDay> get() = _movieOfTheDay
+    private val _movieOfTheDay = MutableLiveData<MovieOfTheDay?>()
+    val movieOfTheDay: LiveData<MovieOfTheDay?> get() = _movieOfTheDay
+
+    private val _error = MutableLiveData<ErrorCarga?>()
+    val error: LiveData<ErrorCarga?> get() = _error
 
     fun fetchNowPlayingMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
-        viewModelScope.launch(Dispatchers.IO) {
-            RetrofitClient.webService.getNowPlayingMovies(apiKey, language, page).enqueue(object :
-                Callback<MoviesResponse> {
-                override fun onResponse(
-                    call: Call<MoviesResponse>,
-                    response: Response<MoviesResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        _nowPlayingMovies.postValue(response.body()?.results ?: emptyList())
-                    }
-                }
-
-                override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-
-                }
-            })
-        }
+        RetrofitClient.webService.getNowPlayingMovies(apiKey, language, page).enqueueSimple(
+            onExito = { _nowPlayingMovies.value = it.results },
+            onError = { _error.value = it }
+        )
     }
 
     fun fetchPopularMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
-        viewModelScope.launch(Dispatchers.IO) {
-            RetrofitClient.webService.getPopularMovies(apiKey, language, page).enqueue(object : Callback<MoviesResponse> {
-                override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-                    if (response.isSuccessful) {
-                        _popularMovies.postValue(response.body()?.results ?: emptyList())
-                    }
-                }
-                override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-
-                }
-            })
-        }
+        RetrofitClient.webService.getPopularMovies(apiKey, language, page).enqueueSimple(
+            onExito = { _popularMovies.value = it.results },
+            onError = { _error.value = it }
+        )
     }
 
     fun fetchTopRatedMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
-        viewModelScope.launch(Dispatchers.IO) {
-            RetrofitClient.webService.getTopRatedMovies(apiKey, language, page).enqueue(object : Callback<MoviesResponse> {
-                override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-                    if (response.isSuccessful) {
-                        _topRatedMovies.postValue(response.body()?.results ?: emptyList())
-                    }
-                }
-                override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-
-                }
-            })
-        }
+        RetrofitClient.webService.getTopRatedMovies(apiKey, language, page).enqueueSimple(
+            onExito = { _topRatedMovies.value = it.results },
+            onError = { _error.value = it }
+        )
     }
 
     fun fetchUpcomingMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
-        viewModelScope.launch(Dispatchers.IO) {
-            RetrofitClient.webService.getUpcomingMovies(apiKey, language, page).enqueue(object : Callback<MoviesResponse> {
-                override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-                    if (response.isSuccessful) {
-                        _upcomingMovies.postValue(response.body()?.results ?: emptyList())
-                    }
-                }
-                override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-
-                }
-            })
-        }
+        RetrofitClient.webService.getUpcomingMovies(apiKey, language, page).enqueueSimple(
+            onExito = { _upcomingMovies.value = it.results },
+            onError = { _error.value = it }
+        )
     }
 
     fun fetchMovieOfTheDay() {
-        viewModelScope.launch(Dispatchers.IO) {
-            FirebaseClient.getMovieOfTheDay { movie ->
-                _movieOfTheDay.postValue(movie)
-            }
+        // Que venga null es normal: si nadie ha curado la pelicula de hoy en Firebase
+        // simplemente no hay ninguna, y eso no es un error que enseñarle al usuario.
+        FirebaseClient.getMovieOfTheDay { movie ->
+            _movieOfTheDay.value = movie
         }
+    }
+
+    /** La vista avisa de que ya ha enseñado el aviso, para que no vuelva a salir solo. */
+    fun errorMostrado() {
+        _error.value = null
     }
 }

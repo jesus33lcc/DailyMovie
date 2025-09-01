@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -16,6 +17,7 @@ import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.fragments.viewmodels.HomeViewModel
 import com.example.dailymovie.activities.views.MovieA
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -72,6 +74,13 @@ class HomeF : Fragment() {
                 Log.d("HomeF", "La pelicula del dia es: ${it.title}")
                 displayMovieOfTheDay(it)
             } ?: Log.d("HomeF", "No hay pelicula del dia")
+        })
+
+        homeViewModel.error.observe(viewLifecycleOwner, Observer { error ->
+            error?.let {
+                Toast.makeText(context, getString(it.mensaje()), Toast.LENGTH_SHORT).show()
+                homeViewModel.errorMostrado()
+            }
         })
 
         homeViewModel.fetchNowPlayingMovies(Constantes.API_KEY)
