@@ -1,9 +1,23 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     // Google services Gradle plugin
     id("com.google.gms.google-services")
     id("kotlin-parcelize")
+}
+
+// La clave de TMDB se lee de local.properties, que no viaja en el repo. Si no esta puesta
+// el proyecto compila igual (para que un clon recien hecho no reviente), pero TMDB
+// respondera 401 y no se cargara ninguna pelicula.
+val localProperties = Properties().apply {
+    val fichero = rootProject.file("local.properties")
+    if (fichero.exists()) fichero.inputStream().use { load(it) }
+}
+val tmdbApiKey: String = localProperties.getProperty("TMDB_API_KEY") ?: ""
+if (tmdbApiKey.isEmpty()) {
+    logger.warn("AVISO: falta TMDB_API_KEY en local.properties, la app no podra pedir peliculas")
 }
 
 android {
@@ -18,6 +32,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKey\"")
     }
 
     buildTypes {
@@ -38,6 +54,7 @@ android {
     }
     buildFeatures{
         viewBinding = true
+        buildConfig = true
     }
 }
 
