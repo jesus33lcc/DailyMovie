@@ -1,7 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!--
+        DailyMovie tiene un solo aspecto, oscuro a proposito, asi que el tema de noche
+        aplica exactamente lo mismo que el de dia.
+
+        Antes este fichero repetia el nombre del tema base pero sin ningun ajuste dentro.
+        Como en modo oscuro Android se queda con esta version, la app perdia el color y la
+        fuente propios y salian los de Material por defecto: boton lila y letra de palo
+        en vez del azul pizarra y la Courier.
+    -->
     <style name="Base.Theme.DailyMovie" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/colorAccent</item>
+        <item name="android:fontFamily">@font/courier</item>
     </style>
 </resources>
