@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- La app pide peliculas a TMDB y datos a Firebase, asi que necesita internet.
+         Funcionaba sin declararlo porque lo aportan las librerias al fusionar el
+         manifest, pero conviene que este a la vista de quien lea el proyecto. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
