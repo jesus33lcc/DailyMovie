@@ -27,44 +27,101 @@ class HomeViewModel : ViewModel() {
     private val _error = MutableLiveData<ErrorCarga?>()
     val error: LiveData<ErrorCarga?> get() = _error
 
+    private val _cargando = MutableLiveData(false)
+    val cargando: LiveData<Boolean> get() = _cargando
+
+    /** Peticiones que faltan por contestar en la carga actual. */
+    private var peticionesPendientes = 0
+
     fun fetchNowPlayingMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
         RetrofitClient.webService.getNowPlayingMovies(apiKey, language, page).enqueueSimple(
-            onExito = { _nowPlayingMovies.value = it.results },
-            onError = { _error.value = it }
+            onExito = { _nowPlayingMovies.value = it.results; peticionTerminada() },
+            onError = { _error.value = it; peticionTerminada() }
         )
     }
 
     fun fetchPopularMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
         RetrofitClient.webService.getPopularMovies(apiKey, language, page).enqueueSimple(
-            onExito = { _popularMovies.value = it.results },
-            onError = { _error.value = it }
+            onExito = { _popularMovies.value = it.results; peticionTerminada() },
+            onError = { _error.value = it; peticionTerminada() }
         )
     }
 
     fun fetchTopRatedMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
         RetrofitClient.webService.getTopRatedMovies(apiKey, language, page).enqueueSimple(
-            onExito = { _topRatedMovies.value = it.results },
-            onError = { _error.value = it }
+            onExito = { _topRatedMovies.value = it.results; peticionTerminada() },
+            onError = { _error.value = it; peticionTerminada() }
         )
     }
 
     fun fetchUpcomingMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
         RetrofitClient.webService.getUpcomingMovies(apiKey, language, page).enqueueSimple(
-            onExito = { _upcomingMovies.value = it.results },
-            onError = { _error.value = it }
+            onExito = { _upcomingMovies.value = it.results; peticionTerminada() },
+            onError = { _error.value = it; peticionTerminada() }
         )
     }
 
     fun fetchMovieOfTheDay() {
-        // Que venga null es normal: si nadie ha curado la pelicula de hoy en Firebase
-        // simplemente no hay ninguna, y eso no es un error que enseñarle al usuario.
+        // Si nadie ha curado la pelicula de hoy en Firebase se enseña la de reserva, para
+        // que la portada nunca quede vacia. Cuando exista la recomendacion segun gustos,
+        // esta sera la que ocupe ese hueco y la de reserva desaparecera.
         FirebaseClient.getMovieOfTheDay { movie ->
-            _movieOfTheDay.value = movie
+            _movieOfTheDay.value = movie ?: PELICULA_DE_RESERVA
+            peticionTerminada()
+        }
+    }
+
+    /**
+     * Pide de golpe todo lo que se ve en la portada y avisa mientras dure.
+     * Lo llaman tanto la primera carga como el gesto de deslizar para refrescar.
+     */
+    fun cargarPortada(apiKey: String) {
+        peticionesPendientes = TOTAL_PETICIONES
+        _cargando.value = true
+
+        fetchNowPlayingMovies(apiKey)
+        fetchPopularMovies(apiKey)
+        fetchTopRatedMovies(apiKey)
+        fetchUpcomingMovies(apiKey)
+        fetchMovieOfTheDay()
+    }
+
+    /**
+     * Va descontando peticiones y apaga el indicador cuando han contestado todas, hayan
+     * ido bien o mal. Antes el circulo de refrescar se paraba al instante, asi que el
+     * gesto parecia terminado cuando en realidad no habia llegado nada.
+     */
+    private fun peticionTerminada() {
+        peticionesPendientes--
+        if (peticionesPendientes <= 0) {
+            peticionesPendientes = 0
+            _cargando.value = false
         }
     }
 
     /** La vista avisa de que ya ha enseñado el aviso, para que no vuelva a salir solo. */
     fun errorMostrado() {
         _error.value = null
+    }
+
+    private companion object {
+        /** Las cuatro listas de TMDB mas la pelicula del dia. */
+        const val TOTAL_PETICIONES = 5
+
+        /**
+         * Pelicula fija que se enseña mientras no haya recomendacion personalizada.
+         * El id y el video son los reales de TMDB, asi que "Ver ficha completa" funciona.
+         */
+        val PELICULA_DE_RESERVA = MovieOfTheDay(
+            id = 238,
+            title = "El Padrino",
+            review = "Don Vito Corleone maneja una de las familias mas poderosas de Nueva " +
+                "York, y lo que empieza como una boda acaba siendo el retrato de como el " +
+                "poder se hereda. Coppola la convirtio en la medida con la que se comparan " +
+                "las demas peliculas de mafia. Si solo vas a ver una, que sea esta.",
+            date = "",
+            author = "DailyMovie",
+            videoId = "v72XprPxy3E"
+        )
     }
 }
