@@ -8,6 +8,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,9 +23,6 @@ import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.fragments.viewmodels.HomeViewModel
 import com.example.dailymovie.activities.views.MovieA
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -32,7 +32,6 @@ class HomeF : Fragment() {
     private lateinit var homeViewModel: HomeViewModel
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private lateinit var youTubePlayerView: YouTubePlayerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,27 +82,22 @@ class HomeF : Fragment() {
             }
         })
 
-        homeViewModel.fetchNowPlayingMovies(Constantes.API_KEY)
-        homeViewModel.fetchPopularMovies(Constantes.API_KEY)
-        homeViewModel.fetchTopRatedMovies(Constantes.API_KEY)
-        homeViewModel.fetchUpcomingMovies(Constantes.API_KEY)
-        homeViewModel.fetchMovieOfTheDay()
+        homeViewModel.cargando.observe(viewLifecycleOwner, Observer { cargando ->
+            binding.swipeRefreshLayout.isRefreshing = cargando
+        })
 
-        youTubePlayerView = binding.youtubePlayerView
-        lifecycle.addObserver(youTubePlayerView)
+        homeViewModel.cargarPortada(Constantes.API_KEY)
+
+        lifecycle.addObserver(binding.youtubePlayerView)
+
 
         setupSwipeRefreshLayout()
     }
 
     private fun setupSwipeRefreshLayout() {
+        // El circulo se para solo cuando el ViewModel avisa de que ha contestado todo.
         binding.swipeRefreshLayout.setOnRefreshListener {
-            homeViewModel.fetchNowPlayingMovies(Constantes.API_KEY)
-            homeViewModel.fetchPopularMovies(Constantes.API_KEY)
-            homeViewModel.fetchTopRatedMovies(Constantes.API_KEY)
-            homeViewModel.fetchUpcomingMovies(Constantes.API_KEY)
-            homeViewModel.fetchMovieOfTheDay()
-
-            binding.swipeRefreshLayout.isRefreshing = false
+            homeViewModel.cargarPortada(Constantes.API_KEY)
         }
     }
 
@@ -116,8 +110,13 @@ class HomeF : Fragment() {
 
         binding.movieAuthor.text = movie.author
 
-        binding.youtubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-            override fun onReady(youTubePlayer: YouTubePlayer) {
+        // Antes se usaba addYouTubePlayerListener y el video no se cargaba nunca: el
+        // reproductor ya se habia inicializado al registrarlo en el ciclo de vida, y a un
+        // oyente que llega despues ya no se le avisa de onReady, asi que cueVideo no
+        // llegaba a ejecutarse. Ademas se acumulaba un oyente por cada vez que llegaban
+        // datos. getYouTubePlayerWhenReady responde al momento si ya esta listo.
+        binding.youtubePlayerView.getYouTubePlayerWhenReady(object : YouTubePlayerCallback {
+            override fun onYouTubePlayer(youTubePlayer: YouTubePlayer) {
                 youTubePlayer.cueVideo(movie.videoId, 0f)
             }
         })
