@@ -4,13 +4,14 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.dailymovie.R
 import com.example.dailymovie.models.VideoModel
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import com.example.dailymovie.utils.Trailers
 
 class VideoAdapter(private val context: Context, private val videoList: List<VideoModel>) :
     RecyclerView.Adapter<VideoAdapter.VideoViewHolder>() {
@@ -23,11 +24,18 @@ class VideoAdapter(private val context: Context, private val videoList: List<Vid
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         val video = videoList[position]
 
-        holder.youtubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-            override fun onReady(youTubePlayer: YouTubePlayer) {
-                youTubePlayer.cueVideo(video.key, 0f)
-            }
-        })
+        // YouTube ya no deja reproducir dentro de un WebView, asi que se enseña la miniatura
+        // y al tocarla se abre el trailer en YouTube. Ver utils/Trailers.
+        Glide.with(context)
+            .load(Trailers.miniatura(video.key))
+            .placeholder(R.drawable.ic_baseline_image_24)
+            .error(R.drawable.ic_baseline_image_24)
+            .into(holder.miniatura)
+
+        holder.contenedor.setOnClickListener {
+            Trailers.abrir(context, video.key)
+        }
+
         holder.txtVideoName.text = video.name
     }
 
@@ -36,8 +44,8 @@ class VideoAdapter(private val context: Context, private val videoList: List<Vid
     }
 
     class VideoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val youtubePlayerView: YouTubePlayerView = itemView.findViewById(R.id.youtube_player_view)
+        val contenedor: FrameLayout = itemView.findViewById(R.id.trailerContainer)
+        val miniatura: ImageView = itemView.findViewById(R.id.trailerThumbnail)
         val txtVideoName: TextView = itemView.findViewById(R.id.txtVideoName)
     }
 }
-

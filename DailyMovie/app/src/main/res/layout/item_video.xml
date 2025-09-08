@@ -5,14 +5,30 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-        android:id="@+id/youtube_player_view"
+    <FrameLayout
+        android:id="@+id/trailerContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginBottom="16dp"
         android:background="@drawable/rounded_border_box_big"
-        android:clipToOutline="true"/>
+        android:clipToOutline="true"
+        android:foreground="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/trailerThumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/ver_trailer" />
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_play_trailer"
+            android:contentDescription="@string/ver_trailer" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/txtVideoName"

@@ -4,4 +4,8 @@
     <!-- Avisos cuando algo no se puede cargar -->
     <string name="error_sin_conexion">No hay conexión. Revisa tu internet e inténtalo otra vez</string>
     <string name="error_respuesta_invalida">No se han podido cargar las películas. Inténtalo más tarde</string>
+    <string name="error_abrir_trailer">No se ha podido abrir el tráiler</string>
+
+    <!-- Trailers -->
+    <string name="ver_trailer">Ver tráiler</string>
 </resources>
