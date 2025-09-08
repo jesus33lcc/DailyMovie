@@ -8,7 +8,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.children
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -25,7 +24,6 @@ import com.example.dailymovie.databinding.ActivityMovieBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.utils.LocaleUtil
 import com.example.dailymovie.utils.mensaje
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 class MovieA : AppCompatActivity() {
 
@@ -347,12 +345,4 @@ class MovieA : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        binding.viewPagerVideos.children.forEach {
-            if (it is YouTubePlayerView) {
-                it.release()
-            }
-        }
-    }
 }

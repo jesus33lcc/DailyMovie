@@ -8,18 +8,18 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerCallback
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.bumptech.glide.Glide
+import com.example.dailymovie.R
 import com.example.dailymovie.adapters.MovieAdapter
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.utils.Trailers
 import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.fragments.viewmodels.HomeViewModel
 import com.example.dailymovie.activities.views.MovieA
@@ -88,7 +88,6 @@ class HomeF : Fragment() {
 
         homeViewModel.cargarPortada(Constantes.API_KEY)
 
-        lifecycle.addObserver(binding.youtubePlayerView)
 
 
         setupSwipeRefreshLayout()
@@ -115,11 +114,17 @@ class HomeF : Fragment() {
         // oyente que llega despues ya no se le avisa de onReady, asi que cueVideo no
         // llegaba a ejecutarse. Ademas se acumulaba un oyente por cada vez que llegaban
         // datos. getYouTubePlayerWhenReady responde al momento si ya esta listo.
-        binding.youtubePlayerView.getYouTubePlayerWhenReady(object : YouTubePlayerCallback {
-            override fun onYouTubePlayer(youTubePlayer: YouTubePlayer) {
-                youTubePlayer.cueVideo(movie.videoId, 0f)
-            }
-        })
+        // YouTube ya no deja reproducir dentro de un WebView, asi que se enseña la
+        // miniatura y al tocarla se abre el trailer en YouTube. Ver utils/Trailers.
+        Glide.with(this)
+            .load(Trailers.miniatura(movie.videoId))
+            .placeholder(R.drawable.ic_baseline_image_24)
+            .error(R.drawable.ic_baseline_image_24)
+            .into(binding.trailerThumbnail)
+
+        binding.trailerContainer.setOnClickListener {
+            Trailers.abrir(requireContext(), movie.videoId)
+        }
 
         binding.btnViewFullDetails.setOnClickListener {
             val intent = Intent(context, MovieA::class.java)
