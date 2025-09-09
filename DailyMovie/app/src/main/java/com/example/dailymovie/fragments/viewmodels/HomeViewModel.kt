@@ -3,15 +3,19 @@ package com.example.dailymovie.fragments.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.dailymovie.client.FirebaseClient
-import com.example.dailymovie.client.RetrofitClient
-import com.example.dailymovie.client.enqueueSimple
+import com.example.dailymovie.data.Dependencias
+import com.example.dailymovie.data.Gustos
+import com.example.dailymovie.data.MovieRepository
+import com.example.dailymovie.data.Resultado
+import com.example.dailymovie.data.UserRepository
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.utils.ErrorCarga
-import com.example.dailymovie.utils.LocaleUtil
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    private val peliculas: MovieRepository = Dependencias.peliculas,
+    private val usuario: UserRepository = Dependencias.usuario
+) : ViewModel() {
 
     private val _nowPlayingMovies = MutableLiveData<List<MovieModel>>()
     val nowPlayingMovies: LiveData<List<MovieModel>> get() = _nowPlayingMovies
@@ -21,8 +25,13 @@ class HomeViewModel : ViewModel() {
     val topRatedMovies: LiveData<List<MovieModel>> get() = _topRatedMovies
     private val _upcomingMovies = MutableLiveData<List<MovieModel>>()
     val upcomingMovies: LiveData<List<MovieModel>> get() = _upcomingMovies
+
     private val _movieOfTheDay = MutableLiveData<MovieOfTheDay?>()
     val movieOfTheDay: LiveData<MovieOfTheDay?> get() = _movieOfTheDay
+
+    /** Por que se enseña esa pelicula, para poder explicarselo al usuario en la portada. */
+    private val _motivoRecomendacion = MutableLiveData<String?>()
+    val motivoRecomendacion: LiveData<String?> get() = _motivoRecomendacion
 
     private val _error = MutableLiveData<ErrorCarga?>()
     val error: LiveData<ErrorCarga?> get() = _error
@@ -30,67 +39,112 @@ class HomeViewModel : ViewModel() {
     private val _cargando = MutableLiveData(false)
     val cargando: LiveData<Boolean> get() = _cargando
 
-    /** Peticiones que faltan por contestar en la carga actual. */
     private var peticionesPendientes = 0
 
-    fun fetchNowPlayingMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
-        RetrofitClient.webService.getNowPlayingMovies(apiKey, language, page).enqueueSimple(
-            onExito = { _nowPlayingMovies.value = it.results; peticionTerminada() },
-            onError = { _error.value = it; peticionTerminada() }
-        )
+    /** Pide de golpe todo lo que se ve en la portada y avisa mientras dure. */
+    fun cargarPortada() {
+        peticionesPendientes = TOTAL_PETICIONES
+        _cargando.value = true
+
+        peliculas.enCartelera { reparte(it) { lista -> _nowPlayingMovies.value = lista } }
+        peliculas.populares { reparte(it) { lista -> _popularMovies.value = lista } }
+        peliculas.mejorValoradas { reparte(it) { lista -> _topRatedMovies.value = lista } }
+        peliculas.proximamente { reparte(it) { lista -> _upcomingMovies.value = lista } }
+        cargarPeliculaDestacada()
     }
 
-    fun fetchPopularMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
-        RetrofitClient.webService.getPopularMovies(apiKey, language, page).enqueueSimple(
-            onExito = { _popularMovies.value = it.results; peticionTerminada() },
-            onError = { _error.value = it; peticionTerminada() }
-        )
+    /**
+     * Elige la pelicula de la portada, en este orden:
+     *
+     * 1. La curada a mano en Firebase para hoy, si la hay.
+     * 2. Una recomendada segun los gustos que el usuario dio al registrarse.
+     * 3. Si no ha dicho sus gustos, la mas popular del momento.
+     *
+     * La idea es que la portada nunca se quede vacia, y que cuanto mas sepa la app de ti,
+     * mas tuya sea la pelicula que te enseña.
+     */
+    private fun cargarPeliculaDestacada() {
+        usuario.peliculaDelDia { curada ->
+            if (curada != null) {
+                _motivoRecomendacion.value = null
+                _movieOfTheDay.value = curada
+                peticionTerminada()
+            } else {
+                recomendarSegunGustos()
+            }
+        }
     }
 
-    fun fetchTopRatedMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
-        RetrofitClient.webService.getTopRatedMovies(apiKey, language, page).enqueueSimple(
-            onExito = { _topRatedMovies.value = it.results; peticionTerminada() },
-            onError = { _error.value = it; peticionTerminada() }
-        )
+    private fun recomendarSegunGustos() {
+        usuario.gustos { gustos ->
+            if (gustos == null || gustos.generos.isEmpty()) {
+                elegirEntrePopulares()
+            } else {
+                recomendarPorGeneros(gustos)
+            }
+        }
     }
 
-    fun fetchUpcomingMovies(apiKey: String, language: String = LocaleUtil.getLanguageAndCountry(), page: Int = 1) {
-        RetrofitClient.webService.getUpcomingMovies(apiKey, language, page).enqueueSimple(
-            onExito = { _upcomingMovies.value = it.results; peticionTerminada() },
-            onError = { _error.value = it; peticionTerminada() }
-        )
+    private fun recomendarPorGeneros(gustos: Gustos) {
+        peliculas.porGeneros(gustos.generos) { resultado ->
+            val candidata = (resultado as? Resultado.Exito)?.datos
+                ?.firstOrNull { it.id !in gustos.peliculas }
+            if (candidata == null) {
+                elegirEntrePopulares()
+            } else {
+                publicarRecomendada(candidata, MOTIVO_GUSTOS)
+            }
+        }
     }
 
-    fun fetchMovieOfTheDay() {
-        // Si nadie ha curado la pelicula de hoy en Firebase se enseña la de reserva, para
-        // que la portada nunca quede vacia. Cuando exista la recomendacion segun gustos,
-        // esta sera la que ocupe ese hueco y la de reserva desaparecera.
-        FirebaseClient.getMovieOfTheDay { movie ->
-            _movieOfTheDay.value = movie ?: PELICULA_DE_RESERVA
-            peticionTerminada()
+    private fun elegirEntrePopulares() {
+        peliculas.populares { resultado ->
+            val candidata = (resultado as? Resultado.Exito)?.datos?.firstOrNull()
+            if (candidata == null) {
+                _motivoRecomendacion.value = null
+                _movieOfTheDay.value = null
+                peticionTerminada()
+            } else {
+                publicarRecomendada(candidata, MOTIVO_POPULAR)
+            }
         }
     }
 
     /**
-     * Pide de golpe todo lo que se ve en la portada y avisa mientras dure.
-     * Lo llaman tanto la primera carga como el gesto de deslizar para refrescar.
+     * Completa la pelicula recomendada con su sinopsis y su trailer.
+     *
+     * La curada a mano en Firebase trae reseña y video escritos por nosotros; una
+     * recomendada no, asi que se rellena con lo que da TMDB para que la portada se vea
+     * igual de completa venga de donde venga.
      */
-    fun cargarPortada(apiKey: String) {
-        peticionesPendientes = TOTAL_PETICIONES
-        _cargando.value = true
-
-        fetchNowPlayingMovies(apiKey)
-        fetchPopularMovies(apiKey)
-        fetchTopRatedMovies(apiKey)
-        fetchUpcomingMovies(apiKey)
-        fetchMovieOfTheDay()
+    private fun publicarRecomendada(pelicula: MovieModel, motivo: String) {
+        peliculas.detalles(pelicula.id) { detalles ->
+            val sinopsis = (detalles as? Resultado.Exito)?.datos?.overview.orEmpty()
+            peliculas.videos(pelicula.id) { videos ->
+                val trailer = (videos as? Resultado.Exito)?.datos?.firstOrNull()?.key.orEmpty()
+                _motivoRecomendacion.value = motivo
+                _movieOfTheDay.value = MovieOfTheDay(
+                    id = pelicula.id,
+                    title = pelicula.title,
+                    review = sinopsis,
+                    date = "",
+                    author = motivo,
+                    videoId = trailer
+                )
+                peticionTerminada()
+            }
+        }
     }
 
-    /**
-     * Va descontando peticiones y apaga el indicador cuando han contestado todas, hayan
-     * ido bien o mal. Antes el circulo de refrescar se paraba al instante, asi que el
-     * gesto parecia terminado cuando en realidad no habia llegado nada.
-     */
+    private fun <T> reparte(resultado: Resultado<T>, alIrBien: (T) -> Unit) {
+        when (resultado) {
+            is Resultado.Exito -> alIrBien(resultado.datos)
+            is Resultado.Fallo -> _error.value = resultado.motivo
+        }
+        peticionTerminada()
+    }
+
+    /** Apaga el indicador cuando han contestado todas, hayan ido bien o mal. */
     private fun peticionTerminada() {
         peticionesPendientes--
         if (peticionesPendientes <= 0) {
@@ -99,29 +153,13 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    /** La vista avisa de que ya ha enseñado el aviso, para que no vuelva a salir solo. */
     fun errorMostrado() {
         _error.value = null
     }
 
     private companion object {
-        /** Las cuatro listas de TMDB mas la pelicula del dia. */
         const val TOTAL_PETICIONES = 5
-
-        /**
-         * Pelicula fija que se enseña mientras no haya recomendacion personalizada.
-         * El id y el video son los reales de TMDB, asi que "Ver ficha completa" funciona.
-         */
-        val PELICULA_DE_RESERVA = MovieOfTheDay(
-            id = 238,
-            title = "El Padrino",
-            review = "Don Vito Corleone maneja una de las familias mas poderosas de Nueva " +
-                "York, y lo que empieza como una boda acaba siendo el retrato de como el " +
-                "poder se hereda. Coppola la convirtio en la medida con la que se comparan " +
-                "las demas peliculas de mafia. Si solo vas a ver una, que sea esta.",
-            date = "",
-            author = "DailyMovie",
-            videoId = "v72XprPxy3E"
-        )
+        const val MOTIVO_GUSTOS = "Porque te gusta este tipo de cine"
+        const val MOTIVO_POPULAR = "De lo más visto ahora mismo"
     }
 }

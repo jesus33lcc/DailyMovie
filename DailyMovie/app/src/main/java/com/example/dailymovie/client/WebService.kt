@@ -87,4 +87,104 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
         @Query("page") page: Int = 1
     ): Call<MoviesResponse>
+
+    // ---- Recomendacion ----
+
+    @GET("discover/movie")
+    fun descubrirPeliculas(
+        @Query("api_key") apiKey: String,
+        @Query("with_genres") generos: String,
+        @Query("sort_by") orden: String = "popularity.desc",
+        @Query("vote_count.gte") votosMinimos: Int = 300,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
+        @Query("page") page: Int = 1
+    ): Call<MoviesResponse>
+
+    @GET("genre/movie/list")
+    fun getGeneros(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<GenresResponse>
+
+    // ---- Personas (actores y directores) ----
+
+    @GET("person/{person_id}")
+    fun getPersona(
+        @Path("person_id") personaId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<PersonResponse>
+
+    @GET("person/{person_id}/movie_credits")
+    fun getFilmografia(
+        @Path("person_id") personaId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<PersonCreditsResponse>
+
+    // ---- Series ----
+
+    @GET("search/tv")
+    fun buscarSeries(
+        @Query("query") titulo: String,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
+        @Query("page") page: Int = 1
+    ): Call<SeriesResponse>
+
+    @GET("tv/popular")
+    fun getSeriesPopulares(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
+        @Query("page") page: Int = 1
+    ): Call<SeriesResponse>
+
+    @GET("tv/top_rated")
+    fun getSeriesMejorValoradas(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
+        @Query("page") page: Int = 1
+    ): Call<SeriesResponse>
+
+    @GET("tv/on_the_air")
+    fun getSeriesEnEmision(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
+        @Query("page") page: Int = 1
+    ): Call<SeriesResponse>
+
+    @GET("tv/{tv_id}")
+    fun getSerieDetalles(
+        @Path("tv_id") serieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<SerieDetailsResponse>
+
+    @GET("tv/{tv_id}/season/{season_number}")
+    fun getTemporada(
+        @Path("tv_id") serieId: Int,
+        @Path("season_number") numeroTemporada: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<SeasonResponse>
+
+    @GET("tv/{tv_id}/credits")
+    fun getSerieCreditos(
+        @Path("tv_id") serieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<CreditResponse>
+
+    @GET("tv/{tv_id}/videos")
+    fun getSerieVideos(
+        @Path("tv_id") serieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<VideoResponse>
+
+    @GET("tv/{tv_id}/watch/providers")
+    fun getSerieProviders(
+        @Path("tv_id") serieId: Int,
+        @Query("api_key") apiKey: String
+    ): Call<ProviderResponse>
 }
