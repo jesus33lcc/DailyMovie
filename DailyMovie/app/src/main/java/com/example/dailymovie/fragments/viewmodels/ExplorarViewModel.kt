@@ -3,15 +3,17 @@ package com.example.dailymovie.fragments.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.dailymovie.client.FirebaseClient
-import com.example.dailymovie.client.RetrofitClient
-import com.example.dailymovie.client.enqueueSimple
+import com.example.dailymovie.data.Dependencias
+import com.example.dailymovie.data.MovieRepository
+import com.example.dailymovie.data.Resultado
+import com.example.dailymovie.data.UserRepository
 import com.example.dailymovie.models.MovieModel
-import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.ErrorCarga
-import com.example.dailymovie.utils.LocaleUtil
 
-class ExplorarViewModel : ViewModel() {
+class ExplorarViewModel(
+    private val peliculas: MovieRepository = Dependencias.peliculas,
+    private val usuario: UserRepository = Dependencias.usuario
+) : ViewModel() {
 
     private val _movies = MutableLiveData<List<MovieModel>>()
     val movies: LiveData<List<MovieModel>> get() = _movies
@@ -22,32 +24,28 @@ class ExplorarViewModel : ViewModel() {
     private val _error = MutableLiveData<ErrorCarga?>()
     val error: LiveData<ErrorCarga?> get() = _error
 
-    fun searchMovies(query: String) {
-        RetrofitClient.webService
-            .searchMovies(query, Constantes.API_KEY, true, LocaleUtil.getLanguageAndCountry(), 1)
-            .enqueueSimple(
-                onExito = { _movies.value = it.results },
-                onError = {
+    fun searchMovies(consulta: String) {
+        peliculas.buscar(consulta) { resultado ->
+            when (resultado) {
+                is Resultado.Exito -> _movies.value = resultado.datos
+                is Resultado.Fallo -> {
                     // Antes se vaciaba la lista sin decir nada, asi que un fallo de red se
                     // veia igual que una busqueda sin resultados.
                     _movies.value = emptyList()
-                    _error.value = it
+                    _error.value = resultado.motivo
                 }
-            )
+            }
+        }
     }
 
-    fun addToHistory(movie: MovieModel) {
-        FirebaseClient.addToHistory(movie) { success ->
-        }
+    fun addToHistory(pelicula: MovieModel) {
+        usuario.anadirAlHistorial(pelicula) { }
     }
 
     fun loadHistory() {
-        FirebaseClient.getHistory { movies ->
-            _history.value = movies
-        }
+        usuario.historial { _history.value = it }
     }
 
-    /** La vista avisa de que ya ha enseñado el aviso, para que no vuelva a salir solo. */
     fun errorMostrado() {
         _error.value = null
     }

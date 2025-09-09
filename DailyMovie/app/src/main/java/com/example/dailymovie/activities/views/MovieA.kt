@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.dailymovie.R
 import com.example.dailymovie.adapters.*
-import com.example.dailymovie.client.FirebaseClient
 import com.example.dailymovie.client.response.*
 import com.example.dailymovie.models.MovieDetailsModel
 import com.example.dailymovie.models.MovieModel
@@ -38,12 +37,7 @@ class MovieA : AppCompatActivity() {
         val movieId = intent.getIntExtra("MOVIE_ID", -1)
 
         if (movieId != -1) {
-            movieViewModel.fetchMovieDetails(movieId, Constantes.API_KEY, LocaleUtil.getLanguageAndCountry())
-            movieViewModel.fetchMovieProviders(movieId, Constantes.API_KEY)
-            movieViewModel.fetchMovieCredits(movieId, Constantes.API_KEY)
-            movieViewModel.fetchMovieVideos(movieId, Constantes.API_KEY)
-            movieViewModel.fetchSimilarMovies(movieId, Constantes.API_KEY, LocaleUtil.getLanguageAndCountry())
-            movieViewModel.fetchRecommendedMovies(movieId, Constantes.API_KEY, LocaleUtil.getLanguageAndCountry())
+            movieViewModel.cargarPelicula(movieId)
 
             movieViewModel.movieDetails.observe(this, Observer { movieDetailsResponse ->
                 movieDetailsResponse?.let {
@@ -141,7 +135,7 @@ class MovieA : AppCompatActivity() {
     }
 
     private fun updateFavoriteButtonIcon(movieId: Int, button: ImageButton) {
-        FirebaseClient.isMovieInFavorites(movieId) { isFavorite ->
+        movieViewModel.esFavorita(movieId) { isFavorite ->
             runOnUiThread {
                 val icon = if (isFavorite) R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
                 button.setImageResource(icon)
@@ -150,7 +144,7 @@ class MovieA : AppCompatActivity() {
     }
 
     private fun updateWatchedButtonIcon(movieId: Int, button: ImageButton) {
-        FirebaseClient.isMovieInWatched(movieId) { isWatched ->
+        movieViewModel.estaVista(movieId) { isWatched ->
             runOnUiThread {
                 val icon = if (isWatched) R.drawable.ic_baseline_visibility_24 else R.drawable.ic_baseline_visibility_off_24
                 button.setImageResource(icon)

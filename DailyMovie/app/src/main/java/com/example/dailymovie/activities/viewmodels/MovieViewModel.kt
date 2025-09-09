@@ -3,18 +3,23 @@ package com.example.dailymovie.activities.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.dailymovie.client.FirebaseClient
-import com.example.dailymovie.client.RetrofitClient
-import com.example.dailymovie.client.enqueueSimple
-import com.example.dailymovie.client.response.*
+import com.example.dailymovie.client.response.CreditResponse
+import com.example.dailymovie.client.response.MovieDetailsResponse
+import com.example.dailymovie.client.response.ProviderResponse
+import com.example.dailymovie.data.Dependencias
+import com.example.dailymovie.data.ListaFija
+import com.example.dailymovie.data.MovieRepository
+import com.example.dailymovie.data.Resultado
+import com.example.dailymovie.data.UserRepository
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.ErrorCarga
-import com.example.dailymovie.utils.LocaleUtil
 
-class MovieViewModel : ViewModel() {
+class MovieViewModel(
+    private val peliculas: MovieRepository = Dependencias.peliculas,
+    private val usuario: UserRepository = Dependencias.usuario
+) : ViewModel() {
 
-    private var currentMovieModel: MovieModel? = null
     private val _movieDetails = MutableLiveData<MovieDetailsResponse>()
     val movieDetails: LiveData<MovieDetailsResponse> get() = _movieDetails
     private val _movieProviders = MutableLiveData<ProviderResponse>()
@@ -27,148 +32,88 @@ class MovieViewModel : ViewModel() {
     val similarMovies: LiveData<List<MovieModel>> get() = _similarMovies
     private val _recommendedMovies = MutableLiveData<List<MovieModel>>()
     val recommendedMovies: LiveData<List<MovieModel>> get() = _recommendedMovies
+
     private val _favorites = MutableLiveData<List<MovieModel>>()
     val favorites: LiveData<List<MovieModel>> get() = _favorites
-
     private val _watched = MutableLiveData<List<MovieModel>>()
     val watched: LiveData<List<MovieModel>> get() = _watched
 
     private val _error = MutableLiveData<ErrorCarga?>()
     val error: LiveData<ErrorCarga?> get() = _error
 
-    fun setCurrentMovieModel(movieModel: MovieModel) {
-        currentMovieModel = movieModel
+    fun cargarPelicula(peliculaId: Int) {
+        // Los datos principales avisan si fallan; las secciones de abajo son un extra y
+        // simplemente se ocultan, para no llenar la pantalla de mensajes.
+        peliculas.detalles(peliculaId) { resultado ->
+            when (resultado) {
+                is Resultado.Exito -> _movieDetails.value = resultado.datos
+                is Resultado.Fallo -> _error.value = resultado.motivo
+            }
+        }
+        peliculas.plataformas(peliculaId) { siVaBien(it) { datos -> _movieProviders.value = datos } }
+        peliculas.reparto(peliculaId) { siVaBien(it) { datos -> _movieCredits.value = datos } }
+        peliculas.videos(peliculaId) { siVaBien(it) { datos -> _movieVideos.value = datos } }
+        peliculas.similares(peliculaId) { siVaBien(it) { datos -> _similarMovies.value = datos } }
+        peliculas.recomendadas(peliculaId) { siVaBien(it) { datos -> _recommendedMovies.value = datos } }
     }
 
-    fun fetchMovieDetails(movieId: Int, apiKey: String, language: String) {
-        RetrofitClient.webService.getMovieDetails(movieId, apiKey, language).enqueueSimple(
-            onExito = { _movieDetails.value = it },
-            onError = { _error.value = it }
-        )
+    private inline fun <T> siVaBien(resultado: Resultado<T>, bloque: (T) -> Unit) {
+        if (resultado is Resultado.Exito) bloque(resultado.datos)
     }
 
-    fun fetchMovieProviders(movieId: Int, apiKey: String) {
-        // Las secciones de abajo (plataformas, reparto, videos...) son un extra: si fallan
-        // solo se ocultan, y no se avisa para no llenar la pantalla de mensajes. El aviso
-        // se reserva para los datos principales de la pelicula.
-        RetrofitClient.webService.getMovieProviders(movieId, apiKey).enqueueSimple(
-            onExito = { _movieProviders.value = it },
-            onError = { }
-        )
+    fun toggleFavorite(pelicula: MovieModel, alTerminar: (Boolean) -> Unit) =
+        usuario.cambiarFavorita(pelicula, alTerminar)
+
+    fun toggleWatched(pelicula: MovieModel, alTerminar: (Boolean) -> Unit) =
+        usuario.cambiarVista(pelicula, alTerminar)
+
+    fun esFavorita(peliculaId: Int, alTerminar: (Boolean) -> Unit) =
+        usuario.esFavorita(peliculaId, alTerminar)
+
+    fun estaVista(peliculaId: Int, alTerminar: (Boolean) -> Unit) =
+        usuario.estaVista(peliculaId, alTerminar)
+
+    fun getCustomLists(alTerminar: (List<String>) -> Unit) = usuario.listasDelUsuario(alTerminar)
+
+    fun addMovieToList(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit) =
+        usuario.anadirALista(nombre, pelicula, alTerminar)
+
+    /** Quitar de una lista fija es cambiar el estado; de una del usuario, sacarla. */
+    fun removeMovieFromList(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit) {
+        when (ListaFija.desdeTitulo(nombre)) {
+            ListaFija.FAVORITOS -> usuario.cambiarFavorita(pelicula, alTerminar)
+            ListaFija.VISTOS -> usuario.cambiarVista(pelicula, alTerminar)
+            null -> usuario.quitarDeLista(nombre, pelicula, alTerminar)
+        }
     }
 
-    fun fetchMovieCredits(movieId: Int, apiKey: String) {
-        RetrofitClient.webService.getMovieCredits(movieId, apiKey).enqueueSimple(
-            onExito = { _movieCredits.value = it },
-            onError = { }
-        )
+    fun getFavorites(alTerminar: (List<MovieModel>) -> Unit) {
+        usuario.favoritas {
+            _favorites.value = it
+            alTerminar(it)
+        }
     }
 
-    fun fetchMovieVideos(movieId: Int, apiKey: String) {
-        // Se piden dos veces: primero en el idioma del movil y luego en ingles, porque
-        // TMDB tiene muchos mas trailers en ingles. Si la segunda falla nos quedamos con
-        // los del idioma local en vez de dejar la seccion vacia.
-        RetrofitClient.webService.getMovieVideos(movieId, apiKey, LocaleUtil.getLanguageAndCountry())
-            .enqueueSimple(
-                onExito = { respuestaLocal ->
-                    val videosLocales = sortVideos(respuestaLocal.results)
-                    RetrofitClient.webService.getMovieVideos(movieId, apiKey, "en-US").enqueueSimple(
-                        onExito = { respuestaIngles ->
-                            _movieVideos.value = videosLocales + sortVideos(respuestaIngles.results)
-                        },
-                        onError = { _movieVideos.value = videosLocales }
-                    )
-                },
-                onError = { }
-            )
+    fun getWatched(alTerminar: (List<MovieModel>) -> Unit) {
+        usuario.vistas {
+            _watched.value = it
+            alTerminar(it)
+        }
     }
 
-    private fun sortVideos(videos: List<VideoModel>): List<VideoModel> {
-        val trailers = videos.filter { it.type == "Trailer" }
-        val others = videos.filter { it.type != "Trailer" }
-        return trailers + others
+    fun getMoviesFromList(nombre: String, alTerminar: (List<MovieModel>) -> Unit) =
+        usuario.peliculasDeLista(nombre, alTerminar)
+
+    /** Carga la lista que toque, sea fija o del usuario. */
+    fun cargarLista(nombre: String, alTerminar: (List<MovieModel>) -> Unit) {
+        when (ListaFija.desdeTitulo(nombre)) {
+            ListaFija.FAVORITOS -> getFavorites(alTerminar)
+            ListaFija.VISTOS -> getWatched(alTerminar)
+            null -> getMoviesFromList(nombre, alTerminar)
+        }
     }
 
-    fun fetchSimilarMovies(movieId: Int, apiKey: String, language: String) {
-        RetrofitClient.webService.getSimilarMovies(movieId, apiKey, language).enqueueSimple(
-            onExito = { _similarMovies.value = it.results },
-            onError = { }
-        )
-    }
-
-    fun fetchRecommendedMovies(movieId: Int, apiKey: String, language: String) {
-        RetrofitClient.webService.getRecommendedMovies(movieId, apiKey, language).enqueueSimple(
-            onExito = { _recommendedMovies.value = it.results },
-            onError = { }
-        )
-    }
-
-    /** La vista avisa de que ya ha enseñado el aviso, para que no vuelva a salir solo. */
     fun errorMostrado() {
         _error.value = null
-    }
-
-    fun toggleFavorite(movie: MovieModel, onComplete: (Boolean) -> Unit) {
-        FirebaseClient.isMovieInFavorites(movie.id) { isFavorite ->
-            if (isFavorite) {
-                FirebaseClient.removeFromFavorites(movie) { success ->
-                    onComplete(success)
-                }
-            } else {
-                FirebaseClient.addToFavorites(movie) { success ->
-                    onComplete(success)
-                }
-            }
-        }
-    }
-
-    fun toggleWatched(movie: MovieModel, onComplete: (Boolean) -> Unit) {
-        FirebaseClient.isMovieInWatched(movie.id) { isWatched ->
-            if (isWatched) {
-                FirebaseClient.removeFromWatched(movie) { success ->
-                    onComplete(success)
-                }
-            } else {
-                FirebaseClient.addToWatched(movie) { success ->
-                    onComplete(success)
-                }
-            }
-        }
-    }
-
-    fun getCustomLists(onComplete: (List<String>) -> Unit) {
-        FirebaseClient.getCustomLists { listNames ->
-            onComplete(listNames)
-        }
-    }
-
-    fun addMovieToList(listName: String, movie: MovieModel, onComplete: (Boolean) -> Unit) {
-        FirebaseClient.addMovieToList(listName, movie) { success ->
-            onComplete(success)
-        }
-    }
-
-    fun removeMovieFromList(listName: String, movie: MovieModel, onComplete: (Boolean) -> Unit) {
-        FirebaseClient.removeMovieFromList(listName, movie) { success ->
-            onComplete(success)
-        }
-    }
-    fun getFavorites(onComplete: (List<MovieModel>) -> Unit) {
-        FirebaseClient.getFavorites { movieList ->
-            _favorites.value = movieList
-            onComplete(movieList)
-        }
-    }
-
-    fun getWatched(onComplete: (List<MovieModel>) -> Unit) {
-        FirebaseClient.getWatched { movieList ->
-            _watched.value = movieList
-            onComplete(movieList)
-        }
-    }
-    fun getMoviesFromList(listName: String, onComplete: (List<MovieModel>) -> Unit) {
-        FirebaseClient.getMoviesFromList(listName) { movieList ->
-            onComplete(movieList)
-        }
     }
 }

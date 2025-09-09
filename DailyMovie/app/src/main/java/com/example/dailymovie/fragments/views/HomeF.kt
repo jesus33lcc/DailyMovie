@@ -18,7 +18,6 @@ import com.example.dailymovie.adapters.MovieAdapter
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieOfTheDay
-import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.Trailers
 import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.fragments.viewmodels.HomeViewModel
@@ -86,7 +85,7 @@ class HomeF : Fragment() {
             binding.swipeRefreshLayout.isRefreshing = cargando
         })
 
-        homeViewModel.cargarPortada(Constantes.API_KEY)
+        homeViewModel.cargarPortada()
 
 
 
@@ -96,7 +95,7 @@ class HomeF : Fragment() {
     private fun setupSwipeRefreshLayout() {
         // El circulo se para solo cuando el ViewModel avisa de que ha contestado todo.
         binding.swipeRefreshLayout.setOnRefreshListener {
-            homeViewModel.cargarPortada(Constantes.API_KEY)
+            homeViewModel.cargarPortada()
         }
     }
 
@@ -104,32 +103,43 @@ class HomeF : Fragment() {
         binding.movieTitle.text = movie.title
         binding.movieReview.text = movie.review
 
-        val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-        binding.movieDate.text = currentDate
+        val hoy = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+        binding.movieDate.text = hoy
 
+        // En la pelicula curada a mano el autor es quien escribio la reseña; en una
+        // recomendada, el motivo por el que se le enseña ("Porque te gusta...").
         binding.movieAuthor.text = movie.author
 
-        // Antes se usaba addYouTubePlayerListener y el video no se cargaba nunca: el
-        // reproductor ya se habia inicializado al registrarlo en el ciclo de vida, y a un
-        // oyente que llega despues ya no se le avisa de onReady, asi que cueVideo no
-        // llegaba a ejecutarse. Ademas se acumulaba un oyente por cada vez que llegaban
-        // datos. getYouTubePlayerWhenReady responde al momento si ya esta listo.
-        // YouTube ya no deja reproducir dentro de un WebView, asi que se enseña la
-        // miniatura y al tocarla se abre el trailer en YouTube. Ver utils/Trailers.
-        Glide.with(this)
-            .load(Trailers.miniatura(movie.videoId))
-            .placeholder(R.drawable.ic_baseline_image_24)
-            .error(R.drawable.ic_baseline_image_24)
-            .into(binding.trailerThumbnail)
-
-        binding.trailerContainer.setOnClickListener {
-            Trailers.abrir(requireContext(), movie.videoId)
-        }
+        mostrarTrailer(movie.videoId)
 
         binding.btnViewFullDetails.setOnClickListener {
             val intent = Intent(context, MovieA::class.java)
             intent.putExtra("MOVIE_ID", movie.id)
             startActivity(intent)
+        }
+    }
+
+    /**
+     * Enseña la miniatura del trailer, o quita el hueco si esa pelicula no tiene ninguno.
+     *
+     * YouTube ya no deja reproducir dentro de un WebView de Android, asi que al tocar la
+     * miniatura se abre YouTube. Ver utils/Trailers.
+     */
+    private fun mostrarTrailer(videoId: String) {
+        if (videoId.isBlank()) {
+            binding.trailerContainer.visibility = View.GONE
+            return
+        }
+
+        binding.trailerContainer.visibility = View.VISIBLE
+        Glide.with(this)
+            .load(Trailers.miniatura(videoId))
+            .placeholder(R.drawable.ic_baseline_image_24)
+            .error(R.drawable.ic_baseline_image_24)
+            .into(binding.trailerThumbnail)
+
+        binding.trailerContainer.setOnClickListener {
+            Trailers.abrir(requireContext(), videoId)
         }
     }
 
