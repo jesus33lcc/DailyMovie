@@ -77,6 +77,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation("com.google.firebase:firebase-firestore")
+    // Inicio de sesion con Google
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
