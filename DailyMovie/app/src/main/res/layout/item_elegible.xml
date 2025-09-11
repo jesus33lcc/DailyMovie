@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Ficha que se puede marcar y desmarcar. Vale para un genero (sin imagen), para una
+    pelicula o para una persona, para no repetir tres layouts casi iguales.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/elegibleContenedor"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_margin="6dp"
+    android:padding="8dp"
+    android:background="@drawable/rounded_border_box"
+    android:clipToOutline="true"
+    android:clickable="true"
+    android:focusable="true">
+
+    <FrameLayout
+        android:id="@+id/elegibleMarco"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/elegibleImagen"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/rounded_border"
+            android:clipToOutline="true"
+            android:contentDescription="@string/ver_trailer"
+            tools:src="@drawable/ic_baseline_image_24" />
+
+        <!-- La marca de elegido: solo se ve cuando esta seleccionado -->
+        <ImageView
+            android:id="@+id/elegibleMarca"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="6dp"
+            android:visibility="gone"
+            android:src="@drawable/ic_marcado"
+            android:contentDescription="Elegido" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/elegibleNombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textSize="15sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textAlignment="center"
+        android:fontFamily="@font/courier_bold"
+        android:textColor="@color/colorTextPrimary"
+        tools:text="Ciencia ficción" />
+</LinearLayout>
