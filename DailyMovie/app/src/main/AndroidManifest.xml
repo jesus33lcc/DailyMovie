@@ -18,6 +18,9 @@
         android:theme="@style/Theme.DailyMovie"
         tools:targetApi="31">
         <activity
+            android:name=".activities.views.OnboardingA"
+            android:exported="false" />
+        <activity
             android:name=".activities.views.ListMoviesA"
             android:exported="false" />
         <activity

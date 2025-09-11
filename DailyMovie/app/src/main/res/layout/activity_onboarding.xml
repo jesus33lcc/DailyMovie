@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorBackground"
+    android:padding="16dp"
+    tools:context=".activities.views.OnboardingA">
+
+    <!-- Cabecera: en que paso vamos y que se pregunta -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@drawable/rounded_border_box_big"
+        android:clipToOutline="true">
+
+        <TextView
+            android:id="@+id/onboardingPaso"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textAlignment="center"
+            android:fontFamily="@font/courier"
+            android:textColor="@color/colorAccent"
+            tools:text="Paso 1 de 3" />
+
+        <TextView
+            android:id="@+id/onboardingTitulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="26sp"
+            android:textAlignment="center"
+            android:fontFamily="@font/courier_bold"
+            android:textColor="@color/black"
+            tools:text="¿Qué géneros te gustan?" />
+
+        <TextView
+            android:id="@+id/onboardingExplicacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="15sp"
+            android:textAlignment="center"
+            android:fontFamily="@font/courier"
+            android:textColor="@color/colorTextPrimary"
+            tools:text="Elige los que más veas. Con esto te recomendamos la película de la portada." />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/onboardingProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp"
+        android:visibility="gone"
+        android:indeterminateTint="@color/colorPrimary" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/onboardingRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/onboardingSaltar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Ahora no"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/colorAccent"
+            android:background="@drawable/rounded_button"
+            android:fontFamily="@font/courier_bold" />
+
+        <Button
+            android:id="@+id/onboardingSiguiente"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="Siguiente"
+            android:textSize="16sp"
+            android:textColor="@color/colorTextPrimary"
+            android:backgroundTint="@color/colorPrimary"
+            android:background="@drawable/rounded_button"
+            android:fontFamily="@font/courier_bold" />
+    </LinearLayout>
+</LinearLayout>
