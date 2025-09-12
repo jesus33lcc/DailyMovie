@@ -30,54 +30,100 @@
                 android:fontFamily="@font/courier_bold"
                 android:textAlignment="center"
                 android:textColor="@color/black"/>
+
+            <TextView
+                android:id="@+id/txtCorreoUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="14sp"
+                android:fontFamily="@font/courier"
+                android:textAlignment="center"
+                android:textColor="@color/colorTextPrimary"
+                tools:text="jesus@correo.com" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnClearHistory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Borrar historial"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_border_button"
-            android:textColor="@color/white"
-            android:paddingVertical="12dp"
-            android:textStyle="bold"
-            android:textSize="16sp" />
+        <!-- Seccion: Tus gustos -->
+        <TextView
+            style="@style/TituloDeSeccionAjustes"
+            android:text="Tus gustos" />
 
         <Button
-            android:id="@+id/btnChangePassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Cambiar contraseña"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_border_button"
-            android:textColor="@color/white"
-            android:paddingVertical="12dp"
-            android:textStyle="bold"
-            android:textSize="16sp" />
+            android:id="@+id/btnEditarGustos"
+            style="@style/BotonDeAjustes"
+            android:text="Editar mis gustos" />
+
+        <!-- Seccion: Contenido -->
+        <TextView
+            style="@style/TituloDeSeccionAjustes"
+            android:text="Contenido" />
 
         <Button
             android:id="@+id/btnRegion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Región"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_border_button"
-            android:textColor="@color/white"
-            android:paddingVertical="12dp"
-            android:textStyle="bold"
-            android:textSize="16sp" />
+            style="@style/BotonDeAjustes"
+            android:text="Región" />
+
+        <Button
+            android:id="@+id/btnClearHistory"
+            style="@style/BotonDeAjustes"
+            android:text="Borrar historial" />
+
+        <!-- Seccion: Cuenta -->
+        <TextView
+            style="@style/TituloDeSeccionAjustes"
+            android:text="Cuenta" />
+
+        <Button
+            android:id="@+id/btnChangePassword"
+            style="@style/BotonDeAjustes"
+            android:text="Cambiar contraseña" />
 
         <Button
             android:id="@+id/btnLogout"
+            style="@style/BotonDeAjustes"
+            android:text="Cerrar sesión" />
+
+        <!-- Seccion: Privacidad -->
+        <TextView
+            style="@style/TituloDeSeccionAjustes"
+            android:text="Privacidad" />
+
+        <Button
+            android:id="@+id/btnPoliticaPrivacidad"
+            style="@style/BotonDeAjustes"
+            android:text="Política de privacidad" />
+
+        <Button
+            android:id="@+id/btnConsentimientoAnalytics"
+            style="@style/BotonDeAjustes"
+            android:text="Datos de uso" />
+
+        <!-- Se separa del resto porque no tiene vuelta atras -->
+        <Button
+            android:id="@+id/btnBorrarCuenta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cerrar sesión"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="Borrar mi cuenta y mis datos"
             android:background="@drawable/rounded_border_button"
+            android:backgroundTint="#8B2C3B"
             android:textColor="@color/white"
             android:paddingVertical="12dp"
             android:textStyle="bold"
+            android:fontFamily="@font/courier_bold"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:fontFamily="@font/courier"
+            android:textColor="@color/colorPrimaryDark"
+            tools:text="DailyMovie 1.0" />
     </LinearLayout>
 
 </ScrollView>
