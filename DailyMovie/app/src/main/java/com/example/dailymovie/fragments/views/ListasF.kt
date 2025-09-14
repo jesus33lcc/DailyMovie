@@ -76,7 +76,7 @@ class ListasF : Fragment() {
             }
         }
         binding.misListasCheckFav.adapter = movieListAdapter
-        binding.misListasCheckFav.addItemDecoration(SpacingItemDecoration(spacing = 8))
+        binding.misListasCheckFav.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
     }
 
     private fun initializeCustomLists(customLists: MutableList<ListaModel>) {
@@ -86,7 +86,7 @@ class ListasF : Fragment() {
             }
         }
         binding.misListaPersonalizadas.adapter = customListsAdapter
-        binding.misListaPersonalizadas.addItemDecoration(SpacingItemDecoration(spacing = 8))
+        binding.misListaPersonalizadas.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
     }
 
     private fun navigateToMovieList(movieList: List<MovieModel>, listName: String) {

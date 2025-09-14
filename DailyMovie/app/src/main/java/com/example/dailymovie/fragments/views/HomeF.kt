@@ -46,13 +46,13 @@ class HomeF : Fragment() {
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
         binding.recyclerViewNowPlaying.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        binding.recyclerViewNowPlaying.addItemDecoration(SpacingItemDecoration(spacing = 8))
+        binding.recyclerViewNowPlaying.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
         binding.recyclerViewPopular.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        binding.recyclerViewPopular.addItemDecoration(SpacingItemDecoration(spacing = 8))
+        binding.recyclerViewPopular.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
         binding.recyclerViewTopRated.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        binding.recyclerViewTopRated.addItemDecoration(SpacingItemDecoration(spacing = 8))
+        binding.recyclerViewTopRated.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
         binding.recyclerViewUpcoming.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        binding.recyclerViewUpcoming.addItemDecoration(SpacingItemDecoration(spacing = 8))
+        binding.recyclerViewUpcoming.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
 
         homeViewModel.nowPlayingMovies.observe(viewLifecycleOwner, Observer { movies ->
             binding.recyclerViewNowPlaying.adapter = MovieAdapter(movies)

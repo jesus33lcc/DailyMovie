@@ -1,5 +1,6 @@
 package com.example.dailymovie.adapters
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.activities.views.PersonaA
 import com.example.dailymovie.models.CastMemberModel
 import com.example.dailymovie.utils.Constantes
 
@@ -27,6 +29,15 @@ class CreditAdapter(private val castList: List<CastMemberModel>) : RecyclerView.
             .into(holder.imgCastProfile)
         holder.txtCastName.text = castMember.name
         holder.txtCharacterName.text = castMember.character
+
+        // Tocar a alguien del reparto abre su ficha, con su biografia y su filmografia.
+        holder.itemView.setOnClickListener {
+            val contexto = holder.itemView.context
+            contexto.startActivity(
+                Intent(contexto, PersonaA::class.java)
+                    .putExtra(PersonaA.EXTRA_PERSONA_ID, castMember.id)
+            )
+        }
     }
 
     override fun getItemCount(): Int {
