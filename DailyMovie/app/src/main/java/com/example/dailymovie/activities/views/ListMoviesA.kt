@@ -55,7 +55,7 @@ class ListMoviesA : AppCompatActivity() {
 
         binding.recyclerViewMovies.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewMovies.adapter = movieListAdapter
-        binding.recyclerViewMovies.addItemDecoration(SpacingItemDecoration(spacing = 8))
+        binding.recyclerViewMovies.addItemDecoration(SpacingItemDecoration.deLista(this))
 
         setupSwipeToDelete(binding.recyclerViewMovies)
     }

@@ -52,7 +52,7 @@ class ExplorarF : Fragment() {
         }
         binding.rvListaBusqueda.layoutManager = LinearLayoutManager(activity)
         binding.rvListaBusqueda.adapter = movieAdapter
-        binding.rvListaBusqueda.addItemDecoration(SpacingItemDecoration(spacing = 8))
+        binding.rvListaBusqueda.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
 
         val searchInput: EditText = binding.searchInput
         val clearSearchIcon: ImageView = binding.clearSearchIcon

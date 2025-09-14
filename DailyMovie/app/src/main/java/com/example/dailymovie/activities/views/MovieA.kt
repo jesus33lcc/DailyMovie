@@ -56,7 +56,7 @@ class MovieA : AppCompatActivity() {
             movieViewModel.movieCredits.observe(this, Observer { creditResponse ->
                 creditResponse?.let {
                     displayCredits(it)
-                    binding.txtDirectorMovie.text = getDirectorName(it)
+                    mostrarDirector(it)
                 }
             })
 
@@ -210,7 +210,7 @@ class MovieA : AppCompatActivity() {
         binding.txtTaglineMovie.text = movie.tagline
         binding.txtTaglineMovie.visibility = if (movie.tagline.isNullOrEmpty()) View.GONE else View.VISIBLE
 
-        binding.txtDirectorMovie.text = getDirectorName(movieViewModel.movieCredits.value)
+        movieViewModel.movieCredits.value?.let { mostrarDirector(it) }
 
         val releaseYear = movie.releaseDate.take(4)
         binding.txtAnioLabel.visibility = if (releaseYear.isEmpty()) View.GONE else View.VISIBLE
@@ -259,6 +259,26 @@ class MovieA : AppCompatActivity() {
         binding.sectionDetails.visibility = if (hasContent) View.VISIBLE else View.GONE
     }
 
+    /**
+     * Enseña al director y deja tocarlo para ir a su ficha.
+     *
+     * Antes solo se escribia el nombre, y era raro que el reparto se pudiera abrir y el
+     * director no, siendo normalmente el nombre por el que buscas una pelicula.
+     */
+    private fun mostrarDirector(creditos: CreditResponse) {
+        val director = creditos.crew.firstOrNull { it.job == "Director" }
+        binding.txtDirectorMovie.text = director?.name ?: getDirectorName(creditos)
+
+        if (director != null) {
+            binding.txtDirectorMovie.setOnClickListener {
+                startActivity(
+                    Intent(this, PersonaA::class.java)
+                        .putExtra(PersonaA.EXTRA_PERSONA_ID, director.id)
+                )
+            }
+        }
+    }
+
     private fun getDirectorName(credits: CreditResponse?): String {
         credits?.let {
             it.crew.forEach { crewMember ->
@@ -282,7 +302,7 @@ class MovieA : AppCompatActivity() {
             binding.recyclerViewProviders.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewProviders.adapter = adapter
             binding.sectionProviders.visibility = View.VISIBLE
-            binding.recyclerViewProviders.addItemDecoration(SpacingItemDecoration(spacing = 8))
+            binding.recyclerViewProviders.addItemDecoration(SpacingItemDecoration.deLista(this))
         } else {
             binding.sectionProviders.visibility = View.GONE
         }
@@ -295,7 +315,7 @@ class MovieA : AppCompatActivity() {
             binding.recyclerViewCredits.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewCredits.adapter = adapter
             binding.sectionCredits.visibility = View.VISIBLE
-            binding.recyclerViewCredits.addItemDecoration(SpacingItemDecoration(spacing = 8))
+            binding.recyclerViewCredits.addItemDecoration(SpacingItemDecoration.deLista(this))
         } else {
             binding.sectionCredits.visibility = View.GONE
         }
@@ -317,7 +337,7 @@ class MovieA : AppCompatActivity() {
             binding.recyclerViewSimilarMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewSimilarMovies.adapter = adapter
             binding.sectionSimilarMovies.visibility = View.VISIBLE
-            binding.recyclerViewSimilarMovies.addItemDecoration(SpacingItemDecoration(spacing = 8))
+            binding.recyclerViewSimilarMovies.addItemDecoration(SpacingItemDecoration.deLista(this))
         } else {
             binding.sectionSimilarMovies.visibility = View.GONE
         }
@@ -329,7 +349,7 @@ class MovieA : AppCompatActivity() {
             binding.recyclerViewRecommendedMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewRecommendedMovies.adapter = adapter
             binding.sectionRecommendedMovies.visibility = View.VISIBLE
-            binding.recyclerViewRecommendedMovies.addItemDecoration(SpacingItemDecoration(spacing = 8))
+            binding.recyclerViewRecommendedMovies.addItemDecoration(SpacingItemDecoration.deLista(this))
         } else {
             binding.sectionRecommendedMovies.visibility = View.GONE
         }

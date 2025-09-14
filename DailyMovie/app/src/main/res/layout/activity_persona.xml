@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".activities.views.PersonaA">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Cabecera: foto, nombre y datos basicos -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@drawable/rounded_border_box_big"
+            android:clipToOutline="true">
+
+            <ImageView
+                android:id="@+id/imgPersona"
+                android:layout_width="180dp"
+                android:layout_height="270dp"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"
+                android:background="@drawable/rounded_border"
+                android:clipToOutline="true"
+                android:contentDescription="Foto"
+                tools:src="@drawable/ic_baseline_image_24" />
+
+            <TextView
+                android:id="@+id/txtNombrePersona"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textSize="26sp"
+                android:textAlignment="center"
+                android:fontFamily="@font/courier_bold"
+                android:textColor="@color/black"
+                tools:text="Marlon Brando" />
+
+            <TextView
+                android:id="@+id/txtOficioPersona"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textAlignment="center"
+                android:fontFamily="@font/courier"
+                android:textColor="@color/colorAccent"
+                tools:text="Actor" />
+
+            <TextView
+                android:id="@+id/txtDatosPersona"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                android:fontFamily="@font/courier"
+                android:textColor="@color/colorTextPrimary"
+                tools:text="3 de abril de 1924 · Omaha, Nebraska" />
+        </LinearLayout>
+
+        <!-- Biografia -->
+        <LinearLayout
+            android:id="@+id/seccionBiografia"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_border_box_big"
+            android:clipToOutline="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Biografía"
+                android:textSize="22sp"
+                android:fontFamily="@font/courier_bold"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/txtBiografia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="12dp"
+                android:textSize="15sp"
+                android:justificationMode="inter_word"
+                android:background="@drawable/rounded_border_box"
+                android:fontFamily="@font/courier"
+                android:textColor="@color/colorTextPrimary"
+                tools:text="Actor estadounidense..." />
+        </LinearLayout>
+
+        <!-- Peliculas en las que ha actuado -->
+        <LinearLayout
+            android:id="@+id/seccionActuando"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_border_box_big"
+            android:clipToOutline="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ha actuado en"
+                android:textSize="22sp"
+                android:fontFamily="@font/courier_bold"
+                android:textColor="@color/black" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerActuando"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal" />
+        </LinearLayout>
+
+        <!-- Peliculas que ha dirigido -->
+        <LinearLayout
+            android:id="@+id/seccionDirigiendo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_border_box_big"
+            android:clipToOutline="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ha dirigido"
+                android:textSize="22sp"
+                android:fontFamily="@font/courier_bold"
+                android:textColor="@color/black" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerDirigiendo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

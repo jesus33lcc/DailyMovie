@@ -13,4 +13,5 @@ object Dependencias {
     /** Se crean una sola vez porque no guardan estado y abrir Firestore cuesta. */
     val peliculas: MovieRepository by lazy { TmdbMovieRepository() }
     val usuario: UserRepository by lazy { FirebaseUserRepository() }
+    val personas: PersonRepository by lazy { TmdbPersonRepository() }
 }
