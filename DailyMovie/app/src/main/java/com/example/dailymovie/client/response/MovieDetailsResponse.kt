@@ -78,4 +78,73 @@ data class MovieDetailsResponse(
 
     @SerializedName("vote_count")
     val voteCount: Int
+,
+
+    // ---- Extras que llegan con append_to_response ----
+
+    @SerializedName("images")
+    val imagenes: ImagenesResponse?,
+
+    @SerializedName("release_dates")
+    val fechasDeEstreno: FechasDeEstrenoResponse?,
+
+    @SerializedName("external_ids")
+    val idsExternos: IdsExternosResponse?
+)
+
+/** Fondos, carteles y logos que TMDB tiene de una pelicula. */
+data class ImagenesResponse(
+    @SerializedName("backdrops")
+    val fondos: List<ImagenTmdb>,
+
+    @SerializedName("posters")
+    val carteles: List<ImagenTmdb>,
+
+    @SerializedName("logos")
+    val logos: List<ImagenTmdb>
+)
+
+data class ImagenTmdb(
+    @SerializedName("file_path")
+    val ruta: String,
+
+    @SerializedName("width")
+    val ancho: Int,
+
+    @SerializedName("height")
+    val alto: Int,
+
+    @SerializedName("vote_average")
+    val valoracion: Double
+)
+
+/**
+ * La clasificacion por edad, que cambia en cada pais.
+ * En España son 'A', 'A/i', 'A/fi', '7', '12', '16', '18' y 'X'.
+ */
+data class FechasDeEstrenoResponse(
+    @SerializedName("results")
+    val porPais: List<EstrenoEnPais>
+)
+
+data class EstrenoEnPais(
+    @SerializedName("iso_3166_1")
+    val pais: String,
+
+    @SerializedName("release_dates")
+    val estrenos: List<EstrenoConClasificacion>
+)
+
+data class EstrenoConClasificacion(
+    @SerializedName("certification")
+    val clasificacion: String?,
+
+    @SerializedName("release_date")
+    val fecha: String?
+)
+
+/** Ids en otras webs. De momento se usa el de IMDb. */
+data class IdsExternosResponse(
+    @SerializedName("imdb_id")
+    val imdb: String?
 )

@@ -20,6 +20,7 @@ import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.databinding.ActivityMovieBinding
+import com.example.dailymovie.adapters.ImagenAdapter
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.utils.LocaleUtil
 import com.example.dailymovie.utils.mensaje
@@ -44,6 +45,7 @@ class MovieA : AppCompatActivity() {
                     val movieDetails = convertToMovieDetailsModel(it)
                     displayMovieDetails(movieDetails)
                     setupButtons(movieDetails)
+                    mostrarExtras(it)
                 }
             })
 
@@ -352,6 +354,52 @@ class MovieA : AppCompatActivity() {
             binding.recyclerViewRecommendedMovies.addItemDecoration(SpacingItemDecoration.deLista(this))
         } else {
             binding.sectionRecommendedMovies.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Lo que TMDB da y antes no se usaba: imagenes, clasificacion por edad y ficha en IMDb.
+     *
+     * Llega en la misma peticion que los detalles gracias a append_to_response, asi que no
+     * cuesta ni un viaje mas a la API.
+     */
+    private fun mostrarExtras(detalles: MovieDetailsResponse) {
+        mostrarImagenes(detalles)
+        mostrarClasificacionPorEdad(detalles)
+    }
+
+    private fun mostrarImagenes(detalles: MovieDetailsResponse) {
+        // Se cogen los fondos y no los carteles: son fotogramas de la pelicula, que es lo
+        // que apetece mirar, y ademas son apaisados y cuadran con la tira horizontal.
+        val fondos = detalles.imagenes?.fondos.orEmpty().map { it.ruta }
+        if (fondos.isEmpty()) {
+            binding.sectionImagenes.visibility = View.GONE
+            return
+        }
+        binding.sectionImagenes.visibility = View.VISIBLE
+        binding.recyclerImagenes.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerImagenes.addItemDecoration(SpacingItemDecoration.deLista(this))
+        binding.recyclerImagenes.adapter = ImagenAdapter(fondos)
+    }
+
+    /**
+     * La clasificacion cambia en cada pais, asi que se busca la del pais del dispositivo.
+     * Si esa pelicula no esta clasificada aqui, no se enseña nada en vez de poner la de
+     * otro pais, que solo confundiria.
+     */
+    private fun mostrarClasificacionPorEdad(detalles: MovieDetailsResponse) {
+        val delPais = detalles.fechasDeEstreno?.porPais
+            ?.firstOrNull { it.pais == LocaleUtil.getDeviceCountry() }
+        val clasificacion = delPais?.estrenos
+            ?.firstOrNull { !it.clasificacion.isNullOrBlank() }
+            ?.clasificacion
+
+        if (clasificacion.isNullOrBlank()) {
+            binding.txtClasificacionEdad.visibility = View.GONE
+        } else {
+            binding.txtClasificacionEdad.visibility = View.VISIBLE
+            binding.txtClasificacionEdad.text = clasificacion
         }
     }
 

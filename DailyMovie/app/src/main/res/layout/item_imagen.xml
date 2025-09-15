@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Una imagen de la tira de la ficha. Es apaisada porque son fotogramas, no carteles. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:foreground="?attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/imagenMiniatura"
+        android:layout_width="240dp"
+        android:layout_height="135dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/rounded_border"
+        android:clipToOutline="true"
+        android:contentDescription="Imagen de la película"
+        tools:src="@drawable/ic_baseline_image_24" />
+</FrameLayout>
