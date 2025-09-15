@@ -59,6 +59,22 @@
                     android:paddingTop="4dp"
                     android:textColor="@color/black"
                     android:text="" />
+
+                <!-- Clasificacion por edad del pais del usuario, que ademas hace falta
+                     declarar en la ficha de Google Play -->
+                <TextView
+                    android:id="@+id/txt_clasificacion_edad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="4dp"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/courier_bold"
+                    android:background="@drawable/rounded_border"
+                    android:textColor="@color/colorTextPrimary"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <LinearLayout
@@ -381,6 +397,34 @@
                     android:orientation="horizontal"
                     android:scrollbars="horizontal"
                     android:visibility="visible" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/sectionImagenes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Imágenes"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="6dp"
+                    android:fontFamily="@font/courier_bold"
+                    android:textColor="@color/black" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerImagenes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal" />
             </LinearLayout>
 
             <LinearLayout

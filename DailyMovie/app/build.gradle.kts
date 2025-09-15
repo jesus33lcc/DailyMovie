@@ -87,6 +87,9 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:5.0.0-rc01")
 
+    // Galeria de imagenes a pantalla completa
+    implementation("androidx.viewpager2:viewpager2:1.1.0")
+
     implementation("androidx.navigation:navigation-fragment:2.7.7")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")

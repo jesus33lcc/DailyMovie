@@ -22,7 +22,12 @@ interface WebService {
     fun getMovieDetails(
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
+        // append_to_response trae imagenes, clasificacion por edad e ids externos en la
+        // misma peticion, en vez de hacer tres viajes mas a TMDB.
+        @Query("append_to_response") extras: String = "images,release_dates,external_ids",
+        // Las imagenes no llevan idioma, asi que hay que pedirlas aparte o vienen vacias.
+        @Query("include_image_language") idiomasDeImagen: String = "es,en,null"
     ): Call<MovieDetailsResponse>
 
     @GET("movie/now_playing")
