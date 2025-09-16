@@ -14,4 +14,5 @@ object Dependencias {
     val peliculas: MovieRepository by lazy { TmdbMovieRepository() }
     val usuario: UserRepository by lazy { FirebaseUserRepository() }
     val personas: PersonRepository by lazy { TmdbPersonRepository() }
+    val series: SerieRepository by lazy { TmdbSerieRepository() }
 }

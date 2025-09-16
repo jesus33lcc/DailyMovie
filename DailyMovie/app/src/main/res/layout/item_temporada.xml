@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- El selector de temporada: un boton por temporada, y se marca la que esta abierta -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/txtTemporada"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="8dp"
+    android:paddingHorizontal="18dp"
+    android:paddingVertical="10dp"
+    android:textSize="16sp"
+    android:fontFamily="@font/courier_bold"
+    android:background="@drawable/rounded_border_box"
+    android:clickable="true"
+    android:focusable="true"
+    android:textColor="@color/colorTextPrimary"
+    tools:text="T1" />

@@ -16,6 +16,11 @@
         android:label="fragment_explorar"
         tools:layout="@layout/fragment_explorar" />
     <fragment
+        android:id="@+id/menu_series"
+        android:name="com.example.dailymovie.fragments.views.SeriesF"
+        android:label="fragment_series"
+        tools:layout="@layout/fragment_series" />
+    <fragment
         android:id="@+id/menu_listas"
         android:name="com.example.dailymovie.fragments.views.ListasF"
         android:label="fragment_listas"

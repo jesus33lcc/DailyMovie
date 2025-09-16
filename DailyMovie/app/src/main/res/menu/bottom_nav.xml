@@ -11,6 +11,11 @@
         android:title="Explorar" />
 
     <item
+        android:id="@+id/menu_series"
+        android:icon="@drawable/ic_series"
+        android:title="Series" />
+
+    <item
         android:id="@+id/menu_listas"
         android:icon="@drawable/ic_baseline_format_list_bulleted_24"
         android:title="Listas" />
