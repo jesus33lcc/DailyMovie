@@ -18,6 +18,9 @@
         android:theme="@style/Theme.DailyMovie"
         tools:targetApi="31">
         <activity
+            android:name=".activities.views.SerieA"
+            android:exported="false" />
+        <activity
             android:name=".activities.views.GaleriaA"
             android:exported="false" />
         <activity
