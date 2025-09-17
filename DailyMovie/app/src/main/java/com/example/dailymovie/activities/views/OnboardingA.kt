@@ -36,7 +36,8 @@ class OnboardingA : AppCompatActivity() {
         binding = ActivityOnboardingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.onboardingRecycler.layoutManager = GridLayoutManager(this, COLUMNAS)
+        // En una tablet caben mas fichas por fila; con dos quedaria medio vacio.
+        binding.onboardingRecycler.layoutManager = GridLayoutManager(this, columnasSegunPantalla())
 
         binding.onboardingSiguiente.setOnClickListener { avanzar() }
         binding.onboardingSaltar.setOnClickListener { terminar() }
@@ -133,10 +134,15 @@ class OnboardingA : AppCompatActivity() {
         terminar()
     }
 
+    /** Una columna por cada 180dp de ancho, con un minimo de dos. */
+    private fun columnasSegunPantalla(): Int {
+        val anchoEnDp = resources.configuration.screenWidthDp
+        return (anchoEnDp / 180).coerceAtLeast(2)
+    }
+
     companion object {
         const val EXTRA_DESDE_AJUSTES = "DESDE_AJUSTES"
         private const val PASO_GENEROS = 0
         private const val PASO_PELICULAS = 1
-        private const val COLUMNAS = 2
     }
 }
