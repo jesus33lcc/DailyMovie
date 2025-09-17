@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="recycler_view_spacing">8dp</dimen>
+
+    <!-- El cartel de las listas. Se saca a dimens para que en tablet se agrande solo -->
+    <dimen name="poster_ancho">120dp</dimen>
+    <dimen name="poster_alto">180dp</dimen>
+
+    <!-- La foto del reparto -->
+    <dimen name="foto_persona_ancho">120dp</dimen>
+    <dimen name="foto_persona_alto">150dp</dimen>
 </resources>
