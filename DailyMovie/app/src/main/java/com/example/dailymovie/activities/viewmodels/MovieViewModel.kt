@@ -57,7 +57,7 @@ class MovieViewModel(
         peliculas.recomendadas(peliculaId) { siVaBien(it) { datos -> _recommendedMovies.value = datos } }
     }
 
-    private inline fun <T> siVaBien(resultado: Resultado<T>, bloque: (T) -> Unit) {
+    private inline fun <T : Any> siVaBien(resultado: Resultado<T>, bloque: (T) -> Unit) {
         if (resultado is Resultado.Exito) bloque(resultado.datos)
     }
 

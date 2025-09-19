@@ -42,19 +42,21 @@ interface MovieRepository {
  * Evita el lio anterior de tener que mirar por un lado la lista y por otro un LiveData de
  * error para saber si algo habia ido bien.
  */
-sealed class Resultado<out T> {
-    data class Exito<T>(val datos: T) : Resultado<T>()
+sealed class Resultado<out T : Any> {
+    // El "T : Any" no es adorno: sin cota, el generico admite nulos y "datos" podria venir
+    // vacio sin que nadie se entere. Con la cota, si algo puede faltar hay que decirlo.
+    data class Exito<T : Any>(val datos: T) : Resultado<T>()
     data class Fallo(val motivo: ErrorCarga) : Resultado<Nothing>()
 }
 
 /** Atajo para no repetir el when cuando solo interesa el caso bueno. */
-inline fun <T> Resultado<T>.siVaBien(bloque: (T) -> Unit): Resultado<T> {
+inline fun <T : Any> Resultado<T>.siVaBien(bloque: (T) -> Unit): Resultado<T> {
     if (this is Resultado.Exito) bloque(datos)
     return this
 }
 
 /** Atajo para el caso malo. */
-inline fun <T> Resultado<T>.siFalla(bloque: (ErrorCarga) -> Unit): Resultado<T> {
+inline fun <T : Any> Resultado<T>.siFalla(bloque: (ErrorCarga) -> Unit): Resultado<T> {
     if (this is Resultado.Fallo) bloque(motivo)
     return this
 }

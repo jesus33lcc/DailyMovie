@@ -136,7 +136,7 @@ class HomeViewModel(
         }
     }
 
-    private fun <T> reparte(resultado: Resultado<T>, alIrBien: (T) -> Unit) {
+    private fun <T : Any> reparte(resultado: Resultado<T>, alIrBien: (T) -> Unit) {
         when (resultado) {
             is Resultado.Exito -> alIrBien(resultado.datos)
             is Resultado.Fallo -> _error.value = resultado.motivo

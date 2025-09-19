@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:textSize="22sp"
+        android:gravity="center_horizontal"
         android:textAlignment="center"
         android:fontFamily="@font/courier_bold"
         android:textColor="@color/colorPrimaryDark"
