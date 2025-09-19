@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -41,6 +42,7 @@ class OnboardingA : AppCompatActivity() {
 
         binding.onboardingSiguiente.setOnClickListener { avanzar() }
         binding.onboardingSaltar.setOnClickListener { terminar() }
+        prepararBotonAtras()
 
         viewModel.cargando.observe(this) { cargando ->
             binding.onboardingProgress.visibility = if (cargando) View.VISIBLE else View.GONE
@@ -129,9 +131,15 @@ class OnboardingA : AppCompatActivity() {
         binding.onboardingRecycler.adapter = ElegibleAdapter(elementos, estaElegido, alTocar)
     }
 
-    /** Con el boton de atras del sistema no se pierde el registro: se sale como si nada. */
-    override fun onBackPressed() {
-        terminar()
+    /**
+     * Con el boton de atras no se pierde lo marcado: se guarda y se sale.
+     *
+     * Se usa el dispatcher y no el onBackPressed de toda la vida, que esta obsoleto desde
+     * Android 13 y ademas obliga a llamar al super, que aqui no interesa porque queremos
+     * decidir a donde va el usuario.
+     */
+    private fun prepararBotonAtras() {
+        onBackPressedDispatcher.addCallback(this) { terminar() }
     }
 
     /** Una columna por cada 180dp de ancho, con un minimo de dos. */
