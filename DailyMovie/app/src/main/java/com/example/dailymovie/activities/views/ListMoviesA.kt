@@ -62,18 +62,13 @@ class ListMoviesA : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (listName == "Favoritos") {
-            movieViewModel.getFavorites { updatedList ->
-                movieList.clear()
-                movieList.addAll(updatedList)
-                movieListAdapter.notifyDataSetChanged()
-            }
-        } else if (listName == "Vistos") {
-            movieViewModel.getWatched { updatedList ->
-                movieList.clear()
-                movieList.addAll(updatedList)
-                movieListAdapter.notifyDataSetChanged()
-            }
+        // Al volver de la ficha la pelicula puede haber dejado de ser favorita o vista, asi
+        // que la lista se vuelve a pedir en vez de quedarse con la que llego en el Intent.
+        // Antes solo se refrescaban Favoritos y Vistos; las listas del usuario no.
+        movieViewModel.cargarLista(listName) { actualizadas ->
+            movieList.clear()
+            movieList.addAll(actualizadas)
+            movieListAdapter.actualizar(actualizadas)
         }
     }
 

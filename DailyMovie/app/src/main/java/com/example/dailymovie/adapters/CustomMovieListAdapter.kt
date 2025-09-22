@@ -58,6 +58,19 @@ class CustomMovieListAdapter(
         return movies[position]
     }
 
+    /**
+     * Cambia las peliculas que se enseñan.
+     *
+     * Hace falta porque el adapter trabaja con su propia lista: la pantalla le pasaba una
+     * copia y luego actualizaba la suya, asi que al volver de la ficha seguia viendose lo
+     * de antes.
+     */
+    fun actualizar(nuevas: List<MovieModel>) {
+        movies.clear()
+        movies.addAll(nuevas)
+        notifyDataSetChanged()
+    }
+
     fun removeItem(position: Int) {
         movies.removeAt(position)
         notifyItemRemoved(position)
