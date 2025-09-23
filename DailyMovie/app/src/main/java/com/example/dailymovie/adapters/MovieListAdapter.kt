@@ -1,32 +1,38 @@
 package com.example.dailymovie.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.R
 import com.example.dailymovie.models.ListaModel
 
+/**
+ * Los nombres de las listas: las dos fijas y las que ha creado el usuario.
+ *
+ * Igual que el de peliculas, va con submitList y comparador para que crear o borrar una
+ * lista se vea entrar y salir en vez de repintarse la pantalla entera.
+ */
 class MovieListAdapter(
-    private val context: Context,
-    private val listaList: MutableList<ListaModel>,
     private val itemClickListener: (ListaModel) -> Unit
-) : RecyclerView.Adapter<MovieListAdapter.ViewHolder>() {
+) : ListAdapter<ListaModel, MovieListAdapter.ViewHolder>(COMPARADOR) {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val iconoTypeListaImg: ImageView = view.findViewById(R.id.iconoTypeLista_img)
         val nombreListaTxt: TextView = view.findViewById(R.id.nombreLista_txt)
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.item_lista_list, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_lista_list, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val lista = listaList[position]
+        val lista = getItem(position)
         holder.nombreListaTxt.text = lista.nombre
         holder.iconoTypeListaImg.setImageResource(lista.icono)
         holder.itemView.setOnClickListener {
@@ -34,16 +40,17 @@ class MovieListAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return listaList.size
-    }
+    /** La lista que esta en esa fila, para cuando el usuario desliza para borrarla. */
+    fun listaEn(position: Int): ListaModel = getItem(position)
 
-    fun removeItem(position: Int) {
-        listaList.removeAt(position)
-        notifyItemRemoved(position)
-    }
+    private companion object {
+        val COMPARADOR = object : DiffUtil.ItemCallback<ListaModel>() {
+            // El nombre es el identificador: en Firestore es el id del documento.
+            override fun areItemsTheSame(vieja: ListaModel, nueva: ListaModel) =
+                vieja.nombre == nueva.nombre
 
-    fun getList(): MutableList<ListaModel> {
-        return listaList
+            override fun areContentsTheSame(vieja: ListaModel, nueva: ListaModel) =
+                vieja == nueva
+        }
     }
 }

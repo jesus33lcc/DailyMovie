@@ -67,6 +67,15 @@ class ListasViewModel(
     fun getMoviesFromList(nombre: String, alTerminar: (List<MovieModel>) -> Unit) =
         usuario.peliculasDeLista(nombre, alTerminar)
 
+    /** Carga la lista que toque sin que la pantalla tenga que saber de que tipo es. */
+    fun cargarLista(nombre: String, alTerminar: (List<MovieModel>) -> Unit) {
+        when (ListaFija.desdeTitulo(nombre)) {
+            ListaFija.FAVORITOS -> getFavorites(alTerminar)
+            ListaFija.VISTOS -> getWatched(alTerminar)
+            null -> getMoviesFromList(nombre, alTerminar)
+        }
+    }
+
     fun deleteCustomList(nombre: String, alTerminar: (Boolean) -> Unit) {
         usuario.borrarLista(nombre) { borrada ->
             if (borrada) cargarListasDelUsuario()

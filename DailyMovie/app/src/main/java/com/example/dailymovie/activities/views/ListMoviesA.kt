@@ -21,7 +21,7 @@ class ListMoviesA : AppCompatActivity() {
     private lateinit var binding: ActivityListMoviesBinding
     private lateinit var movieListAdapter: CustomMovieListAdapter
     private lateinit var listName: String
-    private var movieList: ArrayList<MovieModel> = arrayListOf()
+    private var movieList: MutableList<MovieModel> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,33 +29,25 @@ class ListMoviesA : AppCompatActivity() {
         setContentView(binding.root)
 
         listName = intent.getStringExtra("LIST_NAME") ?: ""
-
         binding.listTitle.text = listName
 
-        movieList = intent.getParcelableArrayListExtra("MOVIE_LIST") ?: arrayListOf()
-        if (listName == "Favoritos" || listName == "Vistos") {
-            movieListAdapter = CustomMovieListAdapter(movieList.toMutableList(), { movie ->
-                val intent = Intent(this, MovieA::class.java).apply {
-                    putExtra("MOVIE_ID", movie.id)
-                }
-                startActivity(intent)
-            }, { movie, position ->
-                showDeleteConfirmationDialog(movie, position)
-            })
-        } else {
-            movieListAdapter = CustomMovieListAdapter(movieList.toMutableList(), { movie ->
-                val intent = Intent(this, MovieA::class.java).apply {
-                    putExtra("MOVIE_ID", movie.id)
-                }
-                startActivity(intent)
-            }, { movie, position ->
-                showDeleteConfirmationDialog(movie, position)
-            })
-        }
+        movieList = intent.getParcelableArrayListExtra<MovieModel>("MOVIE_LIST")?.toMutableList()
+            ?: mutableListOf()
+
+        // Antes habia un if/else que construia dos veces exactamente el mismo adapter, uno
+        // para las listas fijas y otro para las del usuario. Se comportan igual, asi que es
+        // el mismo: quien sabe distinguirlas es el ViewModel al guardar.
+        movieListAdapter = CustomMovieListAdapter(
+            onMovieClick = { movie ->
+                startActivity(Intent(this, MovieA::class.java).putExtra("MOVIE_ID", movie.id))
+            },
+            onMovieDelete = { movie, position -> showDeleteConfirmationDialog(movie, position) }
+        )
 
         binding.recyclerViewMovies.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewMovies.adapter = movieListAdapter
         binding.recyclerViewMovies.addItemDecoration(SpacingItemDecoration.deLista(this))
+        movieListAdapter.submitList(movieList.toList())
 
         setupSwipeToDelete(binding.recyclerViewMovies)
     }
@@ -66,9 +58,8 @@ class ListMoviesA : AppCompatActivity() {
         // que la lista se vuelve a pedir en vez de quedarse con la que llego en el Intent.
         // Antes solo se refrescaban Favoritos y Vistos; las listas del usuario no.
         movieViewModel.cargarLista(listName) { actualizadas ->
-            movieList.clear()
-            movieList.addAll(actualizadas)
-            movieListAdapter.actualizar(actualizadas)
+            movieList = actualizadas.toMutableList()
+            movieListAdapter.submitList(actualizadas)
         }
     }
 
@@ -83,9 +74,8 @@ class ListMoviesA : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val movie = movieListAdapter.getMovieAt(position)
-                showDeleteConfirmationDialog(movie, position)
+                val position = viewHolder.bindingAdapterPosition
+                showDeleteConfirmationDialog(movieListAdapter.peliculaEn(position), position)
             }
         }
 
@@ -94,49 +84,34 @@ class ListMoviesA : AppCompatActivity() {
     }
 
     private fun showDeleteConfirmationDialog(movie: MovieModel, position: Int) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Eliminar película")
-        builder.setMessage("¿Estás seguro de que deseas eliminar la película ${movie.title} de la lista $listName?")
-        builder.setPositiveButton("Eliminar") { dialog, _ ->
-            if (listName == "Favoritos") {
-                movieViewModel.toggleFavorite(movie) { success ->
-                    if (success) {
-                        movieList.remove(movie)
-                        movieListAdapter.removeItem(position)
-                        Toast.makeText(this, "Película eliminada de Favoritos", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this, "Error al eliminar la película", Toast.LENGTH_SHORT).show()
-                        movieListAdapter.notifyItemChanged(position)
-                    }
-                }
-            } else if (listName == "Vistos") {
-                movieViewModel.toggleWatched(movie) { success ->
-                    if (success) {
-                        movieList.remove(movie)
-                        movieListAdapter.removeItem(position)
-                        Toast.makeText(this, "Película eliminada de Vistos", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this, "Error al eliminar la película", Toast.LENGTH_SHORT).show()
-                        movieListAdapter.notifyItemChanged(position)
-                    }
-                }
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar película")
+            .setMessage("¿Seguro que quieres quitar ${movie.title} de $listName?")
+            .setPositiveButton("Eliminar") { _, _ -> borrar(movie, position) }
+            .setNegativeButton("Cancelar") { dialog, _ ->
+                dialog.dismiss()
+                // La fila se ha quedado deslizada a un lado; hay que devolverla a su sitio.
+                movieListAdapter.notifyItemChanged(position)
+            }
+            .show()
+    }
+
+    /**
+     * Quita la pelicula de la lista que sea.
+     *
+     * Antes esto eran tres bloques calcados, uno por tipo de lista, que se diferenciaban
+     * solo en a que funcion llamaban. El ViewModel ya sabe elegir con el enum ListaFija.
+     */
+    private fun borrar(movie: MovieModel, position: Int) {
+        movieViewModel.removeMovieFromList(listName, movie) { bien ->
+            if (bien) {
+                movieList.remove(movie)
+                movieListAdapter.submitList(movieList.toList())
+                Toast.makeText(this, "${movie.title} fuera de $listName", Toast.LENGTH_SHORT).show()
             } else {
-                movieViewModel.removeMovieFromList(listName, movie) { success ->
-                    if (success) {
-                        movieList.remove(movie)
-                        movieListAdapter.removeItem(position)
-                        Toast.makeText(this, "Película eliminada de $listName", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this, "Error al eliminar la película", Toast.LENGTH_SHORT).show()
-                        movieListAdapter.notifyItemChanged(position)
-                    }
-                }
+                Toast.makeText(this, "No se ha podido quitar", Toast.LENGTH_SHORT).show()
+                movieListAdapter.notifyItemChanged(position)
             }
         }
-        builder.setNegativeButton("Cancelar") { dialog, _ ->
-            dialog.dismiss()
-            movieListAdapter.notifyItemChanged(position)
-        }
-        builder.show()
     }
 }

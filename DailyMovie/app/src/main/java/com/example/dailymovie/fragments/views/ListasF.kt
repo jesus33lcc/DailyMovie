@@ -42,15 +42,17 @@ class ListasF : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.misListasCheckFav.layoutManager = LinearLayoutManager(context)
-        binding.misListaPersonalizadas.layoutManager = LinearLayoutManager(context)
+        prepararListas()
 
+        // Los observadores ya solo pasan los datos. Antes cada emision volvia a crear el
+        // adapter y a añadir otra decoracion, asi que la separacion entre filas crecia cada
+        // vez que se creaba o se borraba una lista.
         viewModel.favoriteAndWatchedLists.observe(viewLifecycleOwner, Observer { listas ->
-            initializeListFillInmborrable(listas.toMutableList())
+            movieListAdapter.submitList(listas)
         })
 
         viewModel.customLists.observe(viewLifecycleOwner, Observer { customLists ->
-            initializeCustomLists(customLists.toMutableList())
+            customListsAdapter.submitList(customLists)
         })
 
         binding.btnNewLista.setOnClickListener {
@@ -60,33 +62,29 @@ class ListasF : Fragment() {
         setupSwipeToDelete(binding.misListaPersonalizadas)
     }
 
-    private fun initializeListFillInmborrable(listaListasFill: MutableList<ListaModel>) {
-        movieListAdapter = MovieListAdapter(requireActivity(), listaListasFill) { lista ->
-            when (lista.nombre) {
-                "Favoritos" -> {
-                    viewModel.getFavorites { movieList ->
-                        navigateToMovieList(movieList, lista.nombre)
-                    }
-                }
-                "Vistos" -> {
-                    viewModel.getWatched { movieList ->
-                        navigateToMovieList(movieList, lista.nombre)
-                    }
-                }
-            }
-        }
+    /** Adaptadores y decoraciones, una sola vez. */
+    private fun prepararListas() {
+        movieListAdapter = MovieListAdapter { lista -> abrirLista(lista) }
+        binding.misListasCheckFav.layoutManager = LinearLayoutManager(context)
         binding.misListasCheckFav.adapter = movieListAdapter
         binding.misListasCheckFav.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
-    }
 
-    private fun initializeCustomLists(customLists: MutableList<ListaModel>) {
-        customListsAdapter = MovieListAdapter(requireActivity(), customLists) { lista ->
-            viewModel.getMoviesFromList(lista.nombre) { movieList ->
-                navigateToMovieList(movieList, lista.nombre)
-            }
-        }
+        customListsAdapter = MovieListAdapter { lista -> abrirLista(lista) }
+        binding.misListaPersonalizadas.layoutManager = LinearLayoutManager(context)
         binding.misListaPersonalizadas.adapter = customListsAdapter
         binding.misListaPersonalizadas.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
+    }
+
+    /**
+     * Abre cualquier lista, sea de las fijas o del usuario.
+     *
+     * Antes habia dos caminos distintos y el de las fijas comparaba el nombre por texto;
+     * el ViewModel ya sabe cual toca gracias al enum ListaFija.
+     */
+    private fun abrirLista(lista: ListaModel) {
+        viewModel.cargarLista(lista.nombre) { peliculas ->
+            navigateToMovieList(peliculas, lista.nombre)
+        }
     }
 
     private fun navigateToMovieList(movieList: List<MovieModel>, listName: String) {
@@ -137,28 +135,30 @@ class ListasF : Fragment() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val list = customListsAdapter.getList()[position]
+                val position = viewHolder.bindingAdapterPosition
+                val lista = customListsAdapter.listaEn(position)
 
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("Eliminar lista")
-                builder.setMessage("¿Estás seguro de que deseas eliminar la lista ${list.nombre}?")
-                builder.setPositiveButton("Eliminar") { dialog, which ->
-                    viewModel.deleteCustomList(list.nombre) { success ->
-                        if (success) {
-                            customListsAdapter.removeItem(position)
-                            Toast.makeText(context, "Lista eliminada exitosamente", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, "Error al eliminar la lista", Toast.LENGTH_SHORT).show()
-                            customListsAdapter.notifyItemChanged(position)
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Eliminar lista")
+                    .setMessage("¿Seguro que quieres eliminar la lista ${lista.nombre}?")
+                    .setPositiveButton("Eliminar") { _, _ ->
+                        viewModel.deleteCustomList(lista.nombre) { borrada ->
+                            if (borrada) {
+                                // No hay que sacar la fila a mano: al borrarla el ViewModel
+                                // recarga las listas y el comparador ve que falta esa.
+                                Toast.makeText(context, "Lista eliminada", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, "No se ha podido eliminar", Toast.LENGTH_SHORT).show()
+                                customListsAdapter.notifyItemChanged(position)
+                            }
                         }
                     }
-                }
-                builder.setNegativeButton("Cancelar") { dialog, which ->
-                    dialog.dismiss()
-                    customListsAdapter.notifyItemChanged(position)
-                }
-                builder.show()
+                    .setNegativeButton("Cancelar") { dialog, _ ->
+                        dialog.dismiss()
+                        // La fila se ha quedado deslizada; hay que devolverla a su sitio.
+                        customListsAdapter.notifyItemChanged(position)
+                    }
+                    .show()
             }
         }
 
