@@ -8,4 +8,13 @@
 
     <!-- Trailers -->
     <string name="ver_trailer">Ver tráiler</string>
+
+    <!-- Crear una lista: cada motivo tiene su aviso, que antes todos decían "ya existe" -->
+    <string name="lista_creada">Lista \"%1$s\" creada</string>
+    <string name="lista_nombre_vacio">Ponle un nombre a la lista</string>
+    <string name="lista_nombre_reservado">Ese nombre ya lo usa una lista de la app, elige otro</string>
+    <string name="lista_nombre_invalido">El nombre no puede llevar barras</string>
+    <string name="lista_ya_existe">Ya tienes una lista con ese nombre</string>
+    <string name="lista_sin_sesion">Vuelve a iniciar sesión para crear listas</string>
+    <string name="lista_rechazada">No se ha podido crear la lista. Inténtalo más tarde</string>
 </resources>

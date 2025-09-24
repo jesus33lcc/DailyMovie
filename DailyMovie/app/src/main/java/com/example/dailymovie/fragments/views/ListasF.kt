@@ -21,6 +21,7 @@ import com.example.dailymovie.models.ListaModel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.activities.views.ListMoviesA
 import com.example.dailymovie.fragments.viewmodels.ListasViewModel
+import com.example.dailymovie.utils.mensaje
 
 class ListasF : Fragment() {
 
@@ -102,18 +103,14 @@ class ListasF : Fragment() {
         input.hint = "Nombre de la lista"
         builder.setView(input)
 
-        builder.setPositiveButton("Crear") { dialog, which ->
+        builder.setPositiveButton("Crear") { _, _ ->
             val listName = input.text.toString().trim()
-            if (listName.isNotEmpty()) {
-                viewModel.createNewList(listName) { success ->
-                    if (success) {
-                        Toast.makeText(context, "Lista creada exitosamente", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "La lista ya existe", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } else {
-                Toast.makeText(context, "El nombre de la lista no puede estar vacío", Toast.LENGTH_SHORT).show()
+            viewModel.createNewList(listName) { resultado ->
+                // Cada motivo tiene su aviso. Antes cualquier fallo decia "la lista ya
+                // existe", asi que un rechazo de Firestore o una sesion caducada te dejaban
+                // dando vueltas sin saber que estaba pasando.
+                val texto = getString(resultado.mensaje(), listName)
+                Toast.makeText(context, texto, Toast.LENGTH_SHORT).show()
             }
         }
 
