@@ -53,7 +53,7 @@ interface UserRepository {
     fun cambiarVista(pelicula: MovieModel, alTerminar: (Boolean) -> Unit)
 
     fun listasDelUsuario(alTerminar: (List<String>) -> Unit)
-    fun crearLista(nombre: String, alTerminar: (Boolean) -> Unit)
+    fun crearLista(nombre: String, alTerminar: (AltaDeLista) -> Unit)
     fun borrarLista(nombre: String, alTerminar: (Boolean) -> Unit)
     fun peliculasDeLista(nombre: String, alTerminar: (List<MovieModel>) -> Unit)
     fun anadirALista(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit)
@@ -70,6 +70,29 @@ interface UserRepository {
 
     // ---- Pelicula del dia ----
     fun peliculaDelDia(alTerminar: (MovieOfTheDay?) -> Unit)
+}
+
+/**
+ * Como ha ido crear una lista.
+ *
+ * Antes esto era un Boolean, y la pantalla enseñaba "la lista ya existe" ante cualquier
+ * fallo: nombre reservado, sesion caducada o un rechazo de Firestore se veian todos igual,
+ * asi que era imposible saber que pasaba de verdad.
+ */
+enum class AltaDeLista {
+    CREADA,
+    NOMBRE_VACIO,
+
+    /** El nombre choca con Favoritos o Vistos. */
+    NOMBRE_RESERVADO,
+
+    /** Firestore usa el nombre como id de documento y ahi la barra no vale. */
+    NOMBRE_INVALIDO,
+    YA_EXISTE,
+    SIN_SESION,
+
+    /** Firestore la rechazo: normalmente son las reglas de seguridad. */
+    RECHAZADA
 }
 
 /**

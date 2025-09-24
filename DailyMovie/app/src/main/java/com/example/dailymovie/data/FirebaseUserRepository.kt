@@ -176,19 +176,36 @@ class FirebaseUserRepository(
             .addOnFailureListener { alTerminar(emptyList()) }
     }
 
-    override fun crearLista(nombre: String, alTerminar: (Boolean) -> Unit) {
-        if (ListaFija.estaReservado(nombre)) return alTerminar(false)
-        val documento = documentoDelUsuario() ?: return alTerminar(false)
-        val lista = documento.collection(LISTAS).document(nombre)
-        lista.get().addOnSuccessListener {
-            if (it.exists()) {
-                alTerminar(false)
-            } else {
-                lista.set(mapOf(PELICULAS to emptyList<MovieModel>()))
-                    .addOnSuccessListener { alTerminar(true) }
-                    .addOnFailureListener { alTerminar(false) }
+    override fun crearLista(nombre: String, alTerminar: (AltaDeLista) -> Unit) {
+        val limpio = nombre.trim()
+        when {
+            limpio.isEmpty() -> return alTerminar(AltaDeLista.NOMBRE_VACIO)
+            ListaFija.estaReservado(limpio) -> return alTerminar(AltaDeLista.NOMBRE_RESERVADO)
+            // El nombre acaba siendo el id del documento, y ahi Firestore no admite barras
+            // ni los nombres reservados de un solo punto.
+            limpio.contains("/") || limpio == "." || limpio == ".." ->
+                return alTerminar(AltaDeLista.NOMBRE_INVALIDO)
+        }
+
+        val documento = documentoDelUsuario() ?: return alTerminar(AltaDeLista.SIN_SESION)
+        val lista = documento.collection(LISTAS).document(limpio)
+
+        lista.get()
+            .addOnSuccessListener { doc ->
+                if (doc.exists()) {
+                    alTerminar(AltaDeLista.YA_EXISTE)
+                } else {
+                    // Firestore aplica la escritura en el movil al momento, pero el Task no
+                    // se completa hasta que el servidor la confirma. Si esperasemos a eso,
+                    // con mala cobertura el boton de crear no haria nada de nada: ni exito
+                    // ni error. Se da por creada aqui, que es lo que el usuario ya ve, y si
+                    // el servidor acaba rechazandola se avisa cuando llegue la negativa.
+                    lista.set(mapOf(PELICULAS to emptyList<MovieModel>()))
+                        .addOnFailureListener { alTerminar(AltaDeLista.RECHAZADA) }
+                    alTerminar(AltaDeLista.CREADA)
+                }
             }
-        }.addOnFailureListener { alTerminar(false) }
+            .addOnFailureListener { alTerminar(AltaDeLista.RECHAZADA) }
     }
 
     override fun borrarLista(nombre: String, alTerminar: (Boolean) -> Unit) {

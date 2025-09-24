@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dailymovie.R
 import com.example.dailymovie.data.Dependencias
+import com.example.dailymovie.data.AltaDeLista
 import com.example.dailymovie.data.ListaFija
 import com.example.dailymovie.data.UserRepository
 import com.example.dailymovie.models.ListaModel
@@ -19,10 +20,6 @@ class ListasViewModel(
 
     private val _customLists = MutableLiveData<List<ListaModel>>()
     val customLists: LiveData<List<ListaModel>> get() = _customLists
-
-    /** Motivo por el que no se ha podido crear una lista, para avisar al usuario. */
-    private val _avisoCrearLista = MutableLiveData<String?>()
-    val avisoCrearLista: LiveData<String?> get() = _avisoCrearLista
 
     init {
         cargarListasFijas()
@@ -42,21 +39,16 @@ class ListasViewModel(
         }
     }
 
-    fun createNewList(nombre: String, alTerminar: (Boolean) -> Unit) {
-        // Las listas de serie no se pueden repetir: antes se comparaba el texto a mano en
-        // varios sitios y una lista llamada "Favoritos" chocaba con la de verdad.
-        if (ListaFija.estaReservado(nombre)) {
-            _avisoCrearLista.value = "Ya existe una lista \"$nombre\", elige otro nombre"
-            alTerminar(false)
-            return
-        }
-        usuario.crearLista(nombre) { creada ->
-            if (creada) {
-                cargarListasDelUsuario()
-            } else {
-                _avisoCrearLista.value = "Ya tienes una lista con ese nombre"
-            }
-            alTerminar(creada)
+    /**
+     * Crea una lista y devuelve como ha ido.
+     *
+     * El motivo llega entero hasta la pantalla, que es quien elige el texto. Antes se
+     * devolvia un si o no y cualquier fallo se enseñaba como "la lista ya existe".
+     */
+    fun createNewList(nombre: String, alTerminar: (AltaDeLista) -> Unit) {
+        usuario.crearLista(nombre) { resultado ->
+            if (resultado == AltaDeLista.CREADA) cargarListasDelUsuario()
+            alTerminar(resultado)
         }
     }
 
@@ -83,7 +75,4 @@ class ListasViewModel(
         }
     }
 
-    fun avisoMostrado() {
-        _avisoCrearLista.value = null
-    }
 }
