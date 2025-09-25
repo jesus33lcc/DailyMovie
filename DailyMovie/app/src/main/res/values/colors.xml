@@ -7,4 +7,13 @@
     <color name="colorAccent">#3a506b</color>
     <color name="colorBackground">#1c2541</color>
     <color name="colorTextPrimary">#0b132b</color>
+
+    <!--
+        Rojo de borrar. Es el unico color de fuera de la paleta y solo se usa en los botones
+        que destruyen algo (borrar lista, quitar pelicula, borrar cuenta): son las acciones
+        que no se pueden deshacer y no pueden verse igual que un "aceptar" cualquiera.
+        Esta apagado a proposito para que no chille al lado del azul marino.
+    -->
+    <color name="colorPeligro">#8c3b3b</color>
+    <color name="colorPeligroBorde">#e07a7a</color>
 </resources>

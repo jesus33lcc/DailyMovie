@@ -1,6 +1,5 @@
 package com.example.dailymovie.activities.views
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -14,6 +13,7 @@ import com.example.dailymovie.databinding.ActivityListMoviesBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
+import com.example.dailymovie.utils.DialogoDailyMovie
 
 class ListMoviesA : AppCompatActivity() {
 
@@ -84,16 +84,17 @@ class ListMoviesA : AppCompatActivity() {
     }
 
     private fun showDeleteConfirmationDialog(movie: MovieModel, position: Int) {
-        AlertDialog.Builder(this)
-            .setTitle("Eliminar película")
-            .setMessage("¿Seguro que quieres quitar ${movie.title} de $listName?")
-            .setPositiveButton("Eliminar") { _, _ -> borrar(movie, position) }
-            .setNegativeButton("Cancelar") { dialog, _ ->
-                dialog.dismiss()
-                // La fila se ha quedado deslizada a un lado; hay que devolverla a su sitio.
-                movieListAdapter.notifyItemChanged(position)
-            }
-            .show()
+        DialogoDailyMovie.confirmar(
+            context = this,
+            titulo = "Quitar de la lista",
+            mensaje = "¿Seguro que quieres quitar ${movie.title} de $listName?",
+            textoAceptar = "Quitar",
+            peligroso = true,
+            // La fila se ha quedado deslizada a un lado; hay que devolverla a su sitio.
+            alCancelar = { movieListAdapter.notifyItemChanged(position) }
+        ) {
+            borrar(movie, position)
+        }
     }
 
     /**

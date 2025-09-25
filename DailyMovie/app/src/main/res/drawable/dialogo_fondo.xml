@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Fondo de los dialogos de la app.
+
+    Los AlertDialog salian con el blanco y el gris de Material, que al lado del azul marino
+    y la Courier del resto parecian de otra aplicacion. Este usa el fondo de la app y el
+    borde menta, como las cajas de las fichas.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/colorBackground" />
+    <corners android:radius="16dp" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/colorPrimary" />
+</shape>
