@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Para borrar cosas.
+
+    Es el unico sitio donde la app se sale del azul y el menta, y es a proposito: borrar una
+    lista o una cuenta no se puede ver igual que aceptar cualquier otra cosa.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/colorPeligro" />
+    <corners android:radius="8dp" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/colorPeligroBorde" />
+</shape>

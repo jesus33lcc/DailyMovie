@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Boton principal de los dialogos: el mismo azul pizarra con borde menta de los ajustes -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/colorAccent" />
+    <corners android:radius="8dp" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/colorPrimary" />
+</shape>

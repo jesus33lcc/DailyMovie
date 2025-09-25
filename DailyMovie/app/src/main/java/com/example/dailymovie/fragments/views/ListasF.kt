@@ -1,26 +1,30 @@
 package com.example.dailymovie.fragments.views
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.dailymovie.R
 import com.example.dailymovie.adapters.MovieListAdapter
+import com.example.dailymovie.data.ListaFija
 import com.example.dailymovie.databinding.FragmentListasBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.ListaModel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.activities.views.ListMoviesA
 import com.example.dailymovie.fragments.viewmodels.ListasViewModel
+import com.example.dailymovie.utils.DialogoDailyMovie
 import com.example.dailymovie.utils.mensaje
 
 class ListasF : Fragment() {
@@ -95,30 +99,65 @@ class ListasF : Fragment() {
         startActivity(intent)
     }
 
+    /**
+     * Crear una lista.
+     *
+     * El aviso sale mientras escribes: si el nombre ya esta cogido o lleva una barra se ve
+     * al momento, en vez de dejarte pulsar Crear para luego decirte que no valia.
+     */
     private fun showCreateListDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Crear nueva lista")
+        val contenido = layoutInflater.inflate(R.layout.dialogo_campo_texto, null)
+        val campo = contenido.findViewById<EditText>(R.id.dialogoCampo)
+        val aviso = contenido.findViewById<TextView>(R.id.dialogoAviso)
+        campo.hint = "Nombre de la lista"
 
-        val input = EditText(requireContext())
-        input.hint = "Nombre de la lista"
-        builder.setView(input)
+        // Los nombres que ya no estan libres: los de las listas del usuario y los dos fijos.
+        val cogidos = (viewModel.customLists.value.orEmpty().map { it.nombre } +
+            ListaFija.entries.map { it.titulo }).map { it.lowercase() }
 
-        builder.setPositiveButton("Crear") { _, _ ->
-            val listName = input.text.toString().trim()
-            viewModel.createNewList(listName) { resultado ->
-                // Cada motivo tiene su aviso. Antes cualquier fallo decia "la lista ya
-                // existe", asi que un rechazo de Firestore o una sesion caducada te dejaban
-                // dando vueltas sin saber que estaba pasando.
-                val texto = getString(resultado.mensaje(), listName)
-                Toast.makeText(context, texto, Toast.LENGTH_SHORT).show()
+        fun porQueNoVale(texto: String): String? = when {
+            texto.isBlank() -> null // aun no ha escrito nada, no hay nada que reprocharle
+            texto.lowercase() in cogidos -> getString(R.string.lista_ya_existe)
+            texto.contains("/") -> getString(R.string.lista_nombre_invalido)
+            else -> null
+        }
+
+        campo.doAfterTextChanged { texto ->
+            val problema = porQueNoVale(texto.toString().trim())
+            aviso.text = problema.orEmpty()
+            aviso.visibility = if (problema == null) View.GONE else View.VISIBLE
+        }
+
+        DialogoDailyMovie.mostrar(
+            context = requireContext(),
+            titulo = "Crear nueva lista",
+            mensaje = "Ponle un nombre y podrás guardar ahí las películas que quieras",
+            contenido = contenido,
+            textoAceptar = "Crear"
+        ) { dialogo ->
+            val nombre = campo.text.toString().trim()
+            val problema = porQueNoVale(nombre)
+            when {
+                // El dialogo se queda abierto mientras el nombre no valga, con el aviso
+                // puesto: cerrarlo obligaria a volver a escribirlo todo.
+                nombre.isBlank() -> {
+                    aviso.text = getString(R.string.lista_nombre_vacio)
+                    aviso.visibility = View.VISIBLE
+                }
+                problema != null -> {
+                    aviso.text = problema
+                    aviso.visibility = View.VISIBLE
+                }
+                else -> viewModel.createNewList(nombre) { resultado ->
+                    dialogo.dismiss()
+                    Toast.makeText(
+                        context,
+                        getString(resultado.mensaje(), nombre),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
-
-        builder.setNegativeButton("Cancelar") { dialog, which ->
-            dialog.cancel()
-        }
-
-        builder.show()
     }
 
     private fun setupSwipeToDelete(recyclerView: RecyclerView) {
@@ -135,27 +174,27 @@ class ListasF : Fragment() {
                 val position = viewHolder.bindingAdapterPosition
                 val lista = customListsAdapter.listaEn(position)
 
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Eliminar lista")
-                    .setMessage("¿Seguro que quieres eliminar la lista ${lista.nombre}?")
-                    .setPositiveButton("Eliminar") { _, _ ->
-                        viewModel.deleteCustomList(lista.nombre) { borrada ->
-                            if (borrada) {
-                                // No hay que sacar la fila a mano: al borrarla el ViewModel
-                                // recarga las listas y el comparador ve que falta esa.
-                                Toast.makeText(context, "Lista eliminada", Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(context, "No se ha podido eliminar", Toast.LENGTH_SHORT).show()
-                                customListsAdapter.notifyItemChanged(position)
-                            }
+                DialogoDailyMovie.confirmar(
+                    context = requireContext(),
+                    titulo = "Eliminar lista",
+                    mensaje = "Se borra \"${lista.nombre}\" y las películas que tengas guardadas ahí. " +
+                        "Esto no se puede deshacer.",
+                    textoAceptar = "Eliminar",
+                    peligroso = true,
+                    // La fila se ha quedado deslizada a un lado; hay que devolverla a su sitio.
+                    alCancelar = { customListsAdapter.notifyItemChanged(position) }
+                ) {
+                    viewModel.deleteCustomList(lista.nombre) { borrada ->
+                        if (borrada) {
+                            // No hay que sacar la fila a mano: al borrarla el ViewModel
+                            // recarga las listas y el comparador ve que falta esa.
+                            Toast.makeText(context, "Lista eliminada", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "No se ha podido eliminar", Toast.LENGTH_SHORT).show()
+                            customListsAdapter.notifyItemChanged(position)
                         }
                     }
-                    .setNegativeButton("Cancelar") { dialog, _ ->
-                        dialog.dismiss()
-                        // La fila se ha quedado deslizada; hay que devolverla a su sitio.
-                        customListsAdapter.notifyItemChanged(position)
-                    }
-                    .show()
+                }
             }
         }
 
