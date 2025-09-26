@@ -78,6 +78,10 @@ class MovieViewModel(
     fun addMovieToList(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit) =
         usuario.anadirALista(nombre, pelicula, alTerminar)
 
+    /** En que listas esta ya la pelicula, para abrir el dialogo con las casillas puestas. */
+    fun listasConLaPelicula(peliculaId: Int, alTerminar: (Set<String>) -> Unit) =
+        usuario.listasQueContienen(peliculaId, alTerminar)
+
     /** Quitar de una lista fija es cambiar el estado; de una del usuario, sacarla. */
     fun removeMovieFromList(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit) {
         when (ListaFija.desdeTitulo(nombre)) {

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dailymovie.R
 import com.example.dailymovie.adapters.*
@@ -22,6 +23,7 @@ import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.databinding.ActivityMovieBinding
 import com.example.dailymovie.adapters.ImagenAdapter
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.utils.DialogoDailyMovie
 import com.example.dailymovie.utils.LocaleUtil
 import com.example.dailymovie.utils.mensaje
 
@@ -154,28 +156,70 @@ class MovieA : AppCompatActivity() {
         }
     }
 
+    /**
+     * Guardar la pelicula en las listas del usuario.
+     *
+     * Antes era un menu de una sola eleccion: tocabas una lista, se cerraba, y para meterla
+     * en dos sitios habia que abrirlo otra vez. Tampoco se veia donde la tenias ya guardada
+     * ni se podia sacar desde aqui.
+     *
+     * Ahora salen todas con su casilla, las que ya la tienen vienen marcadas, y al guardar
+     * se aplica de una vez lo que hayas marcado y lo que hayas quitado.
+     */
     private fun showListSelectionDialog(movie: MovieModel) {
-        movieViewModel.getCustomLists { listNames ->
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("Seleccionar lista")
+        movieViewModel.getCustomLists { nombres ->
+            if (nombres.isEmpty()) {
+                DialogoDailyMovie.mostrar(
+                    context = this,
+                    titulo = "Guardar en una lista",
+                    mensaje = "Todavía no tienes ninguna lista tuya. Créala en la pestaña " +
+                        "Listas y aquí podrás guardar lo que quieras.",
+                    textoAceptar = "Entendido",
+                    textoCancelar = null
+                ) { it.dismiss() }
+                return@getCustomLists
+            }
 
-            builder.setItems(listNames.toTypedArray()) { dialog, which ->
-                val selectedList = listNames[which]
-                movieViewModel.addMovieToList(selectedList, movie) { success ->
-                    if (success) {
-                        showToast("Película añadida a $selectedList")
-                    } else {
-                        showToast("La película ya está en la lista $selectedList")
-                    }
+            movieViewModel.listasConLaPelicula(movie.id) { yaEstaba ->
+                val marcadas = yaEstaba.toMutableSet()
+                val contenido = layoutInflater.inflate(R.layout.dialogo_listas, null)
+                val lista = contenido.findViewById<RecyclerView>(R.id.dialogoListas)
+                lista.layoutManager = LinearLayoutManager(this)
+                lista.adapter = ListaCasillaAdapter(nombres, marcadas)
+
+                DialogoDailyMovie.mostrar(
+                    context = this,
+                    titulo = "Guardar en una lista",
+                    mensaje = movie.title,
+                    contenido = contenido,
+                    textoAceptar = "Guardar"
+                ) { dialogo ->
+                    dialogo.dismiss()
+                    aplicarCambiosDeListas(movie, yaEstaba, marcadas)
                 }
             }
-
-            builder.setNegativeButton("Cancelar") { dialog, _ ->
-                dialog.dismiss()
-            }
-
-            builder.show()
         }
+    }
+
+    /** Solo se toca lo que ha cambiado: lo que se ha marcado y lo que se ha desmarcado. */
+    private fun aplicarCambiosDeListas(
+        movie: MovieModel,
+        antes: Set<String>,
+        ahora: Set<String>
+    ) {
+        val meter = ahora - antes
+        val sacar = antes - ahora
+        if (meter.isEmpty() && sacar.isEmpty()) return
+
+        meter.forEach { movieViewModel.addMovieToList(it, movie) { } }
+        sacar.forEach { movieViewModel.removeMovieFromList(it, movie) { } }
+
+        val aviso = when {
+            meter.isNotEmpty() && sacar.isEmpty() -> "Guardada en ${meter.joinToString(", ")}"
+            meter.isEmpty() && sacar.isNotEmpty() -> "Quitada de ${sacar.joinToString(", ")}"
+            else -> "Listas actualizadas"
+        }
+        showToast(aviso)
     }
 
     private fun convertToMovieDetailsModel(response: MovieDetailsResponse): MovieDetailsModel {

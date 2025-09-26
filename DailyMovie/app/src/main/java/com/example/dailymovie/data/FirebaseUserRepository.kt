@@ -222,6 +222,22 @@ class FirebaseUserRepository(
             .addOnFailureListener { alTerminar(emptyList()) }
     }
 
+    override fun listasQueContienen(peliculaId: Int, alTerminar: (Set<String>) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(emptySet())
+        // Se baja la subcoleccion entera una sola vez y se mira dentro, en vez de preguntar
+        // lista por lista: son pocas y asi es un unico viaje.
+        documento.collection(LISTAS).get()
+            .addOnSuccessListener { listas ->
+                alTerminar(
+                    listas.documents
+                        .filter { doc -> aPeliculas(doc.get(PELICULAS)).any { it.id == peliculaId } }
+                        .map { it.id }
+                        .toSet()
+                )
+            }
+            .addOnFailureListener { alTerminar(emptySet()) }
+    }
+
     override fun anadirALista(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit) {
         val documento = documentoDelUsuario() ?: return alTerminar(false)
         val lista = documento.collection(LISTAS).document(nombre)
