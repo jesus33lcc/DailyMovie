@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Las listas con casillas dentro del dialogo de guardar.
+
+    Va con wrap_content porque lo normal es tener unas pocas listas y asi el dialogo ocupa
+    justo lo que necesita. Si algun dia se llenan de listas, aqui es donde habria que ponerle
+    un alto maximo.
+-->
+<androidx.recyclerview.widget.RecyclerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dialogoListas"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:listitem="@layout/item_lista_casilla" />

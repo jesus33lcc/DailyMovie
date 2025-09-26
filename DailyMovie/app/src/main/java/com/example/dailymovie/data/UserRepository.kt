@@ -56,6 +56,14 @@ interface UserRepository {
     fun crearLista(nombre: String, alTerminar: (AltaDeLista) -> Unit)
     fun borrarLista(nombre: String, alTerminar: (Boolean) -> Unit)
     fun peliculasDeLista(nombre: String, alTerminar: (List<MovieModel>) -> Unit)
+
+    /**
+     * En cuales de las listas del usuario esta ya esa pelicula.
+     *
+     * Hace falta para poder abrir el dialogo de añadir con las casillas ya marcadas, en vez
+     * de enseñar todas vacias y que el usuario no sepa donde la tiene guardada.
+     */
+    fun listasQueContienen(peliculaId: Int, alTerminar: (Set<String>) -> Unit)
     fun anadirALista(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit)
     fun quitarDeLista(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit)
 
