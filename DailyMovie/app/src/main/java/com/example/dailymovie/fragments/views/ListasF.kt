@@ -19,6 +19,7 @@ import com.example.dailymovie.R
 import com.example.dailymovie.adapters.MovieListAdapter
 import com.example.dailymovie.data.ListaFija
 import com.example.dailymovie.databinding.FragmentListasBinding
+import com.example.dailymovie.graphics.DeslizarParaBorrar
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.ListaModel
 import com.example.dailymovie.models.MovieModel
@@ -160,46 +161,41 @@ class ListasF : Fragment() {
         }
     }
 
+    /**
+     * Deslizar una lista para borrarla.
+     *
+     * Aqui si se pregunta antes, al reves que al quitar una pelicula: borrar una lista se
+     * lleva por delante todo lo que hubiera dentro y no basta con poder deshacerlo durante
+     * unos segundos.
+     */
     private fun setupSwipeToDelete(recyclerView: RecyclerView) {
-        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
+        val deslizar = DeslizarParaBorrar(requireContext()) { position ->
+            val lista = customListsAdapter.listaEn(position)
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.bindingAdapterPosition
-                val lista = customListsAdapter.listaEn(position)
-
-                DialogoDailyMovie.confirmar(
-                    context = requireContext(),
-                    titulo = "Eliminar lista",
-                    mensaje = "Se borra \"${lista.nombre}\" y las películas que tengas guardadas ahí. " +
-                        "Esto no se puede deshacer.",
-                    textoAceptar = "Eliminar",
-                    peligroso = true,
-                    // La fila se ha quedado deslizada a un lado; hay que devolverla a su sitio.
-                    alCancelar = { customListsAdapter.notifyItemChanged(position) }
-                ) {
-                    viewModel.deleteCustomList(lista.nombre) { borrada ->
-                        if (borrada) {
-                            // No hay que sacar la fila a mano: al borrarla el ViewModel
-                            // recarga las listas y el comparador ve que falta esa.
-                            Toast.makeText(context, "Lista eliminada", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, "No se ha podido eliminar", Toast.LENGTH_SHORT).show()
-                            customListsAdapter.notifyItemChanged(position)
-                        }
+            DialogoDailyMovie.confirmar(
+                context = requireContext(),
+                titulo = "Eliminar lista",
+                mensaje = "Se borra \"${lista.nombre}\" y las películas que tengas guardadas ahí. " +
+                    "Esto no se puede deshacer.",
+                textoAceptar = "Eliminar",
+                peligroso = true,
+                // La fila se ha quedado deslizada a un lado; hay que devolverla a su sitio.
+                alCancelar = { customListsAdapter.notifyItemChanged(position) }
+            ) {
+                viewModel.deleteCustomList(lista.nombre) { borrada ->
+                    if (borrada) {
+                        // No hay que sacar la fila a mano: al borrarla el ViewModel recarga
+                        // las listas y el comparador ve que falta esa.
+                        Toast.makeText(context, "Lista eliminada", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "No se ha podido eliminar", Toast.LENGTH_SHORT).show()
+                        customListsAdapter.notifyItemChanged(position)
                     }
                 }
             }
         }
 
-        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
+        ItemTouchHelper(deslizar).attachToRecyclerView(recyclerView)
     }
 
     override fun onDestroyView() {

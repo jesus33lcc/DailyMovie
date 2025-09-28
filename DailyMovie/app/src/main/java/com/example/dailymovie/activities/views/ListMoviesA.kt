@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.adapters.CustomMovieListAdapter
 import com.example.dailymovie.databinding.ActivityListMoviesBinding
+import com.example.dailymovie.graphics.DeslizarParaBorrar
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
-import com.example.dailymovie.utils.DialogoDailyMovie
+import com.example.dailymovie.utils.Avisos
 
 class ListMoviesA : AppCompatActivity() {
 
@@ -41,7 +42,7 @@ class ListMoviesA : AppCompatActivity() {
             onMovieClick = { movie ->
                 startActivity(Intent(this, MovieA::class.java).putExtra("MOVIE_ID", movie.id))
             },
-            onMovieDelete = { movie, position -> showDeleteConfirmationDialog(movie, position) }
+            onMovieDelete = { movie, position -> quitarConDeshacer(movie, position) }
         )
 
         binding.recyclerViewMovies.layoutManager = LinearLayoutManager(this)
@@ -64,54 +65,48 @@ class ListMoviesA : AppCompatActivity() {
     }
 
     private fun setupSwipeToDelete(recyclerView: RecyclerView) {
-        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.bindingAdapterPosition
-                showDeleteConfirmationDialog(movieListAdapter.peliculaEn(position), position)
-            }
+        val deslizar = DeslizarParaBorrar(this) { posicion ->
+            quitarConDeshacer(movieListAdapter.peliculaEn(posicion), posicion)
         }
-
-        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-    }
-
-    private fun showDeleteConfirmationDialog(movie: MovieModel, position: Int) {
-        DialogoDailyMovie.confirmar(
-            context = this,
-            titulo = "Quitar de la lista",
-            mensaje = "¿Seguro que quieres quitar ${movie.title} de $listName?",
-            textoAceptar = "Quitar",
-            peligroso = true,
-            // La fila se ha quedado deslizada a un lado; hay que devolverla a su sitio.
-            alCancelar = { movieListAdapter.notifyItemChanged(position) }
-        ) {
-            borrar(movie, position)
-        }
+        ItemTouchHelper(deslizar).attachToRecyclerView(recyclerView)
     }
 
     /**
-     * Quita la pelicula de la lista que sea.
+     * Quita la pelicula de la lista dando unos segundos para arrepentirse.
+     *
+     * Antes salia un dialogo preguntando si estabas seguro, que era un paso de mas para algo
+     * que se hace a menudo. Ahora la fila desaparece al momento y el aviso de abajo deja
+     * deshacerlo; hasta que ese aviso no se va, no se toca Firebase.
+     */
+    private fun quitarConDeshacer(movie: MovieModel, position: Int) {
+        movieList.remove(movie)
+        movieListAdapter.submitList(movieList.toList())
+
+        Avisos.conDeshacer(
+            vista = binding.root,
+            texto = "${movie.title} fuera de $listName",
+            alDeshacer = {
+                movieList.add(position.coerceAtMost(movieList.size), movie)
+                movieListAdapter.submitList(movieList.toList())
+            },
+            alConfirmar = { quitarDeVerdad(movie, position) }
+        )
+    }
+
+    /**
+     * El borrado que llega a Firebase.
      *
      * Antes esto eran tres bloques calcados, uno por tipo de lista, que se diferenciaban
      * solo en a que funcion llamaban. El ViewModel ya sabe elegir con el enum ListaFija.
      */
-    private fun borrar(movie: MovieModel, position: Int) {
+    private fun quitarDeVerdad(movie: MovieModel, position: Int) {
         movieViewModel.removeMovieFromList(listName, movie) { bien ->
-            if (bien) {
-                movieList.remove(movie)
-                movieListAdapter.submitList(movieList.toList())
-                Toast.makeText(this, "${movie.title} fuera de $listName", Toast.LENGTH_SHORT).show()
-            } else {
+            if (!bien) {
+                // No se pudo guardar, asi que la pelicula vuelve a su sitio: dejarla fuera
+                // seria mentirle al usuario, porque al volver a entrar reapareceria.
                 Toast.makeText(this, "No se ha podido quitar", Toast.LENGTH_SHORT).show()
-                movieListAdapter.notifyItemChanged(position)
+                movieList.add(position.coerceAtMost(movieList.size), movie)
+                movieListAdapter.submitList(movieList.toList())
             }
         }
     }
