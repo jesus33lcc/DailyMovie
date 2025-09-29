@@ -11,4 +11,11 @@
     <dimen name="poster_alto">270dp</dimen>
     <dimen name="foto_persona_ancho">160dp</dimen>
     <dimen name="foto_persona_alto">200dp</dimen>
+
+    <dimen name="poster_ficha_ancho">280dp</dimen>
+    <dimen name="poster_ficha_alto">420dp</dimen>
+    <dimen name="foto_ficha_persona">240dp</dimen>
+
+    <!-- En una pantalla grande cabe algo mas de texto por linea sin que canse -->
+    <dimen name="ancho_maximo_lectura">720dp</dimen>
 </resources>

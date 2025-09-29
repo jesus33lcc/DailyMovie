@@ -23,8 +23,8 @@
 
             <ImageView
                 android:id="@+id/imgPosterSerie"
-                android:layout_width="200dp"
-                android:layout_height="300dp"
+                android:layout_width="@dimen/poster_ficha_ancho"
+                android:layout_height="@dimen/poster_ficha_alto"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
                 android:background="@drawable/rounded_border"
@@ -71,6 +71,8 @@
             <TextView
                 android:id="@+id/txtSinopsisSerie"
                 android:layout_width="match_parent"
+                android:maxWidth="@dimen/ancho_maximo_lectura"
+                android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:padding="12dp"

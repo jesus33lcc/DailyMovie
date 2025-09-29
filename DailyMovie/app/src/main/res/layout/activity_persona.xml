@@ -23,8 +23,8 @@
 
             <ImageView
                 android:id="@+id/imgPersona"
-                android:layout_width="180dp"
-                android:layout_height="270dp"
+                android:layout_width="@dimen/foto_ficha_persona"
+                android:layout_height="@dimen/foto_ficha_persona"
                 android:layout_gravity="center"
                 android:scaleType="centerCrop"
                 android:background="@drawable/rounded_border"
@@ -87,6 +87,8 @@
             <TextView
                 android:id="@+id/txtBiografia"
                 android:layout_width="match_parent"
+                android:maxWidth="@dimen/ancho_maximo_lectura"
+                android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:padding="12dp"

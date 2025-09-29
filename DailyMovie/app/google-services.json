@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "1001027592941",
     "project_id": "dailymovie-d4480",
-    "storage_bucket": "dailymovie-d4480.appspot.com"
+    "storage_bucket": "dailymovie-d4480.firebasestorage.app"
   },
   "client": [
     {
@@ -14,15 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "1001027592941-ebo6aa3ls6nptdeh84uj7vaemruh59vn.apps.googleusercontent.com",
+          "client_id": "1001027592941-n4gd0c84591bt27n30am4ruhd29aeten.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.dailymovie",
-            "certificate_hash": "b8c27d6cfd838d6718aecc84e629c0aff9e3965d"
+            "certificate_hash": "f3724da251d86af7fe418ee710259376d26eed17"
           }
         },
         {
-          "client_id": "1001027592941-h0uj8ubjvu43js3q9a6kntc0lbkmemje.apps.googleusercontent.com",
+          "client_id": "1001027592941-3i9ncgem1a8v3dshkkq94fbla6rb5ldr.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -35,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1001027592941-h0uj8ubjvu43js3q9a6kntc0lbkmemje.apps.googleusercontent.com",
+              "client_id": "1001027592941-3i9ncgem1a8v3dshkkq94fbla6rb5ldr.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
