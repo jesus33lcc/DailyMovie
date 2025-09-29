@@ -28,12 +28,15 @@
                 android:background="@drawable/rounded_border_box_big"
                 android:clipToOutline="true">
 
+                <!-- Medida fija: con match_parent y adjustViewBounds el cartel se estiraba
+                     al ancho de la pantalla y su alto salia solo, asi que en tablet ocupaba
+                     varias pantallas de scroll el solo -->
                 <ImageView
                     android:id="@+id/img_poster_movie"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:adjustViewBounds="true"
+                    android:layout_width="@dimen/poster_ficha_ancho"
+                    android:layout_height="@dimen/poster_ficha_alto"
+                    android:layout_gravity="center_horizontal"
+                    android:scaleType="centerCrop"
                     android:contentDescription="Póster de la película"
                     android:background="@drawable/image_rounded_border"
                     android:clipToOutline="true" />
@@ -256,6 +259,8 @@
                 <TextView
                     android:id="@+id/txt_overview_movie"
                     android:layout_width="match_parent"
+                    android:maxWidth="@dimen/ancho_maximo_lectura"
+                    android:layout_gravity="center_horizontal"
                     android:layout_height="wrap_content"
                     android:text=""
                     android:textSize="15sp"

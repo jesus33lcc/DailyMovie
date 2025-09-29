@@ -9,4 +9,24 @@
     <!-- La foto del reparto -->
     <dimen name="foto_persona_ancho">120dp</dimen>
     <dimen name="foto_persona_alto">150dp</dimen>
+
+    <!--
+        El cartel grande de la ficha.
+
+        Antes iba con match_parent y adjustViewBounds, asi que se estiraba al ancho de la
+        pantalla y la altura salia sola manteniendo la proporcion: en la tablet apaisada eso
+        eran 2560x3840, mas de dos pantallas de scroll para ver solo el cartel. Con una
+        medida fija ocupa lo que tiene que ocupar y el resto de la ficha se ve de entrada.
+    -->
+    <dimen name="poster_ficha_ancho">200dp</dimen>
+    <dimen name="poster_ficha_alto">300dp</dimen>
+
+    <!-- La foto de la ficha de persona -->
+    <dimen name="foto_ficha_persona">180dp</dimen>
+
+    <!--
+        Lo ancho que puede llegar a ser un parrafo antes de costar leerlo. En tablet las
+        lineas se estiraban de lado a lado y el ojo se perdia al saltar de renglon.
+    -->
+    <dimen name="ancho_maximo_lectura">560dp</dimen>
 </resources>
