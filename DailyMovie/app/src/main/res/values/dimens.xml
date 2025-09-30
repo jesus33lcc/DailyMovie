@@ -29,4 +29,18 @@
         lineas se estiraban de lado a lado y el ojo se perdia al saltar de renglon.
     -->
     <dimen name="ancho_maximo_lectura">560dp</dimen>
+
+    <!-- Los fotogramas de la tira de imagenes, en 16:9 porque no son carteles -->
+    <dimen name="imagen_ancho">240dp</dimen>
+    <dimen name="imagen_alto">135dp</dimen>
+
+    <!--
+        Los videos, un punto mas grandes que las imagenes a proposito: asi se distingue de un
+        vistazo que una tira es de fotogramas y la otra de trailers.
+
+        Antes el video iba a match_parent con 250dp de alto, asi que en tablet se estiraba a
+        2560px de ancho, salia borroso y deformado, y el boton de play tapaba el centro.
+    -->
+    <dimen name="video_ancho">320dp</dimen>
+    <dimen name="video_alto">180dp</dimen>
 </resources>

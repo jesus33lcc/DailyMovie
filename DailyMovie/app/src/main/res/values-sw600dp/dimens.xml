@@ -18,4 +18,9 @@
 
     <!-- En una pantalla grande cabe algo mas de texto por linea sin que canse -->
     <dimen name="ancho_maximo_lectura">720dp</dimen>
+
+    <dimen name="imagen_ancho">320dp</dimen>
+    <dimen name="imagen_alto">180dp</dimen>
+    <dimen name="video_ancho">420dp</dimen>
+    <dimen name="video_alto">236dp</dimen>
 </resources>

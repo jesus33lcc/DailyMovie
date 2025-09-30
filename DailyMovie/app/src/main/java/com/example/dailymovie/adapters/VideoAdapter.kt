@@ -1,6 +1,5 @@
 package com.example.dailymovie.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,17 @@ import com.example.dailymovie.R
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Trailers
 
-class VideoAdapter(private val context: Context, private val videoList: List<VideoModel>) :
+/**
+ * La tira de trailers de la ficha.
+ *
+ * Antes esto vivia dentro de un ViewPager que ocupaba el ancho entero, asi que solo se veia
+ * un video a la vez y en tablet salia estirado y borroso. Ahora es una tira como la de
+ * imagenes y se ven varios de golpe.
+ *
+ * El context sale del propio itemView: pasarlo por el constructor obligaba a que cada
+ * pantalla se lo diera y era una forma facil de quedarse con una referencia de mas.
+ */
+class VideoAdapter(private val videoList: List<VideoModel>) :
     RecyclerView.Adapter<VideoAdapter.VideoViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoViewHolder {
@@ -23,17 +32,18 @@ class VideoAdapter(private val context: Context, private val videoList: List<Vid
 
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         val video = videoList[position]
+        val contexto = holder.itemView.context
 
         // YouTube ya no deja reproducir dentro de un WebView, asi que se enseña la miniatura
         // y al tocarla se abre el trailer en YouTube. Ver utils/Trailers.
-        Glide.with(context)
+        Glide.with(contexto)
             .load(Trailers.miniatura(video.key))
             .placeholder(R.drawable.ic_baseline_image_24)
             .error(R.drawable.ic_baseline_image_24)
             .into(holder.miniatura)
 
         holder.contenedor.setOnClickListener {
-            Trailers.abrir(context, video.key)
+            Trailers.abrir(contexto, video.key)
         }
 
         holder.txtVideoName.text = video.name
