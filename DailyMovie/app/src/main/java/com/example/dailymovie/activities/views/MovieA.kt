@@ -369,8 +369,14 @@ class MovieA : AppCompatActivity() {
 
     private fun displayVideos(videoList: List<VideoModel>) {
         if (videoList.isNotEmpty()) {
-            val adapter = VideoAdapter(this, videoList)
-            binding.viewPagerVideos.adapter = adapter
+            // Los trailers van en tira horizontal, como las imagenes. Antes era un ViewPager
+            // a pantalla completa: se veia un video a la vez y estirado.
+            binding.recyclerVideos.layoutManager =
+                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            binding.recyclerVideos.adapter = VideoAdapter(videoList)
+            if (binding.recyclerVideos.itemDecorationCount == 0) {
+                binding.recyclerVideos.addItemDecoration(SpacingItemDecoration.deLista(this))
+            }
             binding.sectionVideos.visibility = View.VISIBLE
         } else {
             binding.sectionVideos.visibility = View.GONE

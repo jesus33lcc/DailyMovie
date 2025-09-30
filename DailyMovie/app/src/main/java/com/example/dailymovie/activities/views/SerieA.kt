@@ -61,6 +61,9 @@ class SerieA : AppCompatActivity() {
         binding.recyclerRepartoSerie.addItemDecoration(SpacingItemDecoration.deLista(this))
         binding.recyclerPlataformasSerie.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerVideosSerie.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerVideosSerie.addItemDecoration(SpacingItemDecoration.deLista(this))
         binding.recyclerPlataformasSerie.addItemDecoration(SpacingItemDecoration.deLista(this))
     }
 
@@ -76,7 +79,7 @@ class SerieA : AppCompatActivity() {
 
         viewModel.videos.observe(this) { videos ->
             binding.seccionVideosSerie.visibility = if (videos.isEmpty()) View.GONE else View.VISIBLE
-            binding.paginadorVideosSerie.adapter = VideoAdapter(this, videos)
+            binding.recyclerVideosSerie.adapter = VideoAdapter(videos)
         }
 
         viewModel.plataformas.observe(this) { respuesta ->

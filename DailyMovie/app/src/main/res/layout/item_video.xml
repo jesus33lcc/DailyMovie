@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Un trailer de la tira de videos.
+
+    Antes esto ocupaba el ancho entero de la pantalla dentro de un ViewPager: en tablet se
+    estiraba a 2560px, la miniatura de YouTube (que no es tan grande) salia borrosa y
+    deformada, y el play de 64dp se plantaba en el centro tapandolo todo.
+
+    Ahora va como la tira de imagenes, con su medida, y el play se queda en una esquina para
+    dejar ver el fotograma.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="8dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <FrameLayout
         android:id="@+id/trailerContainer"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/rounded_border_box_big"
+        android:layout_width="@dimen/video_ancho"
+        android:layout_height="@dimen/video_alto"
+        android:background="@drawable/rounded_border"
         android:clipToOutline="true"
         android:foreground="?attr/selectableItemBackground">
 
@@ -23,21 +31,24 @@
             android:contentDescription="@string/ver_trailer" />
 
         <ImageView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_gravity="center"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="8dp"
             android:src="@drawable/ic_play_trailer"
             android:contentDescription="@string/ver_trailer" />
     </FrameLayout>
 
     <TextView
         android:id="@+id/txtVideoName"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/video_ancho"
         android:layout_height="wrap_content"
-        android:text="Video Name"
-        android:textStyle="bold"
-        android:textAlignment="center"
         android:paddingTop="8dp"
+        android:textSize="14sp"
+        android:fontFamily="@font/courier"
+        android:textAlignment="center"
+        android:textColor="@color/colorTextPrimary"
         android:ellipsize="end"
-        android:maxLines="2" />
+        android:maxLines="2"
+        tools:text="Breaking Bad: Tráiler en español" />
 </LinearLayout>
