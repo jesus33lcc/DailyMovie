@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarFotograma
 import com.example.dailymovie.activities.views.GaleriaA
 import com.example.dailymovie.utils.Constantes
 
@@ -20,11 +20,7 @@ class ImagenAdapter(private val rutas: List<String>) :
     )
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        Glide.with(holder.itemView.context)
-            .load(Constantes.IMAGE_URL + rutas[position])
-            .placeholder(R.drawable.ic_baseline_image_24)
-            .error(R.drawable.ic_baseline_image_24)
-            .into(holder.imagen)
+        holder.imagen.cargarFotograma(rutas[position])
 
         holder.itemView.setOnClickListener {
             val contexto = holder.itemView.context

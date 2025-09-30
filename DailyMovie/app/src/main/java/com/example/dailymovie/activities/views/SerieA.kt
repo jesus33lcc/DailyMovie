@@ -6,8 +6,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarCartel
 import com.example.dailymovie.activities.viewmodels.SerieViewModel
 import com.example.dailymovie.adapters.CreditAdapter
 import com.example.dailymovie.adapters.EpisodioAdapter
@@ -110,11 +110,7 @@ class SerieA : AppCompatActivity() {
         binding.txtEstadoSerie.visibility = if (estado.isBlank()) View.GONE else View.VISIBLE
         binding.txtEstadoSerie.text = estado
 
-        Glide.with(this)
-            .load(Constantes.IMAGE_URL + serie.poster)
-            .placeholder(R.drawable.ic_baseline_image_24)
-            .error(R.drawable.ic_baseline_image_24)
-            .into(binding.imgPosterSerie)
+        binding.imgPosterSerie.cargarCartel(serie.poster)
 
         // La temporada 0 son los especiales; no es por donde se empieza una serie, asi que
         // no aparece entre los botones.

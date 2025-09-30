@@ -7,8 +7,8 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarFotogramaDeUrl
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Trailers
 
@@ -36,11 +36,7 @@ class VideoAdapter(private val videoList: List<VideoModel>) :
 
         // YouTube ya no deja reproducir dentro de un WebView, asi que se enseña la miniatura
         // y al tocarla se abre el trailer en YouTube. Ver utils/Trailers.
-        Glide.with(contexto)
-            .load(Trailers.miniatura(video.key))
-            .placeholder(R.drawable.ic_baseline_image_24)
-            .error(R.drawable.ic_baseline_image_24)
-            .into(holder.miniatura)
+        holder.miniatura.cargarFotogramaDeUrl(Trailers.miniatura(video.key))
 
         holder.contenedor.setOnClickListener {
             Trailers.abrir(contexto, video.key)

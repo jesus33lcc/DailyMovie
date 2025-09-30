@@ -6,8 +6,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarFotoDePersona
 import com.example.dailymovie.activities.viewmodels.PersonaViewModel
 import com.example.dailymovie.adapters.PeliculaDePersonaAdapter
 import com.example.dailymovie.data.Filmografia
@@ -66,11 +66,7 @@ class PersonaA : AppCompatActivity() {
         binding.txtOficioPersona.text = traducirOficio(persona.oficio)
         binding.txtDatosPersona.text = datosDeVida(persona)
 
-        Glide.with(this)
-            .load(Constantes.IMAGE_URL + persona.foto)
-            .placeholder(R.drawable.ic_baseline_image_24)
-            .error(R.drawable.ic_baseline_image_24)
-            .into(binding.imgPersona)
+        binding.imgPersona.cargarFotoDePersona(persona.foto)
 
         // Muchas fichas no tienen biografia traducida al español, asi que se oculta en
         // vez de dejar un recuadro vacio.

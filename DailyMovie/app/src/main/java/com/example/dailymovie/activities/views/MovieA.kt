@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarCartel
 import com.example.dailymovie.adapters.*
 import com.example.dailymovie.client.response.*
 import com.example.dailymovie.models.MovieDetailsModel
@@ -287,11 +287,7 @@ class MovieA : AppCompatActivity() {
         binding.txtRevenueMovie.text = "${movie.revenue} USD"
         binding.txtRevenueMovie.visibility = if (movie.revenue == 0L) View.GONE else View.VISIBLE
 
-        Glide.with(this)
-            .load(Constantes.IMAGE_URL + movie.posterPath)
-            .placeholder(R.drawable.ic_baseline_image_24)
-            .error(R.drawable.ic_baseline_image_24)
-            .into(binding.imgPosterMovie)
+        binding.imgPosterMovie.cargarCartel(movie.posterPath)
 
         val hasContent = binding.txtDirectorMovie.text.isNotEmpty() ||
                 binding.txtRuntimeMovie.text.isNotEmpty() ||

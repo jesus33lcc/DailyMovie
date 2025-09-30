@@ -7,8 +7,8 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarImagenGrande
 import com.example.dailymovie.databinding.ActivityGaleriaBinding
 import com.example.dailymovie.utils.Constantes
 
@@ -59,12 +59,8 @@ class GaleriaA : AppCompatActivity() {
         )
 
         override fun onBindViewHolder(holder: Holder, position: Int) {
-            Glide.with(holder.imagen.context)
-                // A pantalla completa hace falta el tamaño grande, no el w500 de las listas.
-                .load(Constantes.IMAGE_ORIGINAL_URL + rutas[position])
-                .placeholder(R.drawable.ic_baseline_image_24)
-                .error(R.drawable.ic_baseline_image_24)
-                .into(holder.imagen)
+            // A pantalla completa hace falta el tamaño grande, no el w500 de las listas.
+            holder.imagen.cargarImagenGrande(rutas[position])
         }
 
         override fun getItemCount() = rutas.size

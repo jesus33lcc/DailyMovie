@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarCartel
 
 /**
  * Algo que el usuario puede marcar en el onboarding.
@@ -43,11 +43,7 @@ class ElegibleAdapter(
             holder.marco.visibility = View.GONE
         } else {
             holder.marco.visibility = View.VISIBLE
-            Glide.with(holder.itemView.context)
-                .load(com.example.dailymovie.utils.Constantes.IMAGE_URL + elemento.imagen)
-                .placeholder(R.drawable.ic_baseline_image_24)
-                .error(R.drawable.ic_baseline_image_24)
-                .into(holder.imagen)
+            holder.imagen.cargarCartel(elemento.imagen)
         }
 
         pintarMarca(holder, estaElegido(elemento.id))

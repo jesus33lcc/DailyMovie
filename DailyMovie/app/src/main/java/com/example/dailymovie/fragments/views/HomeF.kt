@@ -12,8 +12,8 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarFotogramaDeUrl
 import com.example.dailymovie.adapters.MovieAdapter
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
@@ -132,11 +132,7 @@ class HomeF : Fragment() {
         }
 
         binding.trailerContainer.visibility = View.VISIBLE
-        Glide.with(this)
-            .load(Trailers.miniatura(videoId))
-            .placeholder(R.drawable.ic_baseline_image_24)
-            .error(R.drawable.ic_baseline_image_24)
-            .into(binding.trailerThumbnail)
+        binding.trailerThumbnail.cargarFotogramaDeUrl(Trailers.miniatura(videoId))
 
         binding.trailerContainer.setOnClickListener {
             Trailers.abrir(requireContext(), videoId)

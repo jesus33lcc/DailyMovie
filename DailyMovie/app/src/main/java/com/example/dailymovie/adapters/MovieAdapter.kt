@@ -4,11 +4,11 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.dailymovie.databinding.ItemMovieCardBinding
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.activities.views.MovieA
+import com.example.dailymovie.utils.cargarCartel
 
 class MovieAdapter(private val movies: List<MovieModel>) :
     RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
@@ -27,9 +27,7 @@ class MovieAdapter(private val movies: List<MovieModel>) :
     class MovieViewHolder(private val binding: ItemMovieCardBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(movie: MovieModel) {
             binding.movieTitle.text = movie.title
-            Glide.with(binding.root.context)
-                .load(Constantes.IMAGE_URL + movie.posterPath)
-                .into(binding.moviePoster)
+            binding.moviePoster.cargarCartel(movie.posterPath)
 
             binding.root.setOnClickListener {
                 val context = binding.root.context
