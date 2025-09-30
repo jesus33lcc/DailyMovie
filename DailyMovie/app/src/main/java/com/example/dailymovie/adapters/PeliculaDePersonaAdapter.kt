@@ -4,8 +4,8 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarCartel
 import com.example.dailymovie.activities.views.MovieA
 import com.example.dailymovie.client.response.PeliculaDePersona
 import com.example.dailymovie.databinding.ItemMovieCardBinding
@@ -34,11 +34,7 @@ class PeliculaDePersonaAdapter(
         fun pintar(pelicula: PeliculaDePersona) {
             binding.movieTitle.text = pelicula.titulo
 
-            Glide.with(binding.root.context)
-                .load(Constantes.IMAGE_URL + pelicula.poster)
-                .placeholder(R.drawable.ic_baseline_image_24)
-                .error(R.drawable.ic_baseline_image_24)
-                .into(binding.moviePoster)
+            binding.moviePoster.cargarCartel(pelicula.poster)
 
             binding.root.setOnClickListener {
                 val contexto = binding.root.context

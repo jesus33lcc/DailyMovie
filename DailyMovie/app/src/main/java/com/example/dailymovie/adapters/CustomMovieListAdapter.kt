@@ -8,8 +8,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarCartel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.utils.Constantes
 
@@ -42,11 +42,7 @@ class CustomMovieListAdapter(
         holder.title.text = movie.title
         holder.year.text = movie.releaseDate.take(4)
         holder.rating.text = "Rating: ${movie.voteAverage}"
-        Glide.with(holder.itemView.context)
-            .load(Constantes.IMAGE_URL + movie.posterPath)
-            .placeholder(R.drawable.ic_baseline_image_24)
-            .error(R.drawable.ic_baseline_image_24)
-            .into(holder.poster)
+        holder.poster.cargarCartel(movie.posterPath)
 
         holder.itemView.setOnClickListener {
             onMovieClick(movie)

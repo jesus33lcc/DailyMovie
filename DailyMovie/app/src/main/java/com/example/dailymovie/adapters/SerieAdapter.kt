@@ -4,8 +4,8 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarCartel
 import com.example.dailymovie.activities.views.SerieA
 import com.example.dailymovie.databinding.ItemMovieCardBinding
 import com.example.dailymovie.models.SerieModel
@@ -32,11 +32,7 @@ class SerieAdapter(private val series: List<SerieModel>) :
         fun pintar(serie: SerieModel) {
             binding.movieTitle.text = serie.titulo
 
-            Glide.with(binding.root.context)
-                .load(Constantes.IMAGE_URL + serie.poster)
-                .placeholder(R.drawable.ic_baseline_image_24)
-                .error(R.drawable.ic_baseline_image_24)
-                .into(binding.moviePoster)
+            binding.moviePoster.cargarCartel(serie.poster)
 
             binding.root.setOnClickListener {
                 val contexto = binding.root.context

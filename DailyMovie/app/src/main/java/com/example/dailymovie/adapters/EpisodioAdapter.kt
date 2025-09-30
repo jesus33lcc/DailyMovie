@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.dailymovie.R
+import com.example.dailymovie.utils.cargarFotograma
 import com.example.dailymovie.models.EpisodioModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.Fechas
@@ -32,11 +32,7 @@ class EpisodioAdapter(private val episodios: List<EpisodioModel>) :
 
         holder.datos.text = datosDelEpisodio(episodio)
 
-        Glide.with(holder.itemView.context)
-            .load(Constantes.IMAGE_URL + episodio.imagen)
-            .placeholder(R.drawable.ic_baseline_image_24)
-            .error(R.drawable.ic_baseline_image_24)
-            .into(holder.imagen)
+        holder.imagen.cargarFotograma(episodio.imagen)
     }
 
     /** Fecha de emision y duracion, lo que quepa de los dos. */

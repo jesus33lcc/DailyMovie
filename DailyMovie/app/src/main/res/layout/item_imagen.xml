@@ -8,11 +8,11 @@
 
     <ImageView
         android:id="@+id/imagenMiniatura"
-        android:layout_width="240dp"
-        android:layout_height="135dp"
+        android:layout_width="@dimen/imagen_ancho"
+        android:layout_height="@dimen/imagen_alto"
         android:scaleType="centerCrop"
         android:background="@drawable/rounded_border"
         android:clipToOutline="true"
         android:contentDescription="Imagen de la película"
-        tools:src="@drawable/ic_baseline_image_24" />
+        tools:src="@drawable/relleno_fotograma" />
 </FrameLayout>
