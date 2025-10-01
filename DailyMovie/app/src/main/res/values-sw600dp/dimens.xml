@@ -23,4 +23,7 @@
     <dimen name="imagen_alto">180dp</dimen>
     <dimen name="video_ancho">420dp</dimen>
     <dimen name="video_alto">236dp</dimen>
+
+    <dimen name="episodio_imagen_ancho">200dp</dimen>
+    <dimen name="episodio_imagen_alto_minimo">113dp</dimen>
 </resources>

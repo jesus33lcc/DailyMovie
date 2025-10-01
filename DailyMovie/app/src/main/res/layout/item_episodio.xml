@@ -21,10 +21,14 @@
         android:textColor="@color/colorPrimaryDark"
         tools:text="1" />
 
+    <!-- El alto va a match_parent para que la imagen llene toda la fila: con un alto fijo
+         se quedaba arriba y debajo sobraba un hueco vacio, porque la fila crece con el
+         texto (titulo, fecha y hasta tres lineas de sinopsis) -->
     <ImageView
         android:id="@+id/imgEpisodio"
-        android:layout_width="120dp"
-        android:layout_height="68dp"
+        android:layout_width="@dimen/episodio_imagen_ancho"
+        android:layout_height="match_parent"
+        android:minHeight="@dimen/episodio_imagen_alto_minimo"
         android:layout_marginHorizontal="8dp"
         android:scaleType="centerCrop"
         android:background="@drawable/rounded_border"
