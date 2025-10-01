@@ -25,5 +25,5 @@
     <dimen name="video_alto">236dp</dimen>
 
     <dimen name="episodio_imagen_ancho">200dp</dimen>
-    <dimen name="episodio_imagen_alto_minimo">113dp</dimen>
+    <dimen name="episodio_imagen_alto">113dp</dimen>
 </resources>
