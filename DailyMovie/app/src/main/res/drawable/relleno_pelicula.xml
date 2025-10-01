@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Relleno de cuando no hay imagen.
+    Relleno de cuando una pelicula o una serie no tiene cartel.
 
-    Antes se usaba el mismo icono gris de Android para todo: peliculas, series, personas y
-    episodios. Ahora cada cosa tiene el suyo y va con los colores de la app.
+    Fondo e icono van dentro del mismo vector, y el lienzo tiene la proporcion del cartel
+    (2:3). Asi da igual como lo escale la vista: se estira todo a la vez y el simbolo se
+    queda pequeño y centrado. Con un layer-list no funcionaba, porque el centerCrop del
+    ImageView agranda el dibujo entero y el icono salia enorme y deformado.
 -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="@color/colorAccent" />
-            <corners android:radius="8dp" />
-        </shape>
-    </item>
-    <item
-        android:drawable="@drawable/ic_relleno_pelicula"
-        android:gravity="center"
-        android:width="48dp"
-        android:height="48dp" />
-</layer-list>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="300dp"
+    android:viewportWidth="200"
+    android:viewportHeight="300">
+
+    <path
+        android:fillColor="@color/colorAccent"
+        android:pathData="M0,0h200v300h-200z" />
+
+    <!-- Claqueta, centrada y a un tamaño discreto -->
+    <group android:translateX="76" android:translateY="126">
+        <path
+            android:fillColor="@color/colorPrimaryDark"
+            android:pathData="M36,8l4,8h-6l-4,-8h-4l4,8h-6l-4,-8H4L0,4v36c0,2.2 1.8,4 4,4h40c2.2,0 4,-1.8 4,-4V8H36z" />
+    </group>
+</vector>

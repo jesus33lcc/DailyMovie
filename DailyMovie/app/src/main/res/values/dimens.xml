@@ -45,10 +45,10 @@
     <dimen name="video_alto">180dp</dimen>
 
     <!--
-        La captura del episodio. El alto no se fija: la imagen se estira a lo que ocupe la
-        fila, que la marca el texto. Antes era 68dp fijos y debajo quedaba un hueco muerto.
-        El minimo es para cuando el episodio no trae sinopsis y la fila queda corta.
+        La captura del episodio, en 16:9 y siempre igual. Manda la imagen: si el texto no
+        cabe se corta con puntos suspensivos, y si el episodio no tiene sinopsis la fila
+        queda mas corta pero la imagen no cambia de forma.
     -->
     <dimen name="episodio_imagen_ancho">150dp</dimen>
-    <dimen name="episodio_imagen_alto_minimo">85dp</dimen>
+    <dimen name="episodio_imagen_alto">85dp</dimen>
 </resources>

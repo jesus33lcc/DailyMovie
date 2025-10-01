@@ -21,20 +21,26 @@
         android:textColor="@color/colorPrimaryDark"
         tools:text="1" />
 
-    <!-- El alto va a match_parent para que la imagen llene toda la fila: con un alto fijo
-         se quedaba arriba y debajo sobraba un hueco vacio, porque la fila crece con el
-         texto (titulo, fecha y hasta tres lineas de sinopsis) -->
+    <!--
+        Medida fija y siempre la misma, pase lo que pase con el texto.
+
+        Con match_parent la imagen se estiraba a lo que midiera la fila, asi que en los
+        episodios sin sinopsis (los que aun no se han emitido) quedaba aplastada y en los de
+        sinopsis larga salia alargada: cada fila con una forma. Ahora manda la imagen y es el
+        texto el que se corta si no cabe.
+    -->
     <ImageView
         android:id="@+id/imgEpisodio"
         android:layout_width="@dimen/episodio_imagen_ancho"
-        android:layout_height="match_parent"
-        android:minHeight="@dimen/episodio_imagen_alto_minimo"
-        android:layout_marginHorizontal="8dp"
+        android:layout_height="@dimen/episodio_imagen_alto"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="20dp"
         android:scaleType="centerCrop"
         android:background="@drawable/rounded_border"
         android:clipToOutline="true"
         android:contentDescription="Imagen del episodio"
-        tools:src="@drawable/ic_baseline_image_24" />
+        tools:src="@drawable/relleno_fotograma" />
 
     <LinearLayout
         android:layout_width="0dp"
