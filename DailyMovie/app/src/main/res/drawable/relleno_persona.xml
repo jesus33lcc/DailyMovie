@@ -1,19 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Relleno de actores y directores sin foto. Lienzo cuadrado, como sus fotos. -->
+<!-- "Aqui no hay imagen" para actores y directores. Lienzo cuadrado, como sus fotos. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="200dp"
-    android:height="200dp"
-    android:viewportWidth="200"
-    android:viewportHeight="200">
-
-    <path
-        android:fillColor="@color/colorAccent"
-        android:pathData="M0,0h200v200h-200z" />
-
-    <!-- Silueta -->
-    <group android:translateX="76" android:translateY="76">
-        <path
-            android:fillColor="@color/colorPrimaryDark"
-            android:pathData="M24,24c6.6,0 12,-5.4 12,-12S30.6,0 24,0 12,5.4 12,12s5.4,12 12,12zM24,30c-8,0 -24,4 -24,12v6h48v-6c0,-8 -16,-12 -24,-12z" />
+    android:width="200dp" android:height="200dp"
+    android:viewportWidth="200" android:viewportHeight="200">
+    <path android:fillColor="@color/colorAccent" android:pathData="M0,0h200v200h-200z" />
+    <group android:translateX="76" android:translateY="76" android:scaleX="2" android:scaleY="2">
+        <path android:fillColor="@color/colorPrimaryDark" android:pathData="M21.9,21.9l-8.49,-8.49l0,0L3.59,3.59l0,0L2.1,2.1L0.69,3.51L3,5.83V19c0,1.1 0.9,2 2,2h13.17l2.31,2.31L21.9,21.9zM5,18l3.5,-4.5l2.5,3.01L12.17,15l3,3H5zM21,18.17L5.83,3H19c1.1,0 2,0.9 2,2V18.17z" />
     </group>
 </vector>
