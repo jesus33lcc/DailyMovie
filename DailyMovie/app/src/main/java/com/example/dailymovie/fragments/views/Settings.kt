@@ -146,6 +146,10 @@ class Settings : Fragment() {
 
     private fun abrirPoliticaDePrivacidad() {
         // Se abre fuera para que el texto se pueda actualizar sin sacar version nueva.
+        //
+        // De momento lleva al repositorio, porque la politica todavia esta sin escribir.
+        // Google Play la exige para publicar cualquier app con registro, asi que cuando
+        // exista hay que cambiar la direccion de abajo y ya.
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(URL_PRIVACIDAD)))
     }
 
