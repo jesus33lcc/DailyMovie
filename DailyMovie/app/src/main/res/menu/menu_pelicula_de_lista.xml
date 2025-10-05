@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lo que se puede hacer con una pelicula desde dentro de una lista -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/accion_ver_ficha" android:title="Ver ficha" />
+    <item android:id="@+id/accion_compartir" android:title="Compartir" />
+    <item android:id="@+id/accion_quitar" android:title="Quitar de la lista" />
+</menu>

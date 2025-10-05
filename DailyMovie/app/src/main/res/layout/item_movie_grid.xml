@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Una pelicula dentro de la cuadricula de una lista.
+
+    Antes las listas eran filas de una en una con el cartel pequeño a la izquierda: en tablet
+    se veian cuatro peliculas y sobraba medio metro de ancho. En cuadricula caben muchas mas
+    de un vistazo y el cartel, que es lo que se reconoce, se ve grande.
+
+    Los tres puntos van sobre el cartel, arriba a la derecha, que es donde se buscan.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:background="@drawable/container_rounded_border"
+        android:clipToOutline="true"
+        android:foreground="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/img_posterMovie"
+            android:layout_width="@dimen/poster_ancho"
+            android:layout_height="@dimen/poster_alto"
+            android:scaleType="centerCrop"
+            android:background="@drawable/image_rounded_border"
+            android:clipToOutline="true"
+            android:contentDescription="Cartel"
+            tools:src="@drawable/relleno_pelicula" />
+
+        <TextView
+            android:id="@+id/txt_titleMovie"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="15sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:fontFamily="@font/courier_bold"
+            android:textColor="@color/white"
+            tools:text="El padrino" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txt_yearMovie"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="13sp"
+                android:fontFamily="@font/courier"
+                android:textColor="@color/colorPrimary"
+                tools:text="1972" />
+
+            <TextView
+                android:id="@+id/txt_voteAverageMovie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:fontFamily="@font/courier_bold"
+                android:textColor="@color/colorPrimary"
+                tools:text="★ 8,7" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Encima del cartel, con su propia zona de toque -->
+    <ImageButton
+        android:id="@+id/btnOpciones"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="4dp"
+        android:src="@drawable/ic_tres_puntos"
+        android:background="@drawable/fondo_boton_opciones"
+        android:scaleType="centerInside"
+        android:contentDescription="Más opciones" />
+</FrameLayout>
