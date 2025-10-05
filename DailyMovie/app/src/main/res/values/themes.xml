@@ -44,4 +44,20 @@
         <item name="android:fontFamily">@font/courier_bold</item>
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
+
+    <!--
+        Los menus de tres puntos. Sin esto salen con el blanco de Material, que al lado del
+        azul marino del resto canta lo mismo que cantaban los dialogos antes de rehacerlos.
+    -->
+    <style name="TemaPopupDailyMovie" parent="Base.Theme.DailyMovie">
+        <!-- El fondo se cambia en el estilo del widget, no aqui: puesto en el tema no le
+             llega al PopupMenu de AppCompat y solo se aplicaba el color del texto, con lo
+             que quedaba blanco sobre blanco -->
+        <item name="popupMenuStyle">@style/PopupMenuDailyMovie</item>
+        <item name="android:textColorPrimary">@color/white</item>
+    </style>
+
+    <style name="PopupMenuDailyMovie" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/dialogo_fondo</item>
+    </style>
 </resources>

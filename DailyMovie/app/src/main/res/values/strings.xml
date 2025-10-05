@@ -17,4 +17,8 @@
     <string name="lista_ya_existe">Ya tienes una lista con ese nombre</string>
     <string name="lista_sin_sesion">Vuelve a iniciar sesión para crear listas</string>
     <string name="lista_rechazada">No se ha podido crear la lista. Inténtalo más tarde</string>
+
+    <!-- La nota de TMDB. Antes se pintaba "Rating: 7.966" tal cual: ni en español ni con
+         un numero que le diga nada a nadie -->
+    <string name="nota_estrella">★ %1$.1f</string>
 </resources>

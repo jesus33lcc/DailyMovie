@@ -3,26 +3,30 @@ package com.example.dailymovie.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.R
-import com.example.dailymovie.utils.cargarCartel
 import com.example.dailymovie.models.MovieModel
-import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.utils.Fechas
+import com.example.dailymovie.utils.cargarCartel
 
 /**
- * Las peliculas que hay dentro de una lista.
+ * Las peliculas de una lista, en cuadricula.
  *
- * Es un ListAdapter: se le pasa la lista entera con submitList y el comparador averigua solo
- * lo que ha cambiado. Antes se repintaba todo con notifyDataSetChanged, que ademas de hacer
- * trabajo de mas se carga las animaciones de entrada y salida de la fila.
+ * Antes eran filas de una en una con el cartel pequeño a la izquierda, asi que en una tablet
+ * se veian cuatro peliculas y sobraba muchisimo ancho. En cuadricula entran bastantes mas de
+ * un vistazo y manda el cartel, que es por lo que uno reconoce una pelicula.
+ *
+ * Cada tarjeta lleva sus tres puntos: el borrado deslizando no se descubria y ademas en una
+ * cuadricula no se entiende, porque no esta claro que se esta arrastrando.
  */
 class CustomMovieListAdapter(
     private val onMovieClick: (MovieModel) -> Unit,
-    private val onMovieDelete: (MovieModel, Int) -> Unit
+    private val onOpciones: (MovieModel, View, Int) -> Unit
 ) : ListAdapter<MovieModel, CustomMovieListAdapter.MovieViewHolder>(COMPARADOR) {
 
     class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -30,31 +34,29 @@ class CustomMovieListAdapter(
         val year: TextView = itemView.findViewById(R.id.txt_yearMovie)
         val poster: ImageView = itemView.findViewById(R.id.img_posterMovie)
         val rating: TextView = itemView.findViewById(R.id.txt_voteAverageMovie)
+        val opciones: ImageButton = itemView.findViewById(R.id.btnOpciones)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_movie_list, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_movie_grid, parent, false)
         return MovieViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie = getItem(position)
         holder.title.text = movie.title
-        holder.year.text = movie.releaseDate.take(4)
-        holder.rating.text = "Rating: ${movie.voteAverage}"
+        holder.year.text = Fechas.soloElAno(movie.releaseDate)
+        // Una estrella y la nota con una decimal: "Rating: 7.966" no lo dice nadie.
+        holder.rating.text = holder.itemView.context.getString(R.string.nota_estrella, movie.voteAverage)
         holder.poster.cargarCartel(movie.posterPath)
 
-        holder.itemView.setOnClickListener {
-            onMovieClick(movie)
-        }
-
-        holder.itemView.setOnLongClickListener {
-            onMovieDelete(movie, holder.bindingAdapterPosition)
-            true
+        holder.itemView.setOnClickListener { onMovieClick(movie) }
+        holder.opciones.setOnClickListener { boton ->
+            onOpciones(movie, boton, holder.bindingAdapterPosition)
         }
     }
 
-    /** La que esta en esa fila, para cuando el usuario desliza para borrar. */
+    /** La que esta en esa posicion, para cuando hay que devolverla a su sitio. */
     fun peliculaEn(position: Int): MovieModel = getItem(position)
 
     private companion object {
