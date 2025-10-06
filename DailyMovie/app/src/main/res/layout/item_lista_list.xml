@@ -15,17 +15,34 @@
         android:layout_marginEnd="16dp"
         tools:src="@drawable/ic_baseline_image_24" />
 
+    <!-- Los tres puntos, a la derecha del todo. Solo salen en las listas del usuario:
+         Favoritos y Vistos vienen con la app y no se pueden borrar -->
+    <ImageButton
+        android:id="@+id/btnOpcionesLista"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_tres_puntos"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside"
+        android:contentDescription="Más opciones"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <TextView
         android:id="@+id/nombreLista_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@id/iconoTypeLista_img"
-        android:layout_toRightOf="@id/iconoTypeLista_img"
+        android:layout_toStartOf="@id/btnOpcionesLista"
         android:text="Nombre lista"
         android:textColor="@color/white"
         android:textSize="20sp"
-        android:textStyle="bold"
-        tools:ignore="MissingConstraints" />
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:fontFamily="@font/courier_bold" />
 
 </RelativeLayout>

@@ -10,16 +10,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.R
 import com.example.dailymovie.adapters.MovieListAdapter
 import com.example.dailymovie.data.ListaFija
 import com.example.dailymovie.databinding.FragmentListasBinding
-import com.example.dailymovie.graphics.DeslizarParaBorrar
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.ListaModel
 import com.example.dailymovie.models.MovieModel
@@ -65,17 +64,20 @@ class ListasF : Fragment() {
             showCreateListDialog()
         }
 
-        setupSwipeToDelete(binding.misListaPersonalizadas)
     }
 
     /** Adaptadores y decoraciones, una sola vez. */
     private fun prepararListas() {
-        movieListAdapter = MovieListAdapter { lista -> abrirLista(lista) }
+        // Sin menu: Favoritos y Vistos vienen con la app y no se pueden borrar
+        movieListAdapter = MovieListAdapter(itemClickListener = { lista -> abrirLista(lista) })
         binding.misListasCheckFav.layoutManager = LinearLayoutManager(context)
         binding.misListasCheckFav.adapter = movieListAdapter
         binding.misListasCheckFav.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
 
-        customListsAdapter = MovieListAdapter { lista -> abrirLista(lista) }
+        customListsAdapter = MovieListAdapter(
+            itemClickListener = { lista -> abrirLista(lista) },
+            onOpciones = { lista, boton -> mostrarOpcionesDeLista(lista, boton) }
+        )
         binding.misListaPersonalizadas.layoutManager = LinearLayoutManager(context)
         binding.misListaPersonalizadas.adapter = customListsAdapter
         binding.misListaPersonalizadas.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
@@ -162,40 +164,43 @@ class ListasF : Fragment() {
     }
 
     /**
-     * Deslizar una lista para borrarla.
+     * El menu de los tres puntos de una lista.
      *
-     * Aqui si se pregunta antes, al reves que al quitar una pelicula: borrar una lista se
+     * Antes se borraba deslizando, pero el gesto no lo descubria nadie y ademas chocaba con
+     * el scroll de la pantalla. Aqui si se sigue preguntando antes de borrar: una lista se
      * lleva por delante todo lo que hubiera dentro y no basta con poder deshacerlo durante
-     * unos segundos.
+     * unos segundos, como cuando se quita una sola pelicula.
      */
-    private fun setupSwipeToDelete(recyclerView: RecyclerView) {
-        val deslizar = DeslizarParaBorrar(requireContext()) { position ->
-            val lista = customListsAdapter.listaEn(position)
-
-            DialogoDailyMovie.confirmar(
-                context = requireContext(),
-                titulo = "Eliminar lista",
-                mensaje = "Se borra \"${lista.nombre}\" y las películas que tengas guardadas ahí. " +
-                    "Esto no se puede deshacer.",
-                textoAceptar = "Eliminar",
-                peligroso = true,
-                // La fila se ha quedado deslizada a un lado; hay que devolverla a su sitio.
-                alCancelar = { customListsAdapter.notifyItemChanged(position) }
-            ) {
-                viewModel.deleteCustomList(lista.nombre) { borrada ->
-                    if (borrada) {
-                        // No hay que sacar la fila a mano: al borrarla el ViewModel recarga
-                        // las listas y el comparador ve que falta esa.
-                        Toast.makeText(context, "Lista eliminada", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "No se ha podido eliminar", Toast.LENGTH_SHORT).show()
-                        customListsAdapter.notifyItemChanged(position)
-                    }
+    private fun mostrarOpcionesDeLista(lista: ListaModel, boton: View) {
+        PopupMenu(ContextThemeWrapper(requireContext(), R.style.TemaPopupDailyMovie), boton).apply {
+            inflate(R.menu.menu_lista)
+            setOnMenuItemClickListener { opcion ->
+                when (opcion.itemId) {
+                    R.id.accion_abrir_lista -> abrirLista(lista)
+                    R.id.accion_eliminar_lista -> confirmarEliminar(lista)
                 }
+                true
+            }
+            show()
+        }
+    }
+
+    private fun confirmarEliminar(lista: ListaModel) {
+        DialogoDailyMovie.confirmar(
+            context = requireContext(),
+            titulo = "Eliminar lista",
+            mensaje = "Se borra \"${lista.nombre}\" y las películas que tengas guardadas ahí. " +
+                "Esto no se puede deshacer.",
+            textoAceptar = "Eliminar",
+            peligroso = true
+        ) {
+            viewModel.deleteCustomList(lista.nombre) { borrada ->
+                // No hay que sacar la fila a mano: al borrarla el ViewModel recarga las
+                // listas y el comparador ve que falta esa.
+                val texto = if (borrada) "Lista eliminada" else "No se ha podido eliminar"
+                Toast.makeText(context, texto, Toast.LENGTH_SHORT).show()
             }
         }
-
-        ItemTouchHelper(deslizar).attachToRecyclerView(recyclerView)
     }
 
     override fun onDestroyView() {

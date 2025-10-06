@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lo que se puede hacer con una lista propia. Favoritos y Vistos no llevan menu -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/accion_abrir_lista" android:title="Abrir" />
+    <item android:id="@+id/accion_eliminar_lista" android:title="Eliminar lista" />
+</menu>

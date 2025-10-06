@@ -3,6 +3,7 @@ package com.example.dailymovie.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
@@ -17,13 +18,20 @@ import com.example.dailymovie.models.ListaModel
  * Igual que el de peliculas, va con submitList y comparador para que crear o borrar una
  * lista se vea entrar y salir en vez de repintarse la pantalla entera.
  */
+/**
+ * @param onOpciones si es null, la fila no enseña los tres puntos. Es lo que distingue a
+ *   Favoritos y Vistos, que vienen con la app y no se pueden borrar ni renombrar, de las
+ *   listas que se ha hecho el usuario.
+ */
 class MovieListAdapter(
-    private val itemClickListener: (ListaModel) -> Unit
+    private val itemClickListener: (ListaModel) -> Unit,
+    private val onOpciones: ((ListaModel, View) -> Unit)? = null
 ) : ListAdapter<ListaModel, MovieListAdapter.ViewHolder>(COMPARADOR) {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val iconoTypeListaImg: ImageView = view.findViewById(R.id.iconoTypeLista_img)
         val nombreListaTxt: TextView = view.findViewById(R.id.nombreLista_txt)
+        val opciones: ImageButton = view.findViewById(R.id.btnOpcionesLista)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,9 +46,16 @@ class MovieListAdapter(
         holder.itemView.setOnClickListener {
             itemClickListener(lista)
         }
+
+        if (onOpciones == null) {
+            holder.opciones.visibility = View.GONE
+        } else {
+            holder.opciones.visibility = View.VISIBLE
+            holder.opciones.setOnClickListener { boton -> onOpciones.invoke(lista, boton) }
+        }
     }
 
-    /** La lista que esta en esa fila, para cuando el usuario desliza para borrarla. */
+    /** La lista que esta en esa fila. */
     fun listaEn(position: Int): ListaModel = getItem(position)
 
     private companion object {
