@@ -2,6 +2,7 @@ package com.example.dailymovie.data
 
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.MovieOfTheDay
+import com.example.dailymovie.models.SerieModel
 
 /**
  * Las dos listas que trae la app de serie.
@@ -66,6 +67,25 @@ interface UserRepository {
     fun listasQueContienen(peliculaId: Int, alTerminar: (Set<String>) -> Unit)
     fun anadirALista(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit)
     fun quitarDeLista(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit)
+
+    // ---- Series ----
+    //
+    // Van en campos aparte de las peliculas (favoriteSeries, watchedSeries, y el campo
+    // "series" dentro de cada lista) porque el dato no es el mismo: una serie tiene fecha de
+    // primera emision y no de estreno, y meterlas en el mismo array obligaria a adivinar que
+    // es cada cosa al leer.
+
+    fun seriesFavoritas(alTerminar: (List<SerieModel>) -> Unit)
+    fun seriesVistas(alTerminar: (List<SerieModel>) -> Unit)
+    fun esSerieFavorita(serieId: Int, alTerminar: (Boolean) -> Unit)
+    fun estaSerieVista(serieId: Int, alTerminar: (Boolean) -> Unit)
+    fun cambiarSerieFavorita(serie: SerieModel, alTerminar: (Boolean) -> Unit)
+    fun cambiarSerieVista(serie: SerieModel, alTerminar: (Boolean) -> Unit)
+
+    fun seriesDeLista(nombre: String, alTerminar: (List<SerieModel>) -> Unit)
+    fun anadirSerieALista(nombre: String, serie: SerieModel, alTerminar: (Boolean) -> Unit)
+    fun quitarSerieDeLista(nombre: String, serie: SerieModel, alTerminar: (Boolean) -> Unit)
+    fun listasQueContienenSerie(serieId: Int, alTerminar: (Set<String>) -> Unit)
 
     // ---- Historial ----
     fun historial(alTerminar: (List<MovieModel>) -> Unit)

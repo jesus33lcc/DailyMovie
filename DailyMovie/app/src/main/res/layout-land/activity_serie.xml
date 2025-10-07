@@ -9,6 +9,7 @@
     Los ids son los mismos que en el layout vertical, o ViewBinding rompe SerieA.
 -->
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -83,7 +84,70 @@
                     android:background="@drawable/rounded_border"
                     android:textColor="@color/colorTextPrimary"
                     tools:text="Terminada" />
+
+                <!-- Los mismos gestos que en la ficha de pelicula: hasta ahora una serie se
+                     podia mirar pero no guardar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:weightSum="4">
+
+                    <ImageButton
+                        android:id="@+id/btnFavoritaSerie"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/rounded_button"
+                        android:src="@drawable/ic_baseline_favorite_border_24"
+                        android:scaleType="centerInside"
+                        android:padding="2dp"
+                        android:contentDescription="Favoritos"
+                        app:tint="@color/white" />
+
+                    <ImageButton
+                        android:id="@+id/btnVistaSerie"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/rounded_button"
+                        android:src="@drawable/ic_baseline_visibility_off_24"
+                        android:scaleType="centerInside"
+                        android:padding="2dp"
+                        android:contentDescription="Vistos"
+                        app:tint="@color/white" />
+
+                    <ImageButton
+                        android:id="@+id/btnAnadirListaSerie"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:background="@drawable/rounded_button"
+                        android:src="@drawable/ic_baseline_playlist_add_24"
+                        android:scaleType="centerInside"
+                        android:padding="2dp"
+                        android:contentDescription="Añadir a lista"
+                        app:tint="@color/white" />
+
+                    <ImageButton
+                        android:id="@+id/btnCompartirSerie"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/rounded_button"
+                        android:src="@drawable/ic_baseline_share_24"
+                        android:scaleType="centerInside"
+                        android:padding="2dp"
+                        android:contentDescription="Compartir"
+                        app:tint="@color/white" />
+                </LinearLayout>
             </LinearLayout>
+
 
             <!-- Derecha: de que va y donde verla -->
             <LinearLayout

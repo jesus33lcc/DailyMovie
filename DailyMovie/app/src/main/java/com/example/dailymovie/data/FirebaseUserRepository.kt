@@ -2,12 +2,14 @@ package com.example.dailymovie.data
 
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.MovieOfTheDay
+import com.example.dailymovie.models.SerieModel
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.SetOptions
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -244,7 +246,7 @@ class FirebaseUserRepository(
         lista.get().addOnSuccessListener { doc ->
             val yaEstaba = aPeliculas(doc.get(PELICULAS)).any { it.id == pelicula.id }
             if (yaEstaba) return@addOnSuccessListener alTerminar(false)
-            lista.set(mapOf(PELICULAS to FieldValue.arrayUnion(pelicula)), com.google.firebase.firestore.SetOptions.merge())
+            lista.set(mapOf(PELICULAS to FieldValue.arrayUnion(pelicula)), SetOptions.merge())
                 .addOnSuccessListener { alTerminar(true) }
                 .addOnFailureListener { alTerminar(false) }
         }.addOnFailureListener { alTerminar(false) }
@@ -258,6 +260,66 @@ class FirebaseUserRepository(
             .addOnFailureListener { alTerminar(false) }
     }
 
+    // ---------------- Series ----------------
+
+    override fun seriesFavoritas(alTerminar: (List<SerieModel>) -> Unit) =
+        leerSeries(SERIES_FAVORITAS, alTerminar)
+
+    override fun seriesVistas(alTerminar: (List<SerieModel>) -> Unit) =
+        leerSeries(SERIES_VISTAS, alTerminar)
+
+    override fun esSerieFavorita(serieId: Int, alTerminar: (Boolean) -> Unit) =
+        leerSeries(SERIES_FAVORITAS) { series -> alTerminar(series.any { it.id == serieId }) }
+
+    override fun estaSerieVista(serieId: Int, alTerminar: (Boolean) -> Unit) =
+        leerSeries(SERIES_VISTAS) { series -> alTerminar(series.any { it.id == serieId }) }
+
+    override fun cambiarSerieFavorita(serie: SerieModel, alTerminar: (Boolean) -> Unit) =
+        alternarSerie(SERIES_FAVORITAS, serie, alTerminar)
+
+    override fun cambiarSerieVista(serie: SerieModel, alTerminar: (Boolean) -> Unit) =
+        alternarSerie(SERIES_VISTAS, serie, alTerminar)
+
+    override fun seriesDeLista(nombre: String, alTerminar: (List<SerieModel>) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(emptyList())
+        documento.collection(LISTAS).document(nombre).get()
+            .addOnSuccessListener { alTerminar(aSeries(it.get(SERIES))) }
+            .addOnFailureListener { alTerminar(emptyList()) }
+    }
+
+    override fun anadirSerieALista(nombre: String, serie: SerieModel, alTerminar: (Boolean) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(false)
+        val lista = documento.collection(LISTAS).document(nombre)
+        lista.get().addOnSuccessListener { doc ->
+            if (aSeries(doc.get(SERIES)).any { it.id == serie.id }) return@addOnSuccessListener alTerminar(false)
+            lista.set(mapOf(SERIES to FieldValue.arrayUnion(serie)), SetOptions.merge())
+                .addOnSuccessListener { alTerminar(true) }
+                .addOnFailureListener { alTerminar(false) }
+        }.addOnFailureListener { alTerminar(false) }
+    }
+
+    override fun quitarSerieDeLista(nombre: String, serie: SerieModel, alTerminar: (Boolean) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(false)
+        documento.collection(LISTAS).document(nombre)
+            .update(SERIES, FieldValue.arrayRemove(serie))
+            .addOnSuccessListener { alTerminar(true) }
+            .addOnFailureListener { alTerminar(false) }
+    }
+
+    override fun listasQueContienenSerie(serieId: Int, alTerminar: (Set<String>) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(emptySet())
+        documento.collection(LISTAS).get()
+            .addOnSuccessListener { listas ->
+                alTerminar(
+                    listas.documents
+                        .filter { doc -> aSeries(doc.get(SERIES)).any { it.id == serieId } }
+                        .map { it.id }
+                        .toSet()
+                )
+            }
+            .addOnFailureListener { alTerminar(emptySet()) }
+    }
+
     // ---------------- Historial ----------------
 
     override fun historial(alTerminar: (List<MovieModel>) -> Unit) = leerLista(HISTORIAL, alTerminar)
@@ -266,9 +328,9 @@ class FirebaseUserRepository(
         val documento = documentoDelUsuario() ?: return alTerminar(false)
         // arrayRemove antes de arrayUnion para que lo visto de nuevo suba al final y el
         // historial quede en orden de visita, sin duplicados.
-        documento.set(mapOf(HISTORIAL to FieldValue.arrayRemove(pelicula)), com.google.firebase.firestore.SetOptions.merge())
+        documento.set(mapOf(HISTORIAL to FieldValue.arrayRemove(pelicula)), SetOptions.merge())
             .addOnCompleteListener {
-                documento.set(mapOf(HISTORIAL to FieldValue.arrayUnion(pelicula)), com.google.firebase.firestore.SetOptions.merge())
+                documento.set(mapOf(HISTORIAL to FieldValue.arrayUnion(pelicula)), SetOptions.merge())
                     .addOnSuccessListener { alTerminar(true) }
                     .addOnFailureListener { alTerminar(false) }
             }
@@ -276,7 +338,7 @@ class FirebaseUserRepository(
 
     override fun borrarHistorial(alTerminar: (Boolean) -> Unit) {
         val documento = documentoDelUsuario() ?: return alTerminar(false)
-        documento.set(mapOf(HISTORIAL to emptyList<MovieModel>()), com.google.firebase.firestore.SetOptions.merge())
+        documento.set(mapOf(HISTORIAL to emptyList<MovieModel>()), SetOptions.merge())
             .addOnSuccessListener { alTerminar(true) }
             .addOnFailureListener { alTerminar(false) }
     }
@@ -292,7 +354,7 @@ class FirebaseUserRepository(
                 "personas" to gustos.personas
             )
         )
-        documento.set(datos, com.google.firebase.firestore.SetOptions.merge())
+        documento.set(datos, SetOptions.merge())
             .addOnSuccessListener { alTerminar(true) }
             .addOnFailureListener { alTerminar(false) }
     }
@@ -369,7 +431,7 @@ class FirebaseUserRepository(
         val documento = documentoDelUsuario() ?: return alTerminar(false)
         contiene(campo, pelicula.id) { yaEstaba ->
             val cambio = if (yaEstaba) FieldValue.arrayRemove(pelicula) else FieldValue.arrayUnion(pelicula)
-            documento.set(mapOf(campo to cambio), com.google.firebase.firestore.SetOptions.merge())
+            documento.set(mapOf(campo to cambio), SetOptions.merge())
                 .addOnSuccessListener { alTerminar(true) }
                 .addOnFailureListener { alTerminar(false) }
         }
@@ -392,6 +454,47 @@ class FirebaseUserRepository(
                 releaseDate = mapa["releaseDate"] as? String ?: "",
                 voteAverage = (mapa["voteAverage"] as? Number)?.toDouble() ?: 0.0,
                 posterPath = mapa["posterPath"] as? String
+            )
+        }
+    }
+
+    private fun leerSeries(campo: String, alTerminar: (List<SerieModel>) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(emptyList())
+        documento.get()
+            .addOnSuccessListener { alTerminar(aSeries(it.get(campo))) }
+            .addOnFailureListener { alTerminar(emptyList()) }
+    }
+
+    /** Mete o saca la serie segun si ya estaba, igual que con las peliculas. */
+    private fun alternarSerie(campo: String, serie: SerieModel, alTerminar: (Boolean) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(false)
+        leerSeries(campo) { series ->
+            val yaEstaba = series.any { it.id == serie.id }
+            val cambio = if (yaEstaba) FieldValue.arrayRemove(serie) else FieldValue.arrayUnion(serie)
+            documento.set(mapOf(campo to cambio), SetOptions.merge())
+                .addOnSuccessListener { alTerminar(true) }
+                .addOnFailureListener { alTerminar(false) }
+        }
+    }
+
+    /**
+     * Las series guardadas, rehechas a mano igual que las peliculas.
+     *
+     * Ojo con los nombres: al guardar el objeto entero con arrayUnion, las claves que quedan
+     * en Firestore son las de Kotlin (titulo, estreno, valoracion, poster), no las de TMDB.
+     */
+    private fun aSeries(bruto: Any?): List<SerieModel> {
+        @Suppress("UNCHECKED_CAST")
+        val lista = bruto as? List<Map<String, Any?>> ?: return emptyList()
+        return lista.mapNotNull { mapa ->
+            val id = (mapa["id"] as? Number)?.toInt() ?: return@mapNotNull null
+            val titulo = mapa["titulo"] as? String ?: return@mapNotNull null
+            SerieModel(
+                id = id,
+                titulo = titulo,
+                estreno = mapa["estreno"] as? String,
+                valoracion = (mapa["valoracion"] as? Number)?.toDouble() ?: 0.0,
+                poster = mapa["poster"] as? String
             )
         }
     }
@@ -429,6 +532,9 @@ class FirebaseUserRepository(
         const val FAVORITAS = "favorites"
         const val VISTAS = "watched"
         const val HISTORIAL = "history"
+        const val SERIES = "series"
+        const val SERIES_FAVORITAS = "favoriteSeries"
+        const val SERIES_VISTAS = "watchedSeries"
         const val GUSTOS = "tastes"
         const val PELICULA_DEL_DIA = "dailymovie"
         const val CAMPO_FECHA = "date"
