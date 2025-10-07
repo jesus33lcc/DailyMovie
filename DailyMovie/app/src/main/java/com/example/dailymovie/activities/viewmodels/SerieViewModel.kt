@@ -10,11 +10,14 @@ import com.example.dailymovie.client.response.SerieDetailsResponse
 import com.example.dailymovie.data.Dependencias
 import com.example.dailymovie.data.Resultado
 import com.example.dailymovie.data.SerieRepository
+import com.example.dailymovie.data.UserRepository
+import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.ErrorCarga
 
 class SerieViewModel(
-    private val series: SerieRepository = Dependencias.series
+    private val series: SerieRepository = Dependencias.series,
+    private val usuario: UserRepository = Dependencias.usuario
 ) : ViewModel() {
 
     private val _detalles = MutableLiveData<SerieDetailsResponse>()
@@ -69,4 +72,33 @@ class SerieViewModel(
     fun errorMostrado() {
         _error.value = null
     }
+
+    // ---- Guardar la serie ----
+    //
+    // Los mismos gestos que en la ficha de pelicula: marcarla como favorita, como vista o
+    // meterla en una lista. Las series se guardan en sus propios campos, ver UserRepository.
+
+    fun esFavorita(serieId: Int, alTerminar: (Boolean) -> Unit) =
+        usuario.esSerieFavorita(serieId, alTerminar)
+
+    fun estaVista(serieId: Int, alTerminar: (Boolean) -> Unit) =
+        usuario.estaSerieVista(serieId, alTerminar)
+
+    fun cambiarFavorita(serie: SerieModel, alTerminar: (Boolean) -> Unit) =
+        usuario.cambiarSerieFavorita(serie, alTerminar)
+
+    fun cambiarVista(serie: SerieModel, alTerminar: (Boolean) -> Unit) =
+        usuario.cambiarSerieVista(serie, alTerminar)
+
+    fun listasDelUsuario(alTerminar: (List<String>) -> Unit) =
+        usuario.listasDelUsuario(alTerminar)
+
+    fun listasConLaSerie(serieId: Int, alTerminar: (Set<String>) -> Unit) =
+        usuario.listasQueContienenSerie(serieId, alTerminar)
+
+    fun anadirALista(nombre: String, serie: SerieModel, alTerminar: (Boolean) -> Unit) =
+        usuario.anadirSerieALista(nombre, serie, alTerminar)
+
+    fun quitarDeLista(nombre: String, serie: SerieModel, alTerminar: (Boolean) -> Unit) =
+        usuario.quitarSerieDeLista(nombre, serie, alTerminar)
 }

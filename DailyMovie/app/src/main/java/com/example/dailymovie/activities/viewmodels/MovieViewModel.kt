@@ -11,7 +11,9 @@ import com.example.dailymovie.data.ListaFija
 import com.example.dailymovie.data.MovieRepository
 import com.example.dailymovie.data.Resultado
 import com.example.dailymovie.data.UserRepository
+import com.example.dailymovie.models.Guardado
 import com.example.dailymovie.models.MovieModel
+import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.ErrorCarga
 
@@ -114,6 +116,53 @@ class MovieViewModel(
             ListaFija.FAVORITOS -> getFavorites(alTerminar)
             ListaFija.VISTOS -> getWatched(alTerminar)
             null -> getMoviesFromList(nombre, alTerminar)
+        }
+    }
+
+    /**
+     * Todo lo que hay en una lista: peliculas y series juntas.
+     *
+     * En Firestore van en campos separados, asi que hay que pedir las dos cosas y unirlas.
+     * Se espera a que contesten las dos antes de avisar, o la pantalla parpadearia enseñando
+     * primero las peliculas y añadiendo las series despues.
+     */
+    fun cargarListaCompleta(nombre: String, alTerminar: (List<Guardado>) -> Unit) {
+        var peliculas: List<Guardado>? = null
+        var series: List<Guardado>? = null
+
+        fun avisarSiEstaTodo() {
+            val p = peliculas ?: return
+            val s = series ?: return
+            alTerminar(p + s)
+        }
+
+        cargarLista(nombre) { lista ->
+            peliculas = lista.map { Guardado.de(it) }
+            avisarSiEstaTodo()
+        }
+        cargarSeriesDeLista(nombre) { lista ->
+            series = lista.map { Guardado.de(it) }
+            avisarSiEstaTodo()
+        }
+    }
+
+    private fun cargarSeriesDeLista(nombre: String, alTerminar: (List<SerieModel>) -> Unit) {
+        when (ListaFija.desdeTitulo(nombre)) {
+            ListaFija.FAVORITOS -> usuario.seriesFavoritas(alTerminar)
+            ListaFija.VISTOS -> usuario.seriesVistas(alTerminar)
+            null -> usuario.seriesDeLista(nombre, alTerminar)
+        }
+    }
+
+    /** Saca de la lista lo que sea, pelicula o serie. */
+    fun quitarDeLista(nombre: String, elemento: Guardado, alTerminar: (Boolean) -> Unit) {
+        if (!elemento.esSerie) return removeMovieFromList(nombre, elemento.aPelicula(), alTerminar)
+
+        val serie = elemento.aSerie()
+        when (ListaFija.desdeTitulo(nombre)) {
+            ListaFija.FAVORITOS -> usuario.cambiarSerieFavorita(serie, alTerminar)
+            ListaFija.VISTOS -> usuario.cambiarSerieVista(serie, alTerminar)
+            null -> usuario.quitarSerieDeLista(nombre, serie, alTerminar)
         }
     }
 

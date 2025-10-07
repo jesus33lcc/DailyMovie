@@ -1,5 +1,6 @@
 package com.example.dailymovie.activities.views
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -9,7 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarCartel
 import com.example.dailymovie.activities.viewmodels.SerieViewModel
+import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.adapters.CreditAdapter
+import com.example.dailymovie.adapters.ListaCasillaAdapter
 import com.example.dailymovie.adapters.EpisodioAdapter
 import com.example.dailymovie.adapters.ProviderAdapter
 import com.example.dailymovie.adapters.TemporadaAdapter
@@ -18,7 +21,9 @@ import com.example.dailymovie.client.response.SeasonResponse
 import com.example.dailymovie.client.response.SerieDetailsResponse
 import com.example.dailymovie.databinding.ActivitySerieBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.utils.DialogoDailyMovie
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.utils.LocaleUtil
 import com.example.dailymovie.utils.mensaje
@@ -34,6 +39,9 @@ class SerieA : AppCompatActivity() {
 
     private lateinit var binding: ActivitySerieBinding
     private val viewModel: SerieViewModel by viewModels()
+
+    /** La serie en su version corta, que es la que se guarda en las listas. */
+    private var serieGuardable: SerieModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,6 +120,8 @@ class SerieA : AppCompatActivity() {
 
         binding.imgPosterSerie.cargarCartel(serie.poster)
 
+        prepararBotonesDeGuardado(serie)
+
         // La temporada 0 son los especiales; no es por donde se empieza una serie, asi que
         // no aparece entre los botones.
         val temporadas = serie.temporadas.filter { it.numero > 0 }
@@ -162,6 +172,118 @@ class SerieA : AppCompatActivity() {
         binding.txtTemporadaAbierta.text =
             "${temporada.nombre} · ${temporada.episodios.size} episodios"
         binding.recyclerEpisodios.adapter = EpisodioAdapter(temporada.episodios)
+    }
+
+    /**
+     * Los botones de guardar, los mismos que en la ficha de pelicula.
+     *
+     * La serie se queda en su version corta (SerieModel) porque es lo que se guarda en
+     * Firestore: la ficha completa trae temporadas y episodios, que no pintan nada dentro
+     * de una lista.
+     */
+    private fun prepararBotonesDeGuardado(serie: SerieDetailsResponse) {
+        val guardable = SerieModel(
+            id = serie.id,
+            titulo = serie.titulo,
+            estreno = serie.estreno,
+            valoracion = serie.valoracion,
+            poster = serie.poster
+        )
+        serieGuardable = guardable
+
+        pintarIconoFavorita(guardable.id)
+        pintarIconoVista(guardable.id)
+
+        binding.btnFavoritaSerie.setOnClickListener {
+            viewModel.cambiarFavorita(guardable) { pintarIconoFavorita(guardable.id) }
+        }
+        binding.btnVistaSerie.setOnClickListener {
+            viewModel.cambiarVista(guardable) { pintarIconoVista(guardable.id) }
+        }
+        binding.btnAnadirListaSerie.setOnClickListener { elegirListas(guardable) }
+        binding.btnCompartirSerie.setOnClickListener { compartir(guardable) }
+    }
+
+    private fun pintarIconoFavorita(serieId: Int) {
+        viewModel.esFavorita(serieId) { esFavorita ->
+            binding.btnFavoritaSerie.setImageResource(
+                if (esFavorita) R.drawable.ic_baseline_favorite_24
+                else R.drawable.ic_baseline_favorite_border_24
+            )
+        }
+    }
+
+    private fun pintarIconoVista(serieId: Int) {
+        viewModel.estaVista(serieId) { estaVista ->
+            binding.btnVistaSerie.setImageResource(
+                if (estaVista) R.drawable.ic_baseline_visibility_24
+                else R.drawable.ic_baseline_visibility_off_24
+            )
+        }
+    }
+
+    /** El mismo dialogo de casillas que en peliculas, pero con las listas de la serie. */
+    private fun elegirListas(serie: SerieModel) {
+        viewModel.listasDelUsuario { nombres ->
+            if (nombres.isEmpty()) {
+                DialogoDailyMovie.mostrar(
+                    context = this,
+                    titulo = "Guardar en una lista",
+                    mensaje = "Todavía no tienes ninguna lista tuya. Créala en la pestaña " +
+                        "Listas y aquí podrás guardar lo que quieras.",
+                    textoAceptar = "Entendido",
+                    textoCancelar = null
+                ) { it.dismiss() }
+                return@listasDelUsuario
+            }
+
+            viewModel.listasConLaSerie(serie.id) { yaEstaba ->
+                val marcadas = yaEstaba.toMutableSet()
+                val contenido = layoutInflater.inflate(R.layout.dialogo_listas, null)
+                val lista = contenido.findViewById<RecyclerView>(R.id.dialogoListas)
+                lista.layoutManager = LinearLayoutManager(this)
+                lista.adapter = ListaCasillaAdapter(nombres, marcadas)
+
+                DialogoDailyMovie.mostrar(
+                    context = this,
+                    titulo = "Guardar en una lista",
+                    mensaje = serie.titulo,
+                    contenido = contenido,
+                    textoAceptar = "Guardar"
+                ) { dialogo ->
+                    dialogo.dismiss()
+                    aplicarCambiosDeListas(serie, yaEstaba, marcadas)
+                }
+            }
+        }
+    }
+
+    /** Solo se tocan las listas que han cambiado. */
+    private fun aplicarCambiosDeListas(serie: SerieModel, antes: Set<String>, ahora: Set<String>) {
+        val meter = ahora - antes
+        val sacar = antes - ahora
+        if (meter.isEmpty() && sacar.isEmpty()) return
+
+        meter.forEach { viewModel.anadirALista(it, serie) { } }
+        sacar.forEach { viewModel.quitarDeLista(it, serie) { } }
+
+        val aviso = when {
+            meter.isNotEmpty() && sacar.isEmpty() -> "Guardada en ${meter.joinToString(", ")}"
+            meter.isEmpty() && sacar.isNotEmpty() -> "Quitada de ${sacar.joinToString(", ")}"
+            else -> "Listas actualizadas"
+        }
+        Toast.makeText(this, aviso, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun compartir(serie: SerieModel) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(
+                Intent.EXTRA_TEXT,
+                "Te recomiendo esta serie: ${serie.titulo}\n${Constantes.BASE_SERIE_URL}${serie.id}"
+            )
+        }
+        startActivity(Intent.createChooser(intent, "Compartir serie"))
     }
 
     companion object {

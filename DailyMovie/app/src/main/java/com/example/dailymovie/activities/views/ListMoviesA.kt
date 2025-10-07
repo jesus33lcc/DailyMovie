@@ -13,7 +13,7 @@ import com.example.dailymovie.R
 import com.example.dailymovie.adapters.CustomMovieListAdapter
 import com.example.dailymovie.databinding.ActivityListMoviesBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
-import com.example.dailymovie.models.MovieModel
+import com.example.dailymovie.models.Guardado
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.utils.Avisos
 import com.example.dailymovie.utils.Constantes
@@ -24,7 +24,7 @@ class ListMoviesA : AppCompatActivity() {
     private lateinit var binding: ActivityListMoviesBinding
     private lateinit var movieListAdapter: CustomMovieListAdapter
     private lateinit var listName: String
-    private var movieList: MutableList<MovieModel> = mutableListOf()
+    private var movieList: MutableList<Guardado> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,12 +34,14 @@ class ListMoviesA : AppCompatActivity() {
         listName = intent.getStringExtra("LIST_NAME") ?: ""
         binding.listTitle.text = listName
 
-        movieList = intent.getParcelableArrayListExtra<MovieModel>("MOVIE_LIST")?.toMutableList()
-            ?: mutableListOf()
+        // Lo que llega en el Intent son solo peliculas; las series entran en onResume, que es
+        // quien pide la lista completa.
+        movieList = intent.getParcelableArrayListExtra<com.example.dailymovie.models.MovieModel>("MOVIE_LIST")
+            ?.map { Guardado.de(it) }?.toMutableList() ?: mutableListOf()
 
         movieListAdapter = CustomMovieListAdapter(
-            onMovieClick = { movie -> abrirFicha(movie) },
-            onOpciones = { movie, boton, posicion -> mostrarOpciones(movie, boton, posicion) }
+            onMovieClick = { elemento -> abrirFicha(elemento) },
+            onOpciones = { elemento, boton, posicion -> mostrarOpciones(elemento, boton, posicion) }
         )
 
         binding.recyclerViewMovies.layoutManager = GridLayoutManager(this, columnasQueCaben())
@@ -67,14 +69,19 @@ class ListMoviesA : AppCompatActivity() {
         super.onResume()
         // Al volver de la ficha la pelicula puede haber dejado de ser favorita o vista, asi
         // que la lista se vuelve a pedir en vez de quedarse con la que llego en el Intent.
-        movieViewModel.cargarLista(listName) { actualizadas ->
+        movieViewModel.cargarListaCompleta(listName) { actualizadas ->
             movieList = actualizadas.toMutableList()
             movieListAdapter.submitList(actualizadas)
         }
     }
 
-    private fun abrirFicha(movie: MovieModel) {
-        startActivity(Intent(this, MovieA::class.java).putExtra("MOVIE_ID", movie.id))
+    private fun abrirFicha(elemento: Guardado) {
+        val destino = if (elemento.esSerie) {
+            Intent(this, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, elemento.id)
+        } else {
+            Intent(this, MovieA::class.java).putExtra("MOVIE_ID", elemento.id)
+        }
+        startActivity(destino)
     }
 
     /**
@@ -84,14 +91,14 @@ class ListMoviesA : AppCompatActivity() {
      * ademas no se entiende, porque no queda claro que se esta arrastrando. Con el menu
      * caben otras acciones sin inventar mas gestos.
      */
-    private fun mostrarOpciones(movie: MovieModel, boton: View, posicion: Int) {
+    private fun mostrarOpciones(elemento: Guardado, boton: View, posicion: Int) {
         PopupMenu(ContextThemeWrapper(this, R.style.TemaPopupDailyMovie), boton).apply {
             inflate(R.menu.menu_pelicula_de_lista)
             setOnMenuItemClickListener { opcion ->
                 when (opcion.itemId) {
-                    R.id.accion_ver_ficha -> abrirFicha(movie)
-                    R.id.accion_compartir -> compartir(movie)
-                    R.id.accion_quitar -> quitarConDeshacer(movie, posicion)
+                    R.id.accion_ver_ficha -> abrirFicha(elemento)
+                    R.id.accion_compartir -> compartir(elemento)
+                    R.id.accion_quitar -> quitarConDeshacer(elemento, posicion)
                 }
                 true
             }
@@ -99,15 +106,14 @@ class ListMoviesA : AppCompatActivity() {
         }
     }
 
-    private fun compartir(movie: MovieModel) {
+    private fun compartir(elemento: Guardado) {
+        val direccion = if (elemento.esSerie) Constantes.BASE_SERIE_URL else Constantes.BASE_MOVIE_URL
+        val queEs = if (elemento.esSerie) "esta serie" else "esta película"
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(
-                Intent.EXTRA_TEXT,
-                "Te recomiendo esta película: ${movie.title}\n${Constantes.BASE_MOVIE_URL}${movie.id}"
-            )
+            putExtra(Intent.EXTRA_TEXT, "Te recomiendo $queEs: ${elemento.titulo}\n$direccion${elemento.id}")
         }
-        startActivity(Intent.createChooser(intent, "Compartir película"))
+        startActivity(Intent.createChooser(intent, "Compartir"))
     }
 
     /**
@@ -116,18 +122,18 @@ class ListMoviesA : AppCompatActivity() {
      * La fila desaparece al momento y el aviso de abajo deja deshacerlo; hasta que ese aviso
      * no se va, no se toca Firebase.
      */
-    private fun quitarConDeshacer(movie: MovieModel, position: Int) {
-        movieList.remove(movie)
+    private fun quitarConDeshacer(elemento: Guardado, position: Int) {
+        movieList.remove(elemento)
         movieListAdapter.submitList(movieList.toList())
 
         Avisos.conDeshacer(
             vista = binding.root,
-            texto = "${movie.title} fuera de $listName",
+            texto = "${elemento.titulo} fuera de $listName",
             alDeshacer = {
-                movieList.add(position.coerceAtMost(movieList.size), movie)
+                movieList.add(position.coerceAtMost(movieList.size), elemento)
                 movieListAdapter.submitList(movieList.toList())
             },
-            alConfirmar = { quitarDeVerdad(movie, position) }
+            alConfirmar = { quitarDeVerdad(elemento, position) }
         )
     }
 
@@ -137,13 +143,13 @@ class ListMoviesA : AppCompatActivity() {
      * Antes esto eran tres bloques calcados, uno por tipo de lista, que se diferenciaban
      * solo en a que funcion llamaban. El ViewModel ya sabe elegir con el enum ListaFija.
      */
-    private fun quitarDeVerdad(movie: MovieModel, position: Int) {
-        movieViewModel.removeMovieFromList(listName, movie) { bien ->
+    private fun quitarDeVerdad(elemento: Guardado, position: Int) {
+        movieViewModel.quitarDeLista(listName, elemento) { bien ->
             if (!bien) {
                 // No se pudo guardar, asi que la pelicula vuelve a su sitio: dejarla fuera
                 // seria mentirle al usuario, porque al volver a entrar reapareceria.
                 Toast.makeText(this, "No se ha podido quitar", Toast.LENGTH_SHORT).show()
-                movieList.add(position.coerceAtMost(movieList.size), movie)
+                movieList.add(position.coerceAtMost(movieList.size), elemento)
                 movieListAdapter.submitList(movieList.toList())
             }
         }
