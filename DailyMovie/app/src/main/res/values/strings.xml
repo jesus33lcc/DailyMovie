@@ -21,4 +21,9 @@
     <!-- La nota de TMDB. Antes se pintaba "Rating: 7.966" tal cual: ni en español ni con
          un numero que le diga nada a nadie -->
     <string name="nota_estrella">★ %1$.1f</string>
+
+    <!-- Para lo que todavia no ha salido. TMDB devuelve los episodios anunciados igual de
+         completos que los emitidos, y sin avisar parecia que ya se podian ver -->
+    <string name="proximamente">Próximamente · estreno el %1$s</string>
+    <string name="proximamente_corto">Próximamente</string>
 </resources>

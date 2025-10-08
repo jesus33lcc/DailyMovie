@@ -30,15 +30,29 @@ class EpisodioAdapter(private val episodios: List<EpisodioModel>) :
         holder.sinopsis.visibility =
             if (episodio.sinopsis.isNullOrBlank()) View.GONE else View.VISIBLE
 
-        holder.datos.text = datosDelEpisodio(episodio)
+        holder.datos.text = datosDelEpisodio(holder.itemView, episodio)
 
         holder.imagen.cargarFotograma(episodio.imagen)
     }
 
-    /** Fecha de emision y duracion, lo que quepa de los dos. */
-    private fun datosDelEpisodio(episodio: EpisodioModel): String {
+    /**
+     * Fecha de emision y duracion, lo que quepa de los dos.
+     *
+     * Si el episodio todavia no se ha emitido se dice, porque TMDB los devuelve igual de
+     * completos que los ya emitidos y solo con la fecha no se distingue: en una serie en
+     * emision parecia que quedaban episodios por ver que en realidad aun no existen.
+     */
+    private fun datosDelEpisodio(vista: View, episodio: EpisodioModel): String {
         val trozos = mutableListOf<String>()
-        episodio.emision?.takeIf { it.isNotBlank() }?.let { trozos += Fechas.enLargo(it) }
+        val emision = episodio.emision?.takeIf { it.isNotBlank() }
+
+        if (emision != null) {
+            trozos += if (Fechas.estaPorVenir(emision)) {
+                vista.context.getString(R.string.proximamente, Fechas.enLargo(emision))
+            } else {
+                Fechas.enLargo(emision)
+            }
+        }
         episodio.duracion?.takeIf { it > 0 }?.let { trozos += "$it min" }
         return trozos.joinToString(" · ")
     }

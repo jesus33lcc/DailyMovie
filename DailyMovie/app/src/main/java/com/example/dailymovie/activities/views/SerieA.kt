@@ -135,10 +135,16 @@ class SerieA : AppCompatActivity() {
     private fun resumenDeLaSerie(serie: SerieDetailsResponse): String {
         val trozos = mutableListOf<String>()
 
-        val desde = Fechas.soloElAno(serie.estreno)
-        val hasta = Fechas.soloElAno(serie.ultimaEmision)
-        if (desde.isNotBlank()) {
-            trozos += if (hasta.isBlank() || hasta == desde) desde else "$desde — $hasta"
+        // Una serie anunciada pero sin estrenar tiene fecha, asi que sin avisar parecia que
+        // ya se podia empezar a ver.
+        if (Fechas.estaPorVenir(serie.estreno)) {
+            trozos += getString(R.string.proximamente, Fechas.enLargo(serie.estreno.orEmpty()))
+        } else {
+            val desde = Fechas.soloElAno(serie.estreno)
+            val hasta = Fechas.soloElAno(serie.ultimaEmision)
+            if (desde.isNotBlank()) {
+                trozos += if (hasta.isBlank() || hasta == desde) desde else "$desde — $hasta"
+            }
         }
         if (serie.numeroDeTemporadas > 0) {
             trozos += if (serie.numeroDeTemporadas == 1) "1 temporada"

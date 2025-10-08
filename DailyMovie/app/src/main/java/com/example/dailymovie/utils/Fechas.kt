@@ -1,6 +1,7 @@
 package com.example.dailymovie.utils
 
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 /**
@@ -24,4 +25,27 @@ object Fechas {
 
     /** Solo el año, que es lo que cabe al lado de un titulo. */
     fun soloElAno(fecha: String?): String = fecha?.take(4).orEmpty()
+
+    /**
+     * Si esa fecha todavia no ha llegado.
+     *
+     * TMDB da igual de completos los episodios ya emitidos que los que estan anunciados, asi
+     * que sin esto una serie en emision enseña los que quedan como si se pudieran ver ya.
+     *
+     * Se compara contra el principio del dia de hoy: lo que se estrena hoy cuenta como
+     * estrenado, aunque sea por la noche.
+     */
+    fun estaPorVenir(fecha: String?): Boolean {
+        val texto = fecha?.takeIf { it.isNotBlank() } ?: return false
+        return try {
+            val leida = SimpleDateFormat(FORMATO_TMDB, Locale.US).parse(texto) ?: return false
+            val hoy = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+            }
+            leida.after(hoy.time)
+        } catch (e: Exception) {
+            false
+        }
+    }
 }
