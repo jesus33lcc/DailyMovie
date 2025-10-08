@@ -19,6 +19,7 @@ import com.example.dailymovie.models.MovieDetailsModel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.databinding.ActivityMovieBinding
 import com.example.dailymovie.adapters.ImagenAdapter
@@ -258,9 +259,18 @@ class MovieA : AppCompatActivity() {
 
         movieViewModel.movieCredits.value?.let { mostrarDirector(it) }
 
+        // Si aun no ha salido se dice, y se enseña la fecha entera en vez del año suelto:
+        // "2026" no aclara si ya se puede ver o si queda medio año.
+        val porVenir = Fechas.estaPorVenir(movie.releaseDate)
         val releaseYear = movie.releaseDate.take(4)
-        binding.txtAnioLabel.visibility = if (releaseYear.isEmpty()) View.GONE else View.VISIBLE
-        binding.txtAnioMovie.text = releaseYear
+        binding.txtAnioMovie.text = if (porVenir) {
+            getString(R.string.proximamente, Fechas.enLargo(movie.releaseDate))
+        } else {
+            releaseYear
+        }
+        // La etiqueta "Año:" sobra cuando el texto ya empieza por "Próximamente".
+        binding.txtAnioLabel.visibility =
+            if (releaseYear.isEmpty() || porVenir) View.GONE else View.VISIBLE
         binding.txtAnioMovie.visibility = if (releaseYear.isEmpty()) View.GONE else View.VISIBLE
 
         binding.txtValoracionLabel.visibility = if (movie.voteAverage == 0.0) View.GONE else View.VISIBLE
