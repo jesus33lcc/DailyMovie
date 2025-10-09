@@ -22,7 +22,7 @@
         android:paddingVertical="10dp"
         android:background="@drawable/rounded_border_box"
         android:textSize="16sp"
-        android:fontFamily="@font/courier_bold"
+        android:fontFamily="@font/courier_prime_bold"
         android:textColor="@color/colorTextPrimary"
         tools:text="3 / 135" />
 </FrameLayout>

@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="22sp"
-        android:fontFamily="@font/courier_bold"
+        android:fontFamily="@font/courier_prime_bold"
         android:textColor="@color/colorPrimary"
         tools:text="Crear nueva lista" />
 
@@ -30,7 +30,7 @@
         android:layout_marginTop="12dp"
         android:textSize="15sp"
         android:lineSpacingExtra="4dp"
-        android:fontFamily="@font/courier"
+        android:fontFamily="@font/courier_prime"
         android:textColor="@color/white"
         tools:text="Ponle un nombre y podras guardar ahi las peliculas que quieras" />
 
@@ -55,7 +55,7 @@
             android:paddingHorizontal="20dp"
             android:paddingVertical="12dp"
             android:textSize="16sp"
-            android:fontFamily="@font/courier_bold"
+            android:fontFamily="@font/courier_prime_bold"
             android:textColor="@color/colorPrimary"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
@@ -70,7 +70,7 @@
             android:paddingHorizontal="24dp"
             android:paddingVertical="12dp"
             android:textSize="16sp"
-            android:fontFamily="@font/courier_bold"
+            android:fontFamily="@font/courier_prime_bold"
             android:textColor="@color/white"
             android:background="@drawable/dialogo_boton"
             android:clickable="true"

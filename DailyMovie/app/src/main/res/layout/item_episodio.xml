@@ -17,7 +17,7 @@
         android:textSize="22sp"
         android:gravity="center_horizontal"
         android:textAlignment="center"
-        android:fontFamily="@font/courier_bold"
+        android:fontFamily="@font/courier_prime_bold"
         android:textColor="@color/colorPrimaryDark"
         tools:text="1" />
 
@@ -55,7 +55,7 @@
             android:textSize="16sp"
             android:maxLines="2"
             android:ellipsize="end"
-            android:fontFamily="@font/courier_bold"
+            android:fontFamily="@font/courier_prime_bold"
             android:textColor="@color/colorTextPrimary"
             tools:text="Piloto" />
 
@@ -64,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="13sp"
-            android:fontFamily="@font/courier"
+            android:fontFamily="@font/courier_prime"
             android:textColor="@color/colorAccent"
             tools:text="20 de enero de 2008 · 58 min" />
 
@@ -76,7 +76,7 @@
             android:textSize="13sp"
             android:maxLines="3"
             android:ellipsize="end"
-            android:fontFamily="@font/courier"
+            android:fontFamily="@font/courier_prime"
             android:textColor="@color/colorTextPrimary"
             tools:text="Un profesor de quimica..." />
     </LinearLayout>

@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
         android:textSize="14sp"
-        android:fontFamily="@font/courier"
+        android:fontFamily="@font/courier_prime"
         android:textAlignment="center"
         android:textColor="@color/colorTextPrimary"
         android:ellipsize="end"

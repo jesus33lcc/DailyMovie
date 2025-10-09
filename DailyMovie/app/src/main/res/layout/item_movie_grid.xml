@@ -40,7 +40,7 @@
             android:textSize="15sp"
             android:maxLines="1"
             android:ellipsize="end"
-            android:fontFamily="@font/courier_bold"
+            android:fontFamily="@font/courier_prime_bold"
             android:textColor="@color/white"
             tools:text="El padrino" />
 
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="13sp"
-                android:fontFamily="@font/courier"
+                android:fontFamily="@font/courier_prime"
                 android:textColor="@color/colorPrimary"
                 tools:text="1972" />
 
@@ -65,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
-                android:fontFamily="@font/courier_bold"
+                android:fontFamily="@font/courier_prime_bold"
                 android:textColor="@color/colorPrimary"
                 tools:text="★ 8,7" />
         </LinearLayout>
