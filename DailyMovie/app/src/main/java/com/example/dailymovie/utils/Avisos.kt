@@ -40,7 +40,7 @@ object Avisos {
 
         // El Snackbar no deja cambiar la fuente desde fuera, hay que buscar su TextView.
         aviso.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-            ?.typeface = ResourcesCompat.getFont(contexto, R.font.courier)
+            ?.typeface = ResourcesCompat.getFont(contexto, R.font.courier_prime)
 
         aviso.setAction(textoAccion) { alDeshacer() }
         aviso.addCallback(object : Snackbar.Callback() {

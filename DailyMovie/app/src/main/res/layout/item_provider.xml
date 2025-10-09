@@ -27,6 +27,6 @@
         android:ellipsize="end"
         android:paddingTop="4dp"
         android:text="Provider Name"
-        android:fontFamily="@font/courier_bold"
+        android:fontFamily="@font/courier_prime_bold"
         android:textColor="@color/white"/>
 </LinearLayout>

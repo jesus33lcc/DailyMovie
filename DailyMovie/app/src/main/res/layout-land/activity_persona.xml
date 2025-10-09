@@ -56,7 +56,7 @@
                     android:layout_marginTop="12dp"
                     android:textSize="26sp"
                     android:textAlignment="center"
-                    android:fontFamily="@font/courier_bold"
+                    android:fontFamily="@font/courier_prime_bold"
                     android:textColor="@color/black"
                     tools:text="Marlon Brando" />
 
@@ -67,7 +67,7 @@
                     android:layout_marginTop="4dp"
                     android:textSize="16sp"
                     android:textAlignment="center"
-                    android:fontFamily="@font/courier"
+                    android:fontFamily="@font/courier_prime"
                     android:textColor="@color/colorAccent"
                     tools:text="Interpretación" />
 
@@ -78,7 +78,7 @@
                     android:layout_marginTop="8dp"
                     android:textSize="15sp"
                     android:textAlignment="center"
-                    android:fontFamily="@font/courier"
+                    android:fontFamily="@font/courier_prime"
                     android:textColor="@color/colorTextPrimary"
                     tools:text="3 de abril de 1924 · Omaha, Nebraska" />
             </LinearLayout>
@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:text="Biografía"
                     android:textSize="22sp"
-                    android:fontFamily="@font/courier_bold"
+                    android:fontFamily="@font/courier_prime_bold"
                     android:textColor="@color/black" />
 
                 <TextView
@@ -112,7 +112,7 @@
                     android:textSize="15sp"
                     android:justificationMode="inter_word"
                     android:background="@drawable/rounded_border_box"
-                    android:fontFamily="@font/courier"
+                    android:fontFamily="@font/courier_prime"
                     android:textColor="@color/colorTextPrimary"
                     tools:text="Actor estadounidense..." />
             </LinearLayout>
@@ -134,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ha actuado en"
                 android:textSize="22sp"
-                android:fontFamily="@font/courier_bold"
+                android:fontFamily="@font/courier_prime_bold"
                 android:textColor="@color/black" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -161,7 +161,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ha dirigido"
                 android:textSize="22sp"
-                android:fontFamily="@font/courier_bold"
+                android:fontFamily="@font/courier_prime_bold"
                 android:textColor="@color/black" />
 
             <androidx.recyclerview.widget.RecyclerView

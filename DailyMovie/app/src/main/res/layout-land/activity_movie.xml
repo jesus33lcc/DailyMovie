@@ -67,7 +67,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="24sp"
-                            android:fontFamily="@font/courier_bold"
+                            android:fontFamily="@font/courier_prime_bold"
                             android:textAlignment="center"
                             android:paddingTop="8dp"
                             android:textColor="@color/black"
@@ -93,7 +93,7 @@
                             android:paddingHorizontal="14dp"
                             android:paddingVertical="4dp"
                             android:textSize="16sp"
-                            android:fontFamily="@font/courier_bold"
+                            android:fontFamily="@font/courier_prime_bold"
                             android:background="@drawable/rounded_border"
                             android:textColor="@color/colorTextPrimary"
                             android:visibility="gone" />
@@ -186,7 +186,7 @@
                             android:text="Director: "
                             android:textSize="16sp"
                             android:textColor="@color/black"
-                            android:fontFamily="@font/courier_bold"/>
+                            android:fontFamily="@font/courier_prime_bold"/>
 
                         <TextView
                             android:id="@+id/txt_director_movie"
@@ -276,7 +276,7 @@
                         android:textSize="20sp"
                         android:paddingTop="8dp"
                         android:textColor="@color/black"
-                        android:fontFamily="@font/courier_bold"/>
+                        android:fontFamily="@font/courier_prime_bold"/>
 
                     <TextView
                         android:id="@+id/txt_overview_movie"
@@ -380,7 +380,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Proveedores"
-                    android:fontFamily="@font/courier_bold"
+                    android:fontFamily="@font/courier_prime_bold"
                     android:textSize="25sp"
                     android:paddingHorizontal="6dp"
                     android:textColor="@color/black" />
@@ -409,7 +409,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Reparto"
-                    android:fontFamily="@font/courier_bold"
+                    android:fontFamily="@font/courier_prime_bold"
                     android:textSize="25sp"
                     android:paddingHorizontal="6dp"
                     android:textColor="@color/black" />
@@ -439,7 +439,7 @@
                     android:text="Imágenes"
                     android:textSize="25sp"
                     android:paddingHorizontal="6dp"
-                    android:fontFamily="@font/courier_bold"
+                    android:fontFamily="@font/courier_prime_bold"
                     android:textColor="@color/black" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -468,7 +468,7 @@
                     android:text="Videos"
                     android:textSize="25sp"
                     android:paddingHorizontal="6dp"
-                    android:fontFamily="@font/courier_bold"
+                    android:fontFamily="@font/courier_prime_bold"
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:textColor="@color/black" />
@@ -497,7 +497,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Similares"
-                    android:fontFamily="@font/courier_bold"
+                    android:fontFamily="@font/courier_prime_bold"
                     android:textSize="25sp"
                     android:paddingHorizontal="6dp"
                     android:textColor="@color/black" />
@@ -526,7 +526,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Recomendadas"
-                    android:fontFamily="@font/courier_bold"
+                    android:fontFamily="@font/courier_prime_bold"
                     android:textSize="25sp"
                     android:paddingHorizontal="6dp"
                     android:textColor="@color/black" />

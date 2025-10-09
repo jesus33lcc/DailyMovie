@@ -52,7 +52,7 @@
         android:maxLines="2"
         android:ellipsize="end"
         android:textAlignment="center"
-        android:fontFamily="@font/courier_bold"
+        android:fontFamily="@font/courier_prime_bold"
         android:textColor="@color/colorTextPrimary"
         tools:text="Ciencia ficción" />
 </LinearLayout>

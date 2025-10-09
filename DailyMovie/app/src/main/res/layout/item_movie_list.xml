@@ -29,7 +29,7 @@
         android:layout_marginLeft="8dp"
         android:text="Title"
         android:textSize="20sp"
-        android:fontFamily="@font/courier_bold"
+        android:fontFamily="@font/courier_prime_bold"
         android:maxLines="1"
         android:ellipsize="end"
         android:textColor="@color/white"

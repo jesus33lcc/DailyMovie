@@ -43,6 +43,6 @@
         android:textSize="20sp"
         android:maxLines="1"
         android:ellipsize="end"
-        android:fontFamily="@font/courier_bold" />
+        android:fontFamily="@font/courier_prime_bold" />
 
 </RelativeLayout>

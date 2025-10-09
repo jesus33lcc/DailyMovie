@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ajustes"
                 android:textSize="24sp"
-                android:fontFamily="@font/courier_bold"
+                android:fontFamily="@font/courier_prime_bold"
                 android:textAlignment="center"
                 android:textColor="@color/black"/>
 
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:textSize="14sp"
-                android:fontFamily="@font/courier"
+                android:fontFamily="@font/courier_prime"
                 android:textAlignment="center"
                 android:textColor="@color/colorTextPrimary"
                 tools:text="jesus@correo.com" />
@@ -111,7 +111,7 @@
             android:textColor="@color/white"
             android:paddingVertical="12dp"
             android:textStyle="bold"
-            android:fontFamily="@font/courier_bold"
+            android:fontFamily="@font/courier_prime_bold"
             android:textSize="16sp" />
 
         <TextView
@@ -121,7 +121,7 @@
             android:layout_marginBottom="16dp"
             android:textSize="12sp"
             android:textAlignment="center"
-            android:fontFamily="@font/courier"
+            android:fontFamily="@font/courier_prime"
             android:textColor="@color/colorPrimaryDark"
             tools:text="DailyMovie 1.0" />
     </LinearLayout>

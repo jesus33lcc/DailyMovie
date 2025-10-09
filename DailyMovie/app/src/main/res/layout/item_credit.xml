@@ -13,7 +13,7 @@
         android:layout_height="@dimen/foto_persona_alto"
         android:scaleType="centerCrop"
         android:contentDescription="Cast Profile"
-        android:fontFamily="@font/courier_bold"
+        android:fontFamily="@font/courier_prime_bold"
         android:background="@drawable/image_rounded_border"
         android:clipToOutline="true"/>
 
@@ -24,7 +24,7 @@
         android:textSize="14sp"
         android:paddingTop="4dp"
         android:text="Cast Name"
-        android:fontFamily="@font/courier_bold"
+        android:fontFamily="@font/courier_prime_bold"
         android:maxLines="1"
         android:ellipsize="end"
         android:textColor="@color/white"/>
