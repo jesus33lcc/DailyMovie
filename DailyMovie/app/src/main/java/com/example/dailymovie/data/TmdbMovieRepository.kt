@@ -4,9 +4,12 @@ import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.WebService
 import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.CreditResponse
+import com.example.dailymovie.client.response.ResultadoMulti
 import com.example.dailymovie.client.response.MovieDetailsResponse
 import com.example.dailymovie.client.response.ProviderResponse
 import com.example.dailymovie.models.GenreModel
+import com.example.dailymovie.models.Hallazgo
+import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Constantes
@@ -26,6 +29,70 @@ class TmdbMovieRepository(
 
     override fun buscar(consulta: String, alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
         listaDePeliculas(servicio.searchMovies(consulta, apiKey), alTerminar)
+
+    override fun buscarTodo(consulta: String, alTerminar: (Resultado<List<Hallazgo>>) -> Unit) {
+        servicio.buscarTodo(consulta, apiKey).enqueueSimple(
+            onExito = { alTerminar(Resultado.Exito(aHallazgos(it.resultados))) },
+            onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    override fun tendencias(alTerminar: (Resultado<List<Hallazgo>>) -> Unit) {
+        servicio.getTendencias(apiKey).enqueueSimple(
+            onExito = { alTerminar(Resultado.Exito(aHallazgos(it.resultados))) },
+            onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    /**
+     * Pasa lo que devuelve TMDB a algo que la pantalla pueda pintar sin preguntarse que es.
+     *
+     * Se tiran los resultados sin titulo o sin tipo: TMDB cuela de vez en cuando entradas a
+     * medias, y una tarjeta en blanco en mitad de la rejilla queda peor que no enseñarla.
+     */
+    private fun aHallazgos(crudos: List<ResultadoMulti>): List<Hallazgo> =
+        crudos.mapNotNull { item ->
+            val tipo = when (item.tipo) {
+                "movie" -> TipoDeHallazgo.PELICULA
+                "tv" -> TipoDeHallazgo.SERIE
+                "person" -> TipoDeHallazgo.PERSONA
+                else -> null
+            } ?: return@mapNotNull null
+
+            val titulo = (item.titulo ?: item.nombre)?.takeIf { it.isNotBlank() }
+                ?: return@mapNotNull null
+
+            Hallazgo(
+                id = item.id,
+                titulo = titulo,
+                subtitulo = when (tipo) {
+                    TipoDeHallazgo.PELICULA -> item.estreno.orEmpty()
+                    TipoDeHallazgo.SERIE -> item.primeraEmision.orEmpty()
+                    // De la gente interesa a que se dedica, no una fecha
+                    TipoDeHallazgo.PERSONA -> traducirOficio(item.oficio)
+                },
+                imagen = if (tipo == TipoDeHallazgo.PERSONA) item.foto else item.cartel,
+                nota = item.nota ?: 0.0,
+                tipo = tipo,
+                relevancia = item.popularidad ?: 0.0
+            )
+        }
+
+    /** TMDB devuelve el oficio siempre en ingles, aunque se le pida en español. */
+    private fun traducirOficio(oficio: String?): String = when (oficio) {
+        "Acting" -> "Interpretación"
+        "Directing" -> "Dirección"
+        "Writing" -> "Guion"
+        "Production" -> "Producción"
+        "Sound" -> "Sonido"
+        "Camera" -> "Fotografía"
+        "Art" -> "Arte"
+        "Editing" -> "Montaje"
+        "Costume & Make-Up" -> "Vestuario y maquillaje"
+        "Visual Effects" -> "Efectos visuales"
+        "Crew" -> "Equipo"
+        else -> oficio.orEmpty()
+    }
 
     override fun enCartelera(alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
         listaDePeliculas(servicio.getNowPlayingMovies(apiKey), alTerminar)

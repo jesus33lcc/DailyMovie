@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Un resultado de busqueda, sea pelicula, serie o persona.
+
+    Es la misma tarjeta para los tres porque lo que se enseña es lo mismo: imagen, nombre y
+    una linea debajo. Lo unico que cambia es la etiqueta de la esquina, que dice de que es,
+    porque en una rejilla mezclada hace falta saberlo de un vistazo.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:background="@drawable/container_rounded_border"
+        android:clipToOutline="true"
+        android:foreground="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/imgHallazgo"
+            android:layout_width="@dimen/poster_ancho"
+            android:layout_height="@dimen/poster_alto"
+            android:scaleType="centerCrop"
+            android:background="@drawable/image_rounded_border"
+            android:clipToOutline="true"
+            android:contentDescription="Imagen"
+            tools:src="@drawable/relleno_pelicula" />
+
+        <TextView
+            android:id="@+id/txtTituloHallazgo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="15sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:fontFamily="@font/courier_prime_bold"
+            android:textColor="@color/white"
+            tools:text="Breaking Bad" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/txtSubtituloHallazgo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="13sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:fontFamily="@font/courier_prime"
+                android:textColor="@color/colorPrimary"
+                tools:text="2008" />
+
+            <TextView
+                android:id="@+id/txtNotaHallazgo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:fontFamily="@font/courier_prime_bold"
+                android:textColor="@color/colorPrimary"
+                tools:text="★ 8,9" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- De que es: en una rejilla mezclada, sin esto no se sabe -->
+    <TextView
+        android:id="@+id/txtTipoHallazgo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_margin="12dp"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="3dp"
+        android:textSize="11sp"
+        android:fontFamily="@font/courier_prime_bold"
+        android:textColor="@color/colorTextPrimary"
+        android:background="@drawable/etiqueta_tipo"
+        tools:text="SERIE" />
+</FrameLayout>

@@ -3,6 +3,7 @@ package com.example.dailymovie.data
 import com.example.dailymovie.client.response.CreditResponse
 import com.example.dailymovie.client.response.MovieDetailsResponse
 import com.example.dailymovie.client.response.ProviderResponse
+import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.ErrorCarga
@@ -17,6 +18,12 @@ import com.example.dailymovie.utils.ErrorCarga
 interface MovieRepository {
 
     fun buscar(consulta: String, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
+
+    /** Busca peliculas, series y gente de una vez. */
+    fun buscarTodo(consulta: String, alTerminar: (Resultado<List<Hallazgo>>) -> Unit)
+
+    /** Lo que esta en tendencia esta semana, mezclando peliculas y series. */
+    fun tendencias(alTerminar: (Resultado<List<Hallazgo>>) -> Unit)
 
     fun enCartelera(alTerminar: (Resultado<List<MovieModel>>) -> Unit)
     fun populares(alTerminar: (Resultado<List<MovieModel>>) -> Unit)

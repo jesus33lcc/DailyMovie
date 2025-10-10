@@ -1,71 +1,338 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Explorar.
+
+    Antes era una caja de texto y una lista de una pelicula por fila, asi que entrar sin ganas
+    de buscar algo concreto no servia de nada, y en tablet se veian cuatro resultados ocupando
+    todo el ancho.
+
+    Ahora la pantalla tiene tres caras y solo se ve una cada vez:
+      · panelExplorar    -> mientras no escribes: recientes, tendencias, generos e historial
+      · rvListaBusqueda  -> lo que sale al buscar, en cuadricula
+      · panelSinNada     -> cuando la busqueda no devuelve nada
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.views.ExplorarF"
-    android:background="@color/colorBackground">
+    android:orientation="vertical"
+    android:background="@color/colorBackground"
+    android:padding="16dp"
+    tools:context=".fragments.views.ExplorarF">
 
+    <!-- La barra de buscar -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_border_box"
+        android:clipToOutline="true"
+        android:padding="14dp"
+        android:gravity="center_vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/search_mag_icon"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/rounded_border_box"
-            android:clipToOutline="true"
-            android:padding="16dp"
-            android:layout_marginBottom="6dp">
+            android:src="@drawable/ic_baseline_search_24"
+            android:contentDescription="Buscar"
+            app:tint="@color/colorTextPrimary" />
 
-            <ImageView
-                android:id="@+id/search_mag_icon"
+        <EditText
+            android:id="@+id/search_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Busca películas, series o gente"
+            android:textColor="@color/colorTextPrimary"
+            android:textColorHint="@color/colorAccent"
+            android:background="@android:color/transparent"
+            android:paddingHorizontal="10dp"
+            android:textSize="17sp"
+            android:fontFamily="@font/courier_prime_bold"
+            android:maxLines="1"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:importantForAutofill="no" />
+
+        <ProgressBar
+            android:id="@+id/progresoBusqueda"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"
+            android:indeterminateTint="@color/colorPrimaryDark" />
+
+        <ImageView
+            android:id="@+id/clear_search_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_clear_24"
+            android:visibility="gone"
+            android:contentDescription="Borrar lo escrito"
+            app:tint="@color/colorTextPrimary" />
+    </LinearLayout>
+
+    <!-- Filtros: solo aparecen cuando hay algo que filtrar -->
+    <LinearLayout
+        android:id="@+id/barraFiltros"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <HorizontalScrollView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollbars="none">
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_search_24"
-                android:layout_gravity="center_vertical"
-                app:tint="@color/black" />
+                android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/search_input"
-                android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/chipTodo"
+                    style="@style/ChipDeFiltro"
+                    tools:text="Todo · 20" />
+
+                <TextView
+                    android:id="@+id/chipPeliculas"
+                    style="@style/ChipDeFiltro"
+                    tools:text="Películas · 12" />
+
+                <TextView
+                    android:id="@+id/chipSeries"
+                    style="@style/ChipDeFiltro"
+                    tools:text="Series · 4" />
+
+                <TextView
+                    android:id="@+id/chipPersonas"
+                    style="@style/ChipDeFiltro"
+                    tools:text="Gente · 4" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <ImageButton
+            android:id="@+id/btnOrdenar"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_ordenar"
+            android:background="@drawable/rounded_button"
+            android:scaleType="centerInside"
+            android:padding="10dp"
+            android:contentDescription="Ordenar" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp">
+
+        <!-- ===== Cara 1: sin escribir nada ===== -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/panelExplorar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Explorar"
-                android:textColor="@color/black"
-                android:textColorHint="@color/black"
-                android:background="@android:color/transparent"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:textStyle="bold"
-                android:layout_gravity="center_vertical"
-                android:textSize="18sp"
-                android:inputType="text"
-                android:imeOptions="actionSearch" />
+                android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/clear_search_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_clear_24"
-                android:layout_gravity="center_vertical"
-                android:visibility="gone"
-                android:paddingStart="8dp"
-                app:tint="@color/black" />
-        </LinearLayout>
+                <!-- Lo ultimo que se busco -->
+                <LinearLayout
+                    android:id="@+id/seccionRecientes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            style="@style/TituloDeSeccionExplorar"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:text="Lo último que buscaste" />
+
+                        <TextView
+                            android:id="@+id/btnOlvidarRecientes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:text="Borrar"
+                            android:textSize="14sp"
+                            android:fontFamily="@font/courier_prime_bold"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:background="?attr/selectableItemBackground" />
+                    </LinearLayout>
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/contenedorRecientes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal" />
+                    </HorizontalScrollView>
+                </LinearLayout>
+
+                <!-- Lo que esta petando -->
+                <LinearLayout
+                    android:id="@+id/seccionTendencias"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        style="@style/TituloDeSeccionExplorar"
+                        android:text="En tendencia esta semana" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvTendencias"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+                </LinearLayout>
+
+                <!-- Por donde tirar si no sabes que buscar -->
+                <LinearLayout
+                    android:id="@+id/seccionGeneros"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        style="@style/TituloDeSeccionExplorar"
+                        android:text="Por género" />
+
+                    <!-- En scroll horizontal para no depender de una libreria de rejilla
+                         que se ajuste sola: son pocos generos y caben de sobra -->
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/contenedorGeneros"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal" />
+                    </HorizontalScrollView>
+                </LinearLayout>
+
+                <!-- Lo que ya has mirado -->
+                <LinearLayout
+                    android:id="@+id/seccionHistorial"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        style="@style/TituloDeSeccionExplorar"
+                        android:text="Lo que has mirado antes" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvHistorial"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+                </LinearLayout>
+
+                <!-- Para cuando no sabes que ver -->
+                <TextView
+                    android:id="@+id/btnSorprendeme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:text="No sé qué ver, sorpréndeme"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/courier_prime_bold"
+                    android:textColor="@color/white"
+                    android:background="@drawable/rounded_border_button"
+                    android:drawableStart="@drawable/ic_dado"
+                    android:drawablePadding="12dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- ===== Cara 2: los resultados ===== -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvListaBusqueda"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingVertical="8dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_movie_list" />
-    </LinearLayout>
+            android:visibility="gone"
+            tools:listitem="@layout/item_hallazgo"
+            tools:visibility="visible" />
 
-</FrameLayout>
+        <!-- ===== Cara 3: no hay nada ===== -->
+        <LinearLayout
+            android:id="@+id/panelSinNada"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:src="@drawable/ic_baseline_search_24"
+                android:alpha="0.5"
+                android:contentDescription="Sin resultados"
+                app:tint="@color/colorPrimaryDark" />
+
+            <TextView
+                android:id="@+id/txtSinNada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:textSize="17sp"
+                android:fontFamily="@font/courier_prime_bold"
+                android:textColor="@color/white"
+                tools:text="No hemos encontrado nada con «xxxx»" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Prueba con menos palabras, o con el título en su idioma original"
+                android:textSize="15sp"
+                android:fontFamily="@font/courier_prime"
+                android:textColor="@color/colorPrimaryDark" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

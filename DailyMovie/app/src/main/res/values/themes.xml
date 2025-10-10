@@ -60,4 +60,29 @@
     <style name="PopupMenuDailyMovie" parent="Widget.AppCompat.PopupMenu">
         <item name="android:popupBackground">@drawable/dialogo_fondo</item>
     </style>
+
+    <!-- Los chips de filtrar del buscador -->
+    <style name="ChipDeFiltro">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:paddingVertical">9dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/courier_prime_bold</item>
+        <item name="android:background">@drawable/chip_fondo</item>
+        <item name="android:textColor">@color/chip_texto</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <!-- Cabecera de cada bloque de Explorar -->
+    <style name="TituloDeSeccionExplorar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:textSize">19sp</item>
+        <item name="android:fontFamily">@font/courier_prime_bold</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
 </resources>
