@@ -93,6 +93,28 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<MoviesResponse>
 
+    // ---- Buscar cualquier cosa ----
+
+    /**
+     * El unico endpoint que busca peliculas, series y gente a la vez, ya ordenadas por lo
+     * que mas encaja con lo escrito. Antes se usaba search/movie, que solo veia peliculas.
+     */
+    @GET("search/multi")
+    fun buscarTodo(
+        @Query("query") consulta: String,
+        @Query("api_key") apiKey: String,
+        @Query("include_adult") incluirAdulto: Boolean = false,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
+        @Query("page") page: Int = 1
+    ): Call<BusquedaMultiResponse>
+
+    /** Lo que esta petando esta semana, para tener algo que enseñar sin buscar nada. */
+    @GET("trending/all/week")
+    fun getTendencias(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<TendenciasResponse>
+
     // ---- Recomendacion ----
 
     @GET("discover/movie")

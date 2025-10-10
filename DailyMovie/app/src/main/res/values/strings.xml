@@ -26,4 +26,7 @@
          completos que los emitidos, y sin avisar parecia que ya se podian ver -->
     <string name="proximamente">Próximamente · estreno el %1$s</string>
     <string name="proximamente_corto">Próximamente</string>
+
+    <!-- Buscador -->
+    <string name="busqueda_sin_resultados">No hemos encontrado nada con «%1$s»</string>
 </resources>

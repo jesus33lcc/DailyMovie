@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Como ordenar los resultados. Se aplica sobre lo ya descargado, sin volver a la red -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/orden_relevancia" android:title="Lo que más encaja" />
+    <item android:id="@+id/orden_nota" android:title="Mejor valoradas" />
+    <item android:id="@+id/orden_ano" android:title="Más recientes" />
+</menu>
