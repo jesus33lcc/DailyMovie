@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -55,8 +56,22 @@ class HallazgoAdapter(
             holder.nota.visibility = View.GONE
             holder.imagen.cargarFotoDePersona(hallazgo.imagen)
         } else {
-            holder.subtitulo.text = Fechas.soloElAno(hallazgo.subtitulo)
-            holder.nota.visibility = if (hallazgo.nota > 0) View.VISIBLE else View.GONE
+            // Lo que aun no ha salido se dice en la propia tarjeta: con el año a secas no se
+            // distingue de lo que ya se puede ver, y ademas todavia no tiene nota.
+            val porVenir = Fechas.estaPorVenir(hallazgo.subtitulo)
+            holder.subtitulo.text = if (porVenir) {
+                contexto.getString(R.string.proximamente_corto)
+            } else {
+                Fechas.soloElAno(hallazgo.subtitulo)
+            }
+            holder.subtitulo.setTextColor(
+                ContextCompat.getColor(
+                    contexto,
+                    if (porVenir) R.color.colorPeligroBorde else R.color.colorPrimary
+                )
+            )
+            holder.nota.visibility =
+                if (hallazgo.nota > 0 && !porVenir) View.VISIBLE else View.GONE
             holder.nota.text = contexto.getString(R.string.nota_estrella, hallazgo.nota)
             holder.imagen.cargarCartel(hallazgo.imagen)
         }

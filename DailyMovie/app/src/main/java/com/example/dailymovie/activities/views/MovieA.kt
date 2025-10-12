@@ -15,6 +15,7 @@ import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarCartel
 import com.example.dailymovie.adapters.*
 import com.example.dailymovie.client.response.*
+import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.MovieDetailsModel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
@@ -128,6 +129,11 @@ class MovieA : AppCompatActivity() {
         btnShare.setOnClickListener {
             shareMovie(movieModel)
         }
+    }
+
+    /** Abre otra pelicula desde las tiras de similares y recomendadas. */
+    private fun abrirOtra(hallazgo: Hallazgo) {
+        startActivity(Intent(this, MovieA::class.java).putExtra("MOVIE_ID", hallazgo.id))
     }
 
     private fun shareMovie(movie: MovieModel) {
@@ -391,7 +397,7 @@ class MovieA : AppCompatActivity() {
 
     private fun displaySimilarMovies(similarMovies: List<MovieModel>) {
         if (similarMovies.isNotEmpty()) {
-            val adapter = MovieAdapter(ArrayList(similarMovies))
+            val adapter = HallazgoAdapter { abrirOtra(it) }.also { it.submitList(similarMovies.map { p -> Hallazgo.de(p) }) }
             binding.recyclerViewSimilarMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewSimilarMovies.adapter = adapter
             binding.sectionSimilarMovies.visibility = View.VISIBLE
@@ -403,7 +409,7 @@ class MovieA : AppCompatActivity() {
 
     private fun displayRecommendedMovies(recommendedMovies: List<MovieModel>) {
         if (recommendedMovies.isNotEmpty()) {
-            val adapter = MovieAdapter(ArrayList(recommendedMovies))
+            val adapter = HallazgoAdapter { abrirOtra(it) }.also { it.submitList(recommendedMovies.map { p -> Hallazgo.de(p) }) }
             binding.recyclerViewRecommendedMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewRecommendedMovies.adapter = adapter
             binding.sectionRecommendedMovies.visibility = View.VISIBLE

@@ -29,4 +29,28 @@ data class Hallazgo(
 
     /** El año, para poder ordenar por fecha sin arrastrar la fecha entera. */
     val ano: Int get() = subtitulo.take(4).toIntOrNull() ?: 0
+
+    companion object {
+        /**
+         * Las tarjetas de la portada y de series son las mismas que las del buscador, asi que
+         * en vez de tener tres adaptadores calcados se convierte a esto y se usa el mismo.
+         */
+        fun de(pelicula: MovieModel) = Hallazgo(
+            id = pelicula.id,
+            titulo = pelicula.title,
+            subtitulo = pelicula.releaseDate,
+            imagen = pelicula.posterPath,
+            nota = pelicula.voteAverage,
+            tipo = TipoDeHallazgo.PELICULA
+        )
+
+        fun de(serie: SerieModel) = Hallazgo(
+            id = serie.id,
+            titulo = serie.titulo,
+            subtitulo = serie.estreno.orEmpty(),
+            imagen = serie.poster,
+            nota = serie.valoracion,
+            tipo = TipoDeHallazgo.SERIE
+        )
+    }
 }
