@@ -11,10 +11,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.dailymovie.models.TipoDeHallazgo
+import com.example.dailymovie.activities.views.SerieA
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarFotogramaDeUrl
-import com.example.dailymovie.adapters.MovieAdapter
+import com.example.dailymovie.adapters.HallazgoAdapter
+import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieOfTheDay
@@ -55,16 +59,16 @@ class HomeF : Fragment() {
         binding.recyclerViewUpcoming.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
 
         homeViewModel.nowPlayingMovies.observe(viewLifecycleOwner, Observer { movies ->
-            binding.recyclerViewNowPlaying.adapter = MovieAdapter(movies)
+            pintarTira(binding.recyclerViewNowPlaying, movies.map { Hallazgo.de(it) })
         })
         homeViewModel.popularMovies.observe(viewLifecycleOwner, Observer { movies ->
-            binding.recyclerViewPopular.adapter = MovieAdapter(movies)
+            pintarTira(binding.recyclerViewPopular, movies.map { Hallazgo.de(it) })
         })
         homeViewModel.topRatedMovies.observe(viewLifecycleOwner, Observer { movies ->
-            binding.recyclerViewTopRated.adapter = MovieAdapter(movies)
+            pintarTira(binding.recyclerViewTopRated, movies.map { Hallazgo.de(it) })
         })
         homeViewModel.upcomingMovies.observe(viewLifecycleOwner, Observer { movies ->
-            binding.recyclerViewUpcoming.adapter = MovieAdapter(movies)
+            pintarTira(binding.recyclerViewUpcoming, movies.map { Hallazgo.de(it) })
         })
 
         homeViewModel.movieOfTheDay.observe(viewLifecycleOwner, Observer { movie ->
@@ -90,6 +94,33 @@ class HomeF : Fragment() {
 
 
         setupSwipeRefreshLayout()
+    }
+
+
+    /**
+     * Pinta una tira con la tarjeta comun.
+     *
+     * Es la misma que usa el buscador: cartel, titulo, año y nota, con la etiqueta de si es
+     * pelicula o serie y el aviso de "Proximamente" en lo que aun no ha salido. Antes cada
+     * pantalla tenia su propio adaptador haciendo lo mismo con otro diseño.
+     */
+    private fun pintarTira(lista: RecyclerView, hallazgos: List<Hallazgo>) {
+        if (lista.itemDecorationCount == 0) {
+            lista.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
+        }
+        val adaptador = lista.adapter as? HallazgoAdapter
+            ?: HallazgoAdapter { abrirFicha(it) }.also { lista.adapter = it }
+        adaptador.submitList(hallazgos)
+    }
+
+    private fun abrirFicha(hallazgo: Hallazgo) {
+        val destino = when (hallazgo.tipo) {
+            TipoDeHallazgo.SERIE ->
+                Intent(context, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, hallazgo.id)
+            else ->
+                Intent(context, MovieA::class.java).putExtra("MOVIE_ID", hallazgo.id)
+        }
+        startActivity(destino)
     }
 
     private fun setupSwipeRefreshLayout() {

@@ -46,6 +46,16 @@ class ExplorarF : Fragment() {
 
     private lateinit var resultadosAdapter: HallazgoAdapter
 
+    /**
+     * Para poder escribir en el campo sin que salga a buscar.
+     *
+     * Al tocar un genero se pone su nombre en la barra para que se vea que estas viendo, pero
+     * la busqueda ya la ha lanzado explorarGenero. Sin esta bandera, el setText disparaba el
+     * oyente del texto y se buscaba "Accion" por titulo, que devuelve "Maridos en accion" y
+     * "Granjas en accion" en vez de peliculas de accion.
+     */
+    private var textoPuestoPorCodigo = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -86,6 +96,12 @@ class ExplorarF : Fragment() {
             val consulta = texto?.toString().orEmpty()
             binding.clearSearchIcon.visibility =
                 if (consulta.isEmpty()) View.GONE else View.VISIBLE
+
+            if (textoPuestoPorCodigo) {
+                textoPuestoPorCodigo = false
+                return@doAfterTextChanged
+            }
+
             explorarViewModel.buscar(consulta)
             decidirQueSeVe()
         }
@@ -187,6 +203,9 @@ class ExplorarF : Fragment() {
                 if (tendencias.isEmpty()) View.GONE else View.VISIBLE
             binding.rvTendencias.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            if (binding.rvTendencias.itemDecorationCount == 0) {
+                binding.rvTendencias.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
+            }
             val adaptador = HallazgoAdapter { abrir(it) }
             binding.rvTendencias.adapter = adaptador
             adaptador.submitList(tendencias)
@@ -199,6 +218,9 @@ class ExplorarF : Fragment() {
                 if (historial.isEmpty()) View.GONE else View.VISIBLE
             binding.rvHistorial.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            if (binding.rvHistorial.itemDecorationCount == 0) {
+                binding.rvHistorial.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
+            }
             binding.rvHistorial.adapter = MovieAdapter(historial)
         }
 
@@ -258,8 +280,13 @@ class ExplorarF : Fragment() {
         generos.forEach { genero ->
             binding.contenedorGeneros.addView(chip(genero.name) {
                 explorarViewModel.explorarGenero(genero)
+                // El nombre va a la barra solo para que se vea que estas mirando, pero sin
+                // volver a buscar: los resultados los trae explorarGenero, por genero de
+                // verdad y no por lo que ponga en el titulo.
+                textoPuestoPorCodigo = true
                 binding.searchInput.setText(genero.name)
                 esconderTeclado()
+                decidirQueSeVe()
             })
         }
     }
