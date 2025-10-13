@@ -133,6 +133,29 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<GenresResponse>
 
+    /**
+     * Los generos de series.
+     *
+     * Van aparte de los de cine porque TMDB usa otros ids: "Accion" es el 28 en peliculas,
+     * pero en series no existe como tal y esta dentro de "Action & Adventure", que es el
+     * 10759. Con el id de pelicula, discover/tv devuelve cualquier cosa.
+     */
+    @GET("genre/tv/list")
+    fun getGenerosDeSeries(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<GenresResponse>
+
+    @GET("discover/tv")
+    fun descubrirSeries(
+        @Query("api_key") apiKey: String,
+        @Query("with_genres") generos: String,
+        @Query("sort_by") orden: String = "popularity.desc",
+        @Query("vote_count.gte") votosMinimos: Int = 100,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
+        @Query("page") page: Int = 1
+    ): Call<SeriesResponse>
+
     // ---- Personas (actores y directores) ----
 
     @GET("person/{person_id}")

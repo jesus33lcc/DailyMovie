@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.dailymovie.data.Dependencias
 import com.example.dailymovie.data.MovieRepository
 import com.example.dailymovie.data.Resultado
+import com.example.dailymovie.data.SerieRepository
 import com.example.dailymovie.data.UserRepository
+import com.example.dailymovie.models.GeneroExplorable
 import com.example.dailymovie.models.GenreModel
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.MovieModel
@@ -27,6 +29,7 @@ enum class OrdenDeBusqueda { RELEVANCIA, NOTA, ANO }
 
 class ExplorarViewModel(
     private val peliculas: MovieRepository = Dependencias.peliculas,
+    private val series: SerieRepository = Dependencias.series,
     private val usuario: UserRepository = Dependencias.usuario
 ) : ViewModel() {
 
@@ -39,8 +42,8 @@ class ExplorarViewModel(
     private val _tendencias = MutableLiveData<List<Hallazgo>>()
     val tendencias: LiveData<List<Hallazgo>> get() = _tendencias
 
-    private val _generos = MutableLiveData<List<GenreModel>>()
-    val generos: LiveData<List<GenreModel>> get() = _generos
+    private val _generos = MutableLiveData<List<GeneroExplorable>>()
+    val generos: LiveData<List<GeneroExplorable>> get() = _generos
 
     private val _history = MutableLiveData<List<MovieModel>>()
     val history: LiveData<List<MovieModel>> get() = _history
@@ -140,11 +143,59 @@ class ExplorarViewModel(
         }
     }
 
+    /**
+     * Junta los generos de cine y los de television en una sola lista de chips.
+     *
+     * Se esperan las dos respuestas antes de pintar nada: si no, saldrian primero los de
+     * cine y los chips se moverian solos al llegar los de series.
+     */
     fun cargarGeneros() {
         if (_generos.value?.isNotEmpty() == true) return
-        peliculas.generos { resultado ->
-            if (resultado is Resultado.Exito) _generos.value = resultado.datos
+
+        var deCine: List<GenreModel>? = null
+        var deSeries: List<GenreModel>? = null
+
+        fun combinarSiEstanLos2() {
+            val cine = deCine ?: return
+            val series = deSeries ?: return
+            _generos.value = combinar(cine, series)
         }
+
+        peliculas.generos { resultado ->
+            deCine = (resultado as? Resultado.Exito)?.datos.orEmpty()
+            combinarSiEstanLos2()
+        }
+        this.series.generos { resultado ->
+            deSeries = (resultado as? Resultado.Exito)?.datos.orEmpty()
+            combinarSiEstanLos2()
+        }
+    }
+
+    /**
+     * Cruza las dos listas de generos.
+     *
+     * Primero por nombre, que es lo que casa en la mayoria (Comedia, Drama, Crimen...), y
+     * para los que TMDB no traduce o agrupa de otra forma se tira del puente de a mano.
+     * Los generos que solo existen en series (Reality, Talk Show, Kids) se añaden al final,
+     * porque tambien hay que poder explorarlos.
+     */
+    private fun combinar(cine: List<GenreModel>, series: List<GenreModel>): List<GeneroExplorable> {
+        val seriesPorNombre = series.associateBy { it.name.lowercase() }
+        val usadosDeSeries = mutableSetOf<Int>()
+
+        val combinados = cine.map { genero ->
+            val porNombre = seriesPorNombre[genero.name.lowercase()]?.id
+            val porPuente = GeneroExplorable.PUENTE_A_SERIES[genero.name.lowercase()]
+            val idSerie = porNombre ?: porPuente
+            idSerie?.let { usadosDeSeries.add(it) }
+            GeneroExplorable(genero.name, genero.id, idSerie)
+        }
+
+        val soloDeSeries = series
+            .filter { it.id !in usadosDeSeries }
+            .map { GeneroExplorable(it.name, null, it.id) }
+
+        return combinados + soloDeSeries
     }
 
     /**
@@ -154,30 +205,56 @@ class ExplorarViewModel(
      * Los resultados se meten en la misma rejilla, asi que tocar un genero se comporta igual
      * que escribir algo: mismos filtros y mismas tarjetas.
      */
-    fun explorarGenero(genero: GenreModel) {
+    /**
+     * Enseña lo mas popular de un genero, con peliculas y series juntas.
+     *
+     * Se piden las dos cosas y se espera a las dos antes de pintar. Al principio esto solo
+     * traia peliculas, porque discover/movie es lo unico que se estaba usando y las series
+     * no aparecian por ningun lado.
+     */
+    fun explorarGenero(genero: GeneroExplorable) {
         trabajoDeBusqueda?.cancel()
-        consultaActual = genero.name
+        consultaActual = genero.nombre
         _cargando.value = true
 
-        peliculas.porGeneros(listOf(genero.id)) { resultado ->
+        var deCine: List<Hallazgo>? = if (genero.idPelicula == null) emptyList() else null
+        var deSeries: List<Hallazgo>? = if (genero.idSerie == null) emptyList() else null
+
+        fun publicarSiEstaTodo() {
+            val cine = deCine ?: return
+            val series = deSeries ?: return
             _cargando.value = false
-            if (resultado is Resultado.Exito) {
-                todosLosResultados = resultado.datos.map { pelicula ->
-                    Hallazgo(
-                        id = pelicula.id,
-                        titulo = pelicula.title,
-                        subtitulo = pelicula.releaseDate,
-                        imagen = pelicula.posterPath,
-                        nota = pelicula.voteAverage,
-                        tipo = TipoDeHallazgo.PELICULA
-                    )
-                }
-                aplicarFiltro()
-                _sinResultados.value = todosLosResultados.isEmpty()
-            } else if (resultado is Resultado.Fallo) {
-                _error.value = resultado.motivo
+            // Se alternan para que la rejilla no salga con todas las peliculas primero y
+            // las series al final, que pareceria que estan separadas.
+            todosLosResultados = intercalar(cine, series)
+            aplicarFiltro()
+            _sinResultados.value = todosLosResultados.isEmpty()
+        }
+
+        genero.idPelicula?.let { id ->
+            peliculas.porGeneros(listOf(id)) { resultado ->
+                deCine = (resultado as? Resultado.Exito)?.datos?.map { Hallazgo.de(it) }.orEmpty()
+                publicarSiEstaTodo()
             }
         }
+        genero.idSerie?.let { id ->
+            series.porGeneros(listOf(id)) { resultado ->
+                deSeries = (resultado as? Resultado.Exito)?.datos?.map { Hallazgo.de(it) }.orEmpty()
+                publicarSiEstaTodo()
+            }
+        }
+        publicarSiEstaTodo()
+    }
+
+    /** Uno de cada, para que peliculas y series salgan mezcladas en la rejilla. */
+    private fun intercalar(unos: List<Hallazgo>, otros: List<Hallazgo>): List<Hallazgo> {
+        val mezcla = mutableListOf<Hallazgo>()
+        val maximo = maxOf(unos.size, otros.size)
+        for (i in 0 until maximo) {
+            unos.getOrNull(i)?.let { mezcla += it }
+            otros.getOrNull(i)?.let { mezcla += it }
+        }
+        return mezcla
     }
 
     /** Una al azar de lo que esta en tendencia, para el "no se que ver". */
