@@ -7,6 +7,7 @@ import com.example.dailymovie.client.response.CreditResponse
 import com.example.dailymovie.client.response.ProviderResponse
 import com.example.dailymovie.client.response.SeasonResponse
 import com.example.dailymovie.client.response.SerieDetailsResponse
+import com.example.dailymovie.models.GenreModel
 import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Constantes
@@ -30,6 +31,12 @@ interface SerieRepository {
     fun reparto(serieId: Int, alTerminar: (Resultado<CreditResponse>) -> Unit)
     fun videos(serieId: Int, alTerminar: (Resultado<List<VideoModel>>) -> Unit)
     fun plataformas(serieId: Int, alTerminar: (Resultado<ProviderResponse>) -> Unit)
+
+    /** Los generos de series, que tienen sus propios ids distintos a los de cine. */
+    fun generos(alTerminar: (Resultado<List<GenreModel>>) -> Unit)
+
+    /** Series de un genero, ordenadas por popularidad. */
+    fun porGeneros(generos: List<Int>, alTerminar: (Resultado<List<SerieModel>>) -> Unit)
 }
 
 class TmdbSerieRepository(
@@ -97,4 +104,14 @@ class TmdbSerieRepository(
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
+
+    override fun generos(alTerminar: (Resultado<List<GenreModel>>) -> Unit) {
+        servicio.getGenerosDeSeries(apiKey).enqueueSimple(
+            onExito = { alTerminar(Resultado.Exito(it.generos)) },
+            onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    override fun porGeneros(generos: List<Int>, alTerminar: (Resultado<List<SerieModel>>) -> Unit) =
+        listaDeSeries(servicio.descubrirSeries(apiKey, generos.joinToString(",")), alTerminar)
 }

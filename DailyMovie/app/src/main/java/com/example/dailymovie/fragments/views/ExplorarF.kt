@@ -25,7 +25,7 @@ import com.example.dailymovie.databinding.FragmentExplorarBinding
 import com.example.dailymovie.fragments.viewmodels.ExplorarViewModel
 import com.example.dailymovie.fragments.viewmodels.OrdenDeBusqueda
 import com.example.dailymovie.graphics.SpacingItemDecoration
-import com.example.dailymovie.models.GenreModel
+import com.example.dailymovie.models.GeneroExplorable
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.utils.BusquedasRecientes
@@ -273,18 +273,18 @@ class ExplorarF : Fragment() {
         }
     }
 
-    private fun pintarGeneros(generos: List<GenreModel>) {
+    private fun pintarGeneros(generos: List<GeneroExplorable>) {
         binding.seccionGeneros.visibility = if (generos.isEmpty()) View.GONE else View.VISIBLE
         binding.contenedorGeneros.removeAllViews()
 
         generos.forEach { genero ->
-            binding.contenedorGeneros.addView(chip(genero.name) {
+            binding.contenedorGeneros.addView(chip(genero.nombre) {
                 explorarViewModel.explorarGenero(genero)
                 // El nombre va a la barra solo para que se vea que estas mirando, pero sin
                 // volver a buscar: los resultados los trae explorarGenero, por genero de
                 // verdad y no por lo que ponga en el titulo.
                 textoPuestoPorCodigo = true
-                binding.searchInput.setText(genero.name)
+                binding.searchInput.setText(genero.nombre)
                 esconderTeclado()
                 decidirQueSeVe()
             })
