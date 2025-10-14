@@ -56,6 +56,16 @@ class ExplorarF : Fragment() {
      */
     private var textoPuestoPorCodigo = false
 
+    /**
+     * Para volver arriba cuando cambia el orden o el filtro.
+     *
+     * Al reordenar, el RecyclerView intenta no perder de vista lo que estabas mirando y
+     * sigue a esa tarjeta a su sitio nuevo: si ordenabas por nota y "La odisea" se iba al
+     * puesto quince, la pantalla bajaba hasta alli. Lo que uno espera al ordenar es ver lo
+     * primero de la lista nueva.
+     */
+    private var volverArriba = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -145,6 +155,7 @@ class ExplorarF : Fragment() {
             binding.chipPersonas to TipoDeHallazgo.PERSONA
         ).forEach { (chip, tipo) ->
             chip.setOnClickListener {
+                volverArriba = true
                 explorarViewModel.cambiarFiltro(explorarViewModel.filtro.copy(tipo = tipo))
                 pintarChips()
             }
@@ -159,6 +170,7 @@ class ExplorarF : Fragment() {
                         R.id.orden_ano -> OrdenDeBusqueda.ANO
                         else -> OrdenDeBusqueda.RELEVANCIA
                     }
+                    volverArriba = true
                     explorarViewModel.cambiarFiltro(explorarViewModel.filtro.copy(orden = orden))
                     true
                 }
@@ -187,7 +199,14 @@ class ExplorarF : Fragment() {
 
     private fun observarViewModel() {
         explorarViewModel.resultados.observe(viewLifecycleOwner) { hallazgos ->
-            resultadosAdapter.submitList(hallazgos)
+            // El subir se hace en el callback, cuando la lista nueva ya esta pintada: antes
+            // de eso el RecyclerView todavia tiene las posiciones viejas.
+            resultadosAdapter.submitList(hallazgos) {
+                if (volverArriba) {
+                    volverArriba = false
+                    binding.rvListaBusqueda.scrollToPosition(0)
+                }
+            }
             pintarChips()
             decidirQueSeVe()
         }
