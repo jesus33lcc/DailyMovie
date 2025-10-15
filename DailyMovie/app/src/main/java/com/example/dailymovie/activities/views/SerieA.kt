@@ -3,7 +3,6 @@ package com.example.dailymovie.activities.views
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,6 +26,7 @@ import com.example.dailymovie.utils.DialogoDailyMovie
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.utils.LocaleUtil
 import com.example.dailymovie.utils.mensaje
+import com.example.dailymovie.utils.Avisos
 
 /**
  * Ficha de una serie.
@@ -50,7 +50,7 @@ class SerieA : AppCompatActivity() {
 
         val serieId = intent.getIntExtra(EXTRA_SERIE_ID, -1)
         if (serieId == -1) {
-            Toast.makeText(this, "No se ha podido abrir la serie", Toast.LENGTH_SHORT).show()
+            Avisos.breve(binding.root, "No se ha podido abrir la serie")
             finish()
             return
         }
@@ -99,7 +99,7 @@ class SerieA : AppCompatActivity() {
 
         viewModel.error.observe(this) { error ->
             error?.let {
-                Toast.makeText(this, getString(it.mensaje()), Toast.LENGTH_SHORT).show()
+                Avisos.breve(binding.root, getString(it.mensaje()))
                 viewModel.errorMostrado()
             }
         }
@@ -278,7 +278,7 @@ class SerieA : AppCompatActivity() {
             meter.isEmpty() && sacar.isNotEmpty() -> "Quitada de ${sacar.joinToString(", ")}"
             else -> "Listas actualizadas"
         }
-        Toast.makeText(this, aviso, Toast.LENGTH_SHORT).show()
+        Avisos.breve(binding.root, aviso)
     }
 
     private fun compartir(serie: SerieModel) {

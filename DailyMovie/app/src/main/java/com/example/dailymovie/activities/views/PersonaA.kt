@@ -2,7 +2,6 @@ package com.example.dailymovie.activities.views
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +16,7 @@ import com.example.dailymovie.models.PersonModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.utils.mensaje
+import com.example.dailymovie.utils.Avisos
 
 /**
  * Ficha de una persona del cine: vale igual para un actor que para un director.
@@ -37,7 +37,7 @@ class PersonaA : AppCompatActivity() {
 
         val personaId = intent.getIntExtra(EXTRA_PERSONA_ID, -1)
         if (personaId == -1) {
-            Toast.makeText(this, "No se ha podido abrir la ficha", Toast.LENGTH_SHORT).show()
+            Avisos.breve(binding.root, "No se ha podido abrir la ficha")
             finish()
             return
         }
@@ -53,7 +53,7 @@ class PersonaA : AppCompatActivity() {
         viewModel.filmografia.observe(this) { pintarFilmografia(it) }
         viewModel.error.observe(this) { error ->
             error?.let {
-                Toast.makeText(this, getString(it.mensaje()), Toast.LENGTH_SHORT).show()
+                Avisos.breve(binding.root, getString(it.mensaje()))
                 viewModel.errorMostrado()
             }
         }

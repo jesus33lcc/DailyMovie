@@ -4,7 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
+import android.view.View
 import com.example.dailymovie.R
 
 /**
@@ -21,8 +21,15 @@ object Trailers {
     /** Miniatura oficial del video. La sirve YouTube sin necesidad de clave. */
     fun miniatura(videoId: String) = "https://img.youtube.com/vi/$videoId/hqdefault.jpg"
 
-    /** Abre la app de YouTube y, si no esta instalada, tira del navegador. */
-    fun abrir(context: Context, videoId: String) {
+    /**
+     * Abre la app de YouTube y, si no esta instalada, tira del navegador.
+     *
+     * Recibe la vista y no el contexto porque el aviso de que no se ha podido abrir sale
+     * como Snackbar, que necesita una vista de la pantalla. Un Toast no valdria: desde
+     * Android 12 no se pueden vestir y saldria con la caja gris del sistema.
+     */
+    fun abrir(vista: View, videoId: String) {
+        val context = vista.context
         val enLaApp = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:$videoId"))
         val enElNavegador = Intent(
             Intent.ACTION_VIEW,
@@ -35,11 +42,7 @@ object Trailers {
             try {
                 context.startActivity(enElNavegador)
             } catch (e: ActivityNotFoundException) {
-                Toast.makeText(
-                    context,
-                    context.getString(R.string.error_abrir_trailer),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Avisos.breve(vista, context.getString(R.string.error_abrir_trailer))
             }
         }
     }

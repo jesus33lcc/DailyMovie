@@ -39,7 +39,7 @@ class VideoAdapter(private val videoList: List<VideoModel>) :
         holder.miniatura.cargarFotogramaDeUrl(Trailers.miniatura(video.key))
 
         holder.contenedor.setOnClickListener {
-            Trailers.abrir(contexto, video.key)
+            Trailers.abrir(holder.itemView, video.key)
         }
 
         holder.txtVideoName.text = video.name

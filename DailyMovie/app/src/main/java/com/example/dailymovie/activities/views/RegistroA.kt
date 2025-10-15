@@ -4,13 +4,13 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dailymovie.activities.viewmodels.RegistroViewModel
 import com.example.dailymovie.databinding.ActivityRegistroBinding
 import com.example.dailymovie.utils.AccesoGoogle
+import com.example.dailymovie.utils.Avisos
 
 class RegistroA : AppCompatActivity() {
 
@@ -76,6 +76,6 @@ class RegistroA : AppCompatActivity() {
     }
 
     private fun avisar(texto: String) {
-        Toast.makeText(this, texto, Toast.LENGTH_SHORT).show()
+        Avisos.breve(binding.root, texto)
     }
 }

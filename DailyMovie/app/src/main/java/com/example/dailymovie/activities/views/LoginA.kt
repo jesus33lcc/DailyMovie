@@ -7,11 +7,13 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dailymovie.activities.viewmodels.LoginViewModel
 import com.example.dailymovie.databinding.ActivityLoginBinding
 import com.example.dailymovie.utils.AccesoGoogle
+import com.example.dailymovie.utils.Avisos
+import com.example.dailymovie.utils.DialogoDailyMovie
+import com.example.dailymovie.R
 
 class LoginA : AppCompatActivity() {
 
@@ -91,36 +93,36 @@ class LoginA : AppCompatActivity() {
      * mismo, que es lo logico si has olvidado la contraseña.
      */
     private fun mostrarRecuperarContrasena() {
-        val campo = android.widget.EditText(this).apply {
+        // El mismo campo que el resto de dialogos, en vez de un EditText suelto sin margenes.
+        val contenido = layoutInflater.inflate(R.layout.dialogo_campo_texto, null)
+        val campo = contenido.findViewById<android.widget.EditText>(R.id.dialogoCampo).apply {
             hint = "Tu correo electrónico"
             inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
             setText(binding.loginEmailEdittxt.text.toString())
-            setPadding(48, 32, 48, 32)
         }
 
-        AlertDialog.Builder(this)
-            .setTitle("Recuperar contraseña")
-            .setMessage(
-                "Te mandamos un correo con un enlace para poner una contraseña nueva.\n\n" +
-                    "Si no te llega en unos minutos, mira en la carpeta de spam."
-            )
-            .setView(campo)
-            .setPositiveButton("Enviar") { _, _ ->
-                viewModel.recuperarContrasena(campo.text.toString())
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        DialogoDailyMovie.mostrar(
+            context = this,
+            titulo = "Recuperar contraseña",
+            mensaje = "Te mandamos un correo con un enlace para poner una contraseña nueva.\n\n" +
+                "Si no te llega en unos minutos, mira en la carpeta de spam.",
+            contenido = contenido,
+            textoAceptar = "Enviar"
+        ) { dialogo ->
+            dialogo.dismiss()
+            viewModel.recuperarContrasena(campo.text.toString())
+        }
     }
 
     private fun mostrarCorreoEnviado() {
-        AlertDialog.Builder(this)
-            .setTitle("Correo enviado")
-            .setMessage(
-                "Ya te hemos mandado el enlace. Ábrelo desde el móvil, elige tu contraseña " +
-                    "nueva y vuelve aquí a iniciar sesión."
-            )
-            .setPositiveButton("Entendido", null)
-            .show()
+        DialogoDailyMovie.mostrar(
+            context = this,
+            titulo = "Correo enviado",
+            mensaje = "Ya te hemos mandado el enlace. Ábrelo desde el móvil, elige tu contraseña " +
+                "nueva y vuelve aquí a iniciar sesión.",
+            textoAceptar = "Entendido",
+            textoCancelar = null
+        ) { it.dismiss() }
     }
 
     private fun irALaPrincipal() {
@@ -129,7 +131,7 @@ class LoginA : AppCompatActivity() {
     }
 
     private fun avisar(texto: String) {
-        Toast.makeText(this, texto, Toast.LENGTH_SHORT).show()
+        Avisos.breve(binding.root, texto)
     }
 
     override fun onStart() {

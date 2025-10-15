@@ -7,8 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.dailymovie.R
@@ -18,6 +17,8 @@ import com.example.dailymovie.databinding.FragmentSettingsBinding
 import com.example.dailymovie.fragments.viewmodels.SettingsViewModel
 import com.example.dailymovie.utils.Analitica
 import com.example.dailymovie.utils.LocaleUtil
+import com.example.dailymovie.utils.Avisos
+import com.example.dailymovie.utils.DialogoDailyMovie
 
 class Settings : Fragment() {
 
@@ -55,7 +56,7 @@ class Settings : Fragment() {
 
         viewModel.mensaje.observe(viewLifecycleOwner) { texto ->
             texto?.let {
-                Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+                Avisos.breve(binding.root, it)
                 viewModel.mensajeMostrado()
             }
         }
@@ -71,42 +72,38 @@ class Settings : Fragment() {
      * se cambia en los ajustes de Android y no dentro de la app.
      */
     private fun mostrarRegion() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Región e idioma")
-            .setMessage(
-                "Ahora mismo: ${LocaleUtil.getDeviceCountry()} · ${LocaleUtil.getDeviceLanguage()}\n\n" +
-                    "Con esto decidimos en qué idioma te enseñamos las películas y qué " +
-                    "plataformas de streaming te salen, porque no son las mismas en cada país.\n\n" +
-                    "Se coge de los ajustes del móvil. Si lo cambias ahí, la app te sigue."
-            )
-            .setPositiveButton("Abrir ajustes del móvil") { _, _ ->
-                startActivity(Intent(android.provider.Settings.ACTION_LOCALE_SETTINGS))
-            }
-            .setNegativeButton("Cerrar", null)
-            .show()
+        DialogoDailyMovie.mostrar(
+            context = requireContext(),
+            titulo = "Región e idioma",
+            mensaje = "Ahora mismo: ${LocaleUtil.getDeviceCountry()} · ${LocaleUtil.getDeviceLanguage()}\n\n" +
+                "Con esto decidimos en qué idioma te enseñamos las películas y qué " +
+                "plataformas de streaming te salen, porque no son las mismas en cada país.\n\n" +
+                "Se coge de los ajustes del móvil. Si lo cambias ahí, la app te sigue.",
+            textoAceptar = "Abrir ajustes del móvil",
+            textoCancelar = "Cerrar"
+        ) { dialogo ->
+            dialogo.dismiss()
+            startActivity(Intent(android.provider.Settings.ACTION_LOCALE_SETTINGS))
+        }
     }
 
     private fun confirmarBorrarHistorial() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Borrar historial")
-            .setMessage("Se borra todo lo que has buscado. Tus listas y favoritos no se tocan.")
-            .setPositiveButton("Borrar") { _, _ ->
-                viewModel.borrarHistorial { bien ->
-                    val texto = if (bien) "Historial borrado" else "No se ha podido borrar"
-                    Toast.makeText(requireContext(), texto, Toast.LENGTH_SHORT).show()
-                }
+        DialogoDailyMovie.confirmar(
+            context = requireContext(),
+            titulo = "Borrar historial",
+            mensaje = "Se borra todo lo que has buscado. Tus listas y favoritos no se tocan.",
+            textoAceptar = "Borrar",
+            peligroso = true
+        ) {
+            viewModel.borrarHistorial { bien ->
+                Avisos.breve(binding.root, if (bien) "Historial borrado" else "No se ha podido borrar")
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        }
     }
 
     private fun mostrarCambiarContrasena() {
         if (!viewModel.entroConCorreo()) {
-            Toast.makeText(
-                requireContext(),
-                "Entraste con Google, así que la contraseña se cambia desde tu cuenta de Google",
-                Toast.LENGTH_LONG
-            ).show()
+            Avisos.largo(binding.root, "Entraste con Google, así que la contraseña se cambia desde tu cuenta de Google")
             return
         }
 
@@ -115,33 +112,38 @@ class Settings : Fragment() {
         val nueva = vista.findViewById<EditText>(R.id.editTextNewPassword)
         val repetida = vista.findViewById<EditText>(R.id.editTextConfirmPassword)
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Cambiar contraseña")
-            .setView(vista)
-            .setPositiveButton("Cambiar") { _, _ ->
-                val laActual = actual.text.toString()
-                val laNueva = nueva.text.toString()
-                when {
-                    laActual.isEmpty() || laNueva.isEmpty() ->
-                        avisar("Rellena las dos contraseñas")
-                    laNueva != repetida.text.toString() ->
-                        avisar("Las dos contraseñas nuevas no coinciden")
-                    laNueva.length < 6 ->
-                        avisar("La contraseña necesita al menos 6 caracteres")
-                    else -> viewModel.cambiarContrasena(laActual, laNueva)
+        DialogoDailyMovie.mostrar(
+            context = requireContext(),
+            titulo = "Cambiar contraseña",
+            contenido = vista,
+            textoAceptar = "Cambiar"
+        ) { dialogo ->
+            val laActual = actual.text.toString()
+            val laNueva = nueva.text.toString()
+            when {
+                laActual.isEmpty() || laNueva.isEmpty() ->
+                    avisar("Rellena las dos contraseñas")
+                laNueva != repetida.text.toString() ->
+                    avisar("Las dos contraseñas nuevas no coinciden")
+                laNueva.length < 6 ->
+                    avisar("La contraseña necesita al menos 6 caracteres")
+                else -> {
+                    dialogo.dismiss()
+                    viewModel.cambiarContrasena(laActual, laNueva)
                 }
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        }
     }
 
     private fun confirmarCerrarSesion() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Cerrar sesión")
-            .setMessage("¿Seguro? Tus listas se quedan guardadas para cuando vuelvas.")
-            .setPositiveButton("Cerrar sesión") { _, _ -> viewModel.cerrarSesion() }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        DialogoDailyMovie.confirmar(
+            context = requireContext(),
+            titulo = "Cerrar sesión",
+            mensaje = "¿Seguro? Tus listas se quedan guardadas para cuando vuelvas.",
+            textoAceptar = "Cerrar sesión"
+        ) {
+            viewModel.cerrarSesion()
+        }
     }
 
     private fun abrirPoliticaDePrivacidad() {
@@ -159,21 +161,19 @@ class Settings : Fragment() {
      */
     private fun mostrarConsentimiento() {
         val activada = Analitica.estaActivada(requireContext())
-        AlertDialog.Builder(requireContext())
-            .setTitle("Datos de uso")
-            .setMessage(
-                "Recogemos datos anónimos de cómo se usa la app (qué pantallas se abren, " +
-                    "si algo falla) para saber qué mejorar.\n\n" +
-                    "No incluye lo que ves ni tus listas, y puedes desactivarlo cuando quieras.\n\n" +
-                    "Ahora mismo está ${if (activada) "activado" else "desactivado"}."
-            )
-            .setPositiveButton(if (activada) "Desactivar" else "Activar") { _, _ ->
-                Analitica.activar(requireContext(), !activada)
-                val texto = if (activada) "Datos de uso desactivados" else "Datos de uso activados"
-                Toast.makeText(requireContext(), texto, Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton("Cerrar", null)
-            .show()
+        DialogoDailyMovie.confirmar(
+            context = requireContext(),
+            titulo = "Datos de uso",
+            mensaje = "Recogemos datos anónimos de cómo se usa la app (qué pantallas se abren, " +
+                "si algo falla) para saber qué mejorar.\n\n" +
+                "No incluye lo que ves ni tus listas, y puedes desactivarlo cuando quieras.\n\n" +
+                "Ahora mismo está ${if (activada) "activado" else "desactivado"}.",
+            textoAceptar = if (activada) "Desactivar" else "Activar"
+        ) {
+            Analitica.activar(requireContext(), !activada)
+            val texto = if (activada) "Datos de uso desactivados" else "Datos de uso activados"
+            Avisos.breve(binding.root, texto)
+        }
     }
 
     /**
@@ -181,16 +181,17 @@ class Settings : Fragment() {
      * borrar de verdad los datos, no solo cerrar sesion.
      */
     private fun confirmarBorrarCuenta() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Borrar mi cuenta")
-            .setMessage(
-                "Se borra tu cuenta y todo lo que tenemos guardado: favoritos, vistos, " +
-                    "listas, historial y tus gustos.\n\n" +
-                    "Esto no se puede deshacer."
-            )
-            .setPositiveButton("Continuar") { _, _ -> pedirContrasenaYBorrar() }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        DialogoDailyMovie.confirmar(
+            context = requireContext(),
+            titulo = "Borrar mi cuenta",
+            mensaje = "Se borra tu cuenta y todo lo que tenemos guardado: favoritos, vistos, " +
+                "listas, historial y tus gustos.\n\n" +
+                "Esto no se puede deshacer.",
+            textoAceptar = "Continuar",
+            peligroso = true
+        ) {
+            pedirContrasenaYBorrar()
+        }
     }
 
     private fun pedirContrasenaYBorrar() {
@@ -200,27 +201,34 @@ class Settings : Fragment() {
             return
         }
 
-        val campo = EditText(requireContext()).apply {
+        // El mismo campo que usa el dialogo de crear lista, para no montar otro a mano.
+        val contenido = layoutInflater.inflate(R.layout.dialogo_campo_texto, null)
+        val campo = contenido.findViewById<EditText>(R.id.dialogoCampo).apply {
             hint = "Tu contraseña"
             inputType = android.text.InputType.TYPE_CLASS_TEXT or
                 android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            setPadding(48, 32, 48, 32)
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Confirma que eres tú")
-            .setMessage("Escribe tu contraseña para poder borrar la cuenta.")
-            .setView(campo)
-            .setPositiveButton("Borrar definitivamente") { _, _ ->
-                val contrasena = campo.text.toString()
-                if (contrasena.isEmpty()) {
-                    avisar("Escribe tu contraseña")
-                } else {
-                    viewModel.borrarCuenta(contrasena)
+        DialogoDailyMovie.mostrar(
+            context = requireContext(),
+            titulo = "Confirma que eres tú",
+            mensaje = "Escribe tu contraseña para poder borrar la cuenta.",
+            contenido = contenido,
+            textoAceptar = "Borrar definitivamente",
+            peligroso = true
+        ) { dialogo ->
+            val contrasena = campo.text.toString()
+            if (contrasena.isEmpty()) {
+                // Se deja abierto: cerrarlo obligaria a empezar de cero.
+                contenido.findViewById<TextView>(R.id.dialogoAviso).apply {
+                    text = "Escribe tu contraseña"
+                    visibility = View.VISIBLE
                 }
+            } else {
+                dialogo.dismiss()
+                viewModel.borrarCuenta(contrasena)
             }
-            .setNegativeButton("Cancelar", null)
-            .show()
+        }
     }
 
     private fun irALogin() {
@@ -230,7 +238,7 @@ class Settings : Fragment() {
     }
 
     private fun avisar(texto: String) {
-        Toast.makeText(requireContext(), texto, Toast.LENGTH_SHORT).show()
+        Avisos.breve(binding.root, texto)
     }
 
     override fun onDestroyView() {

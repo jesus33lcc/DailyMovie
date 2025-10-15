@@ -28,6 +28,7 @@ import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.utils.DialogoDailyMovie
 import com.example.dailymovie.utils.LocaleUtil
 import com.example.dailymovie.utils.mensaje
+import com.example.dailymovie.utils.Avisos
 
 class MovieA : AppCompatActivity() {
 
@@ -466,7 +467,7 @@ class MovieA : AppCompatActivity() {
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        Avisos.breve(binding.root, message)
     }
 
 }

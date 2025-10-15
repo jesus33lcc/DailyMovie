@@ -3,7 +3,6 @@ package com.example.dailymovie.activities.views
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +11,7 @@ import com.example.dailymovie.activities.viewmodels.OnboardingViewModel
 import com.example.dailymovie.adapters.Elegible
 import com.example.dailymovie.adapters.ElegibleAdapter
 import com.example.dailymovie.databinding.ActivityOnboardingBinding
+import com.example.dailymovie.utils.Avisos
 
 /**
  * Las preguntas que se le hacen al usuario nada mas registrarse.
@@ -62,7 +62,7 @@ class OnboardingA : AppCompatActivity() {
 
         viewModel.guardado.observe(this) { guardado ->
             if (guardado == null) return@observe
-            if (!guardado) Toast.makeText(this, "No se han podido guardar tus gustos", Toast.LENGTH_SHORT).show()
+            if (!guardado) Avisos.breve(binding.root, "No se han podido guardar tus gustos")
             salir()
         }
 
@@ -100,7 +100,7 @@ class OnboardingA : AppCompatActivity() {
         when (paso) {
             PASO_GENEROS -> {
                 if (!viewModel.hayAlgunGenero()) {
-                    Toast.makeText(this, "Elige al menos un género, o toca \"Ahora no\"", Toast.LENGTH_SHORT).show()
+                    Avisos.breve(binding.root, "Elige al menos un género, o toca \"Ahora no\"")
                     return
                 }
                 paso = PASO_PELICULAS

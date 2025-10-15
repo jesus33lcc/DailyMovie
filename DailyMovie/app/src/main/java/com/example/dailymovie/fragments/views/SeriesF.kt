@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +18,7 @@ import com.example.dailymovie.databinding.FragmentSeriesBinding
 import com.example.dailymovie.fragments.viewmodels.SeriesViewModel
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.utils.mensaje
+import com.example.dailymovie.utils.Avisos
 
 /** La pestaña de series, con la misma pinta que la portada de peliculas. */
 class SeriesF : Fragment() {
@@ -58,7 +58,7 @@ class SeriesF : Fragment() {
 
         viewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
-                Toast.makeText(context, getString(it.mensaje()), Toast.LENGTH_SHORT).show()
+                Avisos.breve(binding.root, getString(it.mensaje()))
                 viewModel.errorMostrado()
             }
         }

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.widget.doAfterTextChanged
@@ -30,6 +29,7 @@ import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.utils.BusquedasRecientes
 import com.example.dailymovie.utils.mensaje
+import com.example.dailymovie.utils.Avisos
 
 /**
  * Explorar.
@@ -245,7 +245,7 @@ class ExplorarF : Fragment() {
 
         explorarViewModel.error.observe(viewLifecycleOwner) { error ->
             error?.let {
-                Toast.makeText(context, getString(it.mensaje()), Toast.LENGTH_SHORT).show()
+                Avisos.breve(binding.root, getString(it.mensaje()))
                 explorarViewModel.errorMostrado()
             }
         }
@@ -322,7 +322,7 @@ class ExplorarF : Fragment() {
     private fun sorprender() {
         val elegida = explorarViewModel.unaAlAzar()
         if (elegida == null) {
-            Toast.makeText(context, "Todavía no hay nada que proponerte", Toast.LENGTH_SHORT).show()
+            Avisos.breve(binding.root, "Todavía no hay nada que proponerte")
             return
         }
         abrir(elegida)
