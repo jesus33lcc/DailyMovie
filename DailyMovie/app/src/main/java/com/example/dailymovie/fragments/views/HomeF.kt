@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dailymovie.models.TipoDeHallazgo
@@ -29,6 +28,7 @@ import com.example.dailymovie.activities.views.MovieA
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.dailymovie.utils.Avisos
 
 class HomeF : Fragment() {
 
@@ -80,7 +80,7 @@ class HomeF : Fragment() {
 
         homeViewModel.error.observe(viewLifecycleOwner, Observer { error ->
             error?.let {
-                Toast.makeText(context, getString(it.mensaje()), Toast.LENGTH_SHORT).show()
+                Avisos.breve(binding.root, getString(it.mensaje()))
                 homeViewModel.errorMostrado()
             }
         })
@@ -166,7 +166,7 @@ class HomeF : Fragment() {
         binding.trailerThumbnail.cargarFotogramaDeUrl(Trailers.miniatura(videoId))
 
         binding.trailerContainer.setOnClickListener {
-            Trailers.abrir(requireContext(), videoId)
+            Trailers.abrir(binding.root, videoId)
         }
     }
 

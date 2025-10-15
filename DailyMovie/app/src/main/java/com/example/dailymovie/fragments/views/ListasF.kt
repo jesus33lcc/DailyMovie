@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.appcompat.view.ContextThemeWrapper
@@ -26,6 +25,7 @@ import com.example.dailymovie.activities.views.ListMoviesA
 import com.example.dailymovie.fragments.viewmodels.ListasViewModel
 import com.example.dailymovie.utils.DialogoDailyMovie
 import com.example.dailymovie.utils.mensaje
+import com.example.dailymovie.utils.Avisos
 
 class ListasF : Fragment() {
 
@@ -153,11 +153,7 @@ class ListasF : Fragment() {
                 }
                 else -> viewModel.createNewList(nombre) { resultado ->
                     dialogo.dismiss()
-                    Toast.makeText(
-                        context,
-                        getString(resultado.mensaje(), nombre),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Avisos.breve(binding.root, getString(resultado.mensaje(), nombre))
                 }
             }
         }
@@ -198,7 +194,7 @@ class ListasF : Fragment() {
                 // No hay que sacar la fila a mano: al borrarla el ViewModel recarga las
                 // listas y el comparador ve que falta esa.
                 val texto = if (borrada) "Lista eliminada" else "No se ha podido eliminar"
-                Toast.makeText(context, texto, Toast.LENGTH_SHORT).show()
+                Avisos.breve(binding.root, texto)
             }
         }
     }

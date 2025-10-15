@@ -3,7 +3,6 @@ package com.example.dailymovie.activities.views
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
@@ -148,7 +147,7 @@ class ListMoviesA : AppCompatActivity() {
             if (!bien) {
                 // No se pudo guardar, asi que la pelicula vuelve a su sitio: dejarla fuera
                 // seria mentirle al usuario, porque al volver a entrar reapareceria.
-                Toast.makeText(this, "No se ha podido quitar", Toast.LENGTH_SHORT).show()
+                Avisos.breve(binding.root, "No se ha podido quitar")
                 movieList.add(position.coerceAtMost(movieList.size), elemento)
                 movieListAdapter.submitList(movieList.toList())
             }

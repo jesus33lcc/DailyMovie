@@ -1,6 +1,7 @@
 package com.example.dailymovie.utils
 
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -18,6 +19,61 @@ import com.google.android.material.snackbar.Snackbar
 object Avisos {
 
     /**
+     * Un aviso corto, de los de "hecho" o "no se ha podido".
+     *
+     * Sustituye a los Toast. No es capricho: desde Android 12 el sistema **ignora** los Toast
+     * personalizados (setView esta desactivado por seguridad, para que ninguna app pueda
+     * imitar avisos del sistema), asi que un Toast siempre sale con la caja gris de Android
+     * y no hay forma de darle los colores ni la fuente de la app. Con la app en minSdk 33,
+     * eso significa que un Toast nunca se va a parecer al resto.
+     *
+     * El Snackbar si se puede vestir, sale en el mismo sitio y ademas no tapa nada.
+     */
+    fun breve(vista: View, texto: String) {
+        vestir(Snackbar.make(vista, texto, Snackbar.LENGTH_SHORT), vista).show()
+    }
+
+    /** Igual pero para textos que hay que leer con calma. */
+    fun largo(vista: View, texto: String) {
+        vestir(Snackbar.make(vista, texto, Snackbar.LENGTH_LONG), vista).show()
+    }
+
+    /**
+     * @param origen la vista desde la que se pidio el aviso. Hace falta para buscar la barra
+     *   de abajo: la vista del propio Snackbar todavia no esta metida en la pantalla cuando
+     *   se le da forma, asi que desde ella no se encuentra nada.
+     */
+    private fun vestir(aviso: Snackbar, origen: View): Snackbar {
+        val contexto = aviso.view.context
+
+        // Si la pantalla tiene la barra de abajo, el aviso sube por encima en vez de taparla:
+        // si no, se come los botones de navegar justo cuando uno podria querer irse.
+        //
+        // Se hace con margen y no con anchorView porque el anclaje de Material necesita un
+        // CoordinatorLayout, y las pantallas de la app no lo usan: se probó y el aviso seguía
+        // saliendo encima de la barra.
+        origen.rootView.findViewById<View>(R.id.nav_view)
+            ?.takeIf { it.visibility == View.VISIBLE && it.height > 0 }
+            ?.let { barra ->
+                (aviso.view.layoutParams as? ViewGroup.MarginLayoutParams)?.let { medidas ->
+                    medidas.bottomMargin += barra.height
+                    aviso.view.layoutParams = medidas
+                }
+            }
+
+        aviso.setBackgroundTint(ContextCompat.getColor(contexto, R.color.colorAccent))
+        aviso.setTextColor(ContextCompat.getColor(contexto, R.color.white))
+        aviso.setActionTextColor(ContextCompat.getColor(contexto, R.color.colorPrimary))
+        aviso.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)?.apply {
+            typeface = ResourcesCompat.getFont(contexto, R.font.courier_prime)
+            // Los avisos de la app pueden ser largos ("Ya tienes una lista con ese nombre"),
+            // y por defecto el Snackbar los corta en una linea.
+            maxLines = 3
+        }
+        return aviso
+    }
+
+    /**
      * Enseña el aviso y espera.
      *
      * Ojo con el orden: `alConfirmar` es donde va el borrado de verdad, y solo se llama si
@@ -31,17 +87,7 @@ object Avisos {
         alDeshacer: () -> Unit,
         alConfirmar: () -> Unit
     ) {
-        val contexto = vista.context
-        val aviso = Snackbar.make(vista, texto, Snackbar.LENGTH_LONG)
-
-        aviso.setBackgroundTint(ContextCompat.getColor(contexto, R.color.colorAccent))
-        aviso.setTextColor(ContextCompat.getColor(contexto, R.color.white))
-        aviso.setActionTextColor(ContextCompat.getColor(contexto, R.color.colorPrimary))
-
-        // El Snackbar no deja cambiar la fuente desde fuera, hay que buscar su TextView.
-        aviso.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-            ?.typeface = ResourcesCompat.getFont(contexto, R.font.courier_prime)
-
+        val aviso = vestir(Snackbar.make(vista, texto, Snackbar.LENGTH_LONG), vista)
         aviso.setAction(textoAccion) { alDeshacer() }
         aviso.addCallback(object : Snackbar.Callback() {
             override fun onDismissed(aviso: Snackbar?, evento: Int) {
