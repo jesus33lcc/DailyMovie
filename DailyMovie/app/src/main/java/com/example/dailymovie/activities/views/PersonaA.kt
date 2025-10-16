@@ -1,5 +1,6 @@
 package com.example.dailymovie.activities.views
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -8,7 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarFotoDePersona
 import com.example.dailymovie.activities.viewmodels.PersonaViewModel
-import com.example.dailymovie.adapters.PeliculaDePersonaAdapter
+import com.example.dailymovie.adapters.HallazgoAdapter
+import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.data.Filmografia
 import com.example.dailymovie.databinding.ActivityPersonaBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
@@ -106,11 +108,23 @@ class PersonaA : AppCompatActivity() {
     private fun pintarFilmografia(filmografia: Filmografia) {
         binding.seccionActuando.visibility =
             if (filmografia.actuando.isEmpty()) View.GONE else View.VISIBLE
-        binding.recyclerActuando.adapter = PeliculaDePersonaAdapter(filmografia.actuando)
+        pintarFilmografia(binding.recyclerActuando, filmografia.actuando)
 
         binding.seccionDirigiendo.visibility =
             if (filmografia.dirigiendo.isEmpty()) View.GONE else View.VISIBLE
-        binding.recyclerDirigiendo.adapter = PeliculaDePersonaAdapter(filmografia.dirigiendo)
+        pintarFilmografia(binding.recyclerDirigiendo, filmografia.dirigiendo)
+    }
+
+    /** La filmografia con la misma tarjeta que el resto del catalogo. */
+    private fun pintarFilmografia(
+        lista: androidx.recyclerview.widget.RecyclerView,
+        peliculas: List<com.example.dailymovie.client.response.PeliculaDePersona>
+    ) {
+        val adaptador = lista.adapter as? HallazgoAdapter
+            ?: HallazgoAdapter { hallazgo ->
+                startActivity(Intent(this, MovieA::class.java).putExtra("MOVIE_ID", hallazgo.id))
+            }.also { lista.adapter = it }
+        adaptador.submitList(peliculas.map { Hallazgo.de(it) })
     }
 
     companion object {
