@@ -44,6 +44,16 @@ data class Hallazgo(
             tipo = TipoDeHallazgo.PELICULA
         )
 
+        /** Una pelicula de la filmografia de alguien. */
+        fun de(pelicula: com.example.dailymovie.client.response.PeliculaDePersona) = Hallazgo(
+            id = pelicula.id,
+            titulo = pelicula.titulo.orEmpty(),
+            subtitulo = pelicula.estreno.orEmpty(),
+            imagen = pelicula.poster,
+            nota = pelicula.valoracion,
+            tipo = TipoDeHallazgo.PELICULA
+        )
+
         fun de(serie: SerieModel) = Hallazgo(
             id = serie.id,
             titulo = serie.titulo,

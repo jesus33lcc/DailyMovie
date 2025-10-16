@@ -19,7 +19,6 @@ import com.example.dailymovie.activities.views.MovieA
 import com.example.dailymovie.activities.views.PersonaA
 import com.example.dailymovie.activities.views.SerieA
 import com.example.dailymovie.adapters.HallazgoAdapter
-import com.example.dailymovie.adapters.MovieAdapter
 import com.example.dailymovie.databinding.FragmentExplorarBinding
 import com.example.dailymovie.fragments.viewmodels.ExplorarViewModel
 import com.example.dailymovie.fragments.viewmodels.OrdenDeBusqueda
@@ -240,7 +239,9 @@ class ExplorarF : Fragment() {
             if (binding.rvHistorial.itemDecorationCount == 0) {
                 binding.rvHistorial.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
             }
-            binding.rvHistorial.adapter = MovieAdapter(historial)
+            val adaptadorHistorial = HallazgoAdapter { abrir(it) }
+            binding.rvHistorial.adapter = adaptadorHistorial
+            adaptadorHistorial.submitList(historial.map { Hallazgo.de(it) })
         }
 
         explorarViewModel.error.observe(viewLifecycleOwner) { error ->
