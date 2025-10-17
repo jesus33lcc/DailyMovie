@@ -40,7 +40,7 @@ class MovieA : AppCompatActivity() {
         binding = ActivityMovieBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val movieId = intent.getIntExtra("MOVIE_ID", -1)
+        val movieId = intent.getIntExtra(EXTRA_MOVIE_ID, -1)
 
         if (movieId != -1) {
             movieViewModel.cargarPelicula(movieId)
@@ -134,7 +134,7 @@ class MovieA : AppCompatActivity() {
 
     /** Abre otra pelicula desde las tiras de similares y recomendadas. */
     private fun abrirOtra(hallazgo: Hallazgo) {
-        startActivity(Intent(this, MovieA::class.java).putExtra("MOVIE_ID", hallazgo.id))
+        startActivity(Intent(this, MovieA::class.java).putExtra(EXTRA_MOVIE_ID, hallazgo.id))
     }
 
     private fun shareMovie(movie: MovieModel) {
@@ -470,4 +470,15 @@ class MovieA : AppCompatActivity() {
         Avisos.breve(binding.root, message)
     }
 
+
+    companion object {
+        /**
+         * Con que id se abre esta pantalla.
+         *
+         * Estaba escrita a mano en nueve sitios: en las tarjetas, en las listas, en la
+         * filmografia, en el buscador... y cambiarla obligaba a buscarla por todo el
+         * proyecto. Las pantallas nuevas ya declaraban la suya asi.
+         */
+        const val EXTRA_MOVIE_ID = "MOVIE_ID"
+    }
 }

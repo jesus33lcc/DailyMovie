@@ -97,8 +97,8 @@ class ListasF : Fragment() {
 
     private fun navigateToMovieList(movieList: List<MovieModel>, listName: String) {
         val intent = Intent(context, ListMoviesA::class.java)
-        intent.putParcelableArrayListExtra("MOVIE_LIST", ArrayList(movieList))
-        intent.putExtra("LIST_NAME", listName)
+        intent.putParcelableArrayListExtra(ListMoviesA.EXTRA_LISTA, ArrayList(movieList))
+        intent.putExtra(ListMoviesA.EXTRA_NOMBRE, listName)
         startActivity(intent)
     }
 

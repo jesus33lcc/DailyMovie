@@ -334,7 +334,7 @@ class ExplorarF : Fragment() {
     private fun abrir(hallazgo: Hallazgo) {
         val destino = when (hallazgo.tipo) {
             TipoDeHallazgo.PELICULA ->
-                Intent(context, MovieA::class.java).putExtra("MOVIE_ID", hallazgo.id)
+                Intent(context, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
             TipoDeHallazgo.SERIE ->
                 Intent(context, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, hallazgo.id)
             TipoDeHallazgo.PERSONA ->
