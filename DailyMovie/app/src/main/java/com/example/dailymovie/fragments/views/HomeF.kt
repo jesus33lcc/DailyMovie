@@ -118,7 +118,7 @@ class HomeF : Fragment() {
             TipoDeHallazgo.SERIE ->
                 Intent(context, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, hallazgo.id)
             else ->
-                Intent(context, MovieA::class.java).putExtra("MOVIE_ID", hallazgo.id)
+                Intent(context, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
         }
         startActivity(destino)
     }
@@ -145,7 +145,7 @@ class HomeF : Fragment() {
 
         binding.btnViewFullDetails.setOnClickListener {
             val intent = Intent(context, MovieA::class.java)
-            intent.putExtra("MOVIE_ID", movie.id)
+            intent.putExtra(MovieA.EXTRA_MOVIE_ID, movie.id)
             startActivity(intent)
         }
     }

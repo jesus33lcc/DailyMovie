@@ -122,7 +122,7 @@ class PersonaA : AppCompatActivity() {
     ) {
         val adaptador = lista.adapter as? HallazgoAdapter
             ?: HallazgoAdapter { hallazgo ->
-                startActivity(Intent(this, MovieA::class.java).putExtra("MOVIE_ID", hallazgo.id))
+                startActivity(Intent(this, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id))
             }.also { lista.adapter = it }
         adaptador.submitList(peliculas.map { Hallazgo.de(it) })
     }

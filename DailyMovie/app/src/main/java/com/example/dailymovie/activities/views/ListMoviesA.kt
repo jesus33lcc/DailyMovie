@@ -30,12 +30,12 @@ class ListMoviesA : AppCompatActivity() {
         binding = ActivityListMoviesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        listName = intent.getStringExtra("LIST_NAME") ?: ""
+        listName = intent.getStringExtra(EXTRA_NOMBRE) ?: ""
         binding.listTitle.text = listName
 
         // Lo que llega en el Intent son solo peliculas; las series entran en onResume, que es
         // quien pide la lista completa.
-        movieList = intent.getParcelableArrayListExtra<com.example.dailymovie.models.MovieModel>("MOVIE_LIST")
+        movieList = intent.getParcelableArrayListExtra<com.example.dailymovie.models.MovieModel>(EXTRA_LISTA)
             ?.map { Guardado.de(it) }?.toMutableList() ?: mutableListOf()
 
         movieListAdapter = CustomMovieListAdapter(
@@ -78,7 +78,7 @@ class ListMoviesA : AppCompatActivity() {
         val destino = if (elemento.esSerie) {
             Intent(this, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, elemento.id)
         } else {
-            Intent(this, MovieA::class.java).putExtra("MOVIE_ID", elemento.id)
+            Intent(this, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, elemento.id)
         }
         startActivity(destino)
     }
@@ -152,5 +152,13 @@ class ListMoviesA : AppCompatActivity() {
                 movieListAdapter.submitList(movieList.toList())
             }
         }
+    }
+
+    companion object {
+        /** Lo que ya se sabe de la lista, para pintar algo antes de que conteste Firebase. */
+        const val EXTRA_LISTA = "MOVIE_LIST"
+
+        /** El nombre de la lista, que ademas es su id en Firestore. */
+        const val EXTRA_NOMBRE = "LIST_NAME"
     }
 }
