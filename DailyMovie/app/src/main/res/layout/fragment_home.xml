@@ -108,6 +108,7 @@
                             android:orientation="horizontal">
 
                             <TextView
+                                android:id="@+id/lblFecha"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Fecha: "
@@ -128,10 +129,12 @@
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
+                            <!-- Solo en la curada a mano: quien firma la reseña -->
                             <TextView
+                                android:id="@+id/lblAutor"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Autor: "
+                                android:text="Reseña de: "
                                 android:textSize="18sp"
                                 android:fontFamily="@font/courier_prime_bold"
                                 android:textColor="@color/colorTextPrimary"/>
@@ -143,6 +146,21 @@
                                 android:textSize="18sp"
                                 android:textColor="@color/colorTextPrimary"/>
                         </LinearLayout>
+                        <!-- Solo en la recomendada: por que se te enseña esta.
+                             Va sin etiqueta porque la frase ya se explica sola -->
+                        <TextView
+                            android:id="@+id/txtMotivo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textSize="17sp"
+                            android:textStyle="italic"
+                            android:fontFamily="@font/courier_prime"
+                            android:textColor="@color/colorAccent"
+                            android:visibility="gone"
+                            tools:text="Porque te gusta este tipo de cine"
+                            tools:visibility="visible" />
+
                     </LinearLayout>
 
                 </LinearLayout>

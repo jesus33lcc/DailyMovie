@@ -128,7 +128,8 @@ class HomeViewModel(
                     title = pelicula.title,
                     review = sinopsis,
                     date = "",
-                    author = motivo,
+                    // Una recomendada no tiene autor: lo que tiene es un motivo.
+                    motivo = motivo,
                     videoId = trailer
                 )
                 peticionTerminada()

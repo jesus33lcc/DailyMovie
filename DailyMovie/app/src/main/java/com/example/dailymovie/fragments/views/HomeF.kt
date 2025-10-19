@@ -134,12 +134,23 @@ class HomeF : Fragment() {
         binding.movieTitle.text = movie.title
         binding.movieReview.text = movie.review
 
-        val hoy = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-        binding.movieDate.text = hoy
+        // La fecha es la del dia que se curo; en una recomendada no significa nada.
+        val esCurada = !movie.author.isNullOrBlank()
+        binding.lblFecha.visibility = if (esCurada) View.VISIBLE else View.GONE
+        binding.movieDate.visibility = if (esCurada) View.VISIBLE else View.GONE
+        binding.movieDate.text =
+            if (esCurada) SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date()) else ""
 
-        // En la pelicula curada a mano el autor es quien escribio la reseña; en una
-        // recomendada, el motivo por el que se le enseña ("Porque te gusta...").
-        binding.movieAuthor.text = movie.author
+        // La curada a mano la firma alguien; la recomendada no tiene autor, tiene motivo.
+        // Solo se enseña lo que haya, y nunca los dos a la vez.
+        val hayAutor = !movie.author.isNullOrBlank()
+        binding.lblAutor.visibility = if (hayAutor) View.VISIBLE else View.GONE
+        binding.movieAuthor.visibility = if (hayAutor) View.VISIBLE else View.GONE
+        binding.movieAuthor.text = movie.author.orEmpty()
+
+        val hayMotivo = !movie.motivo.isNullOrBlank()
+        binding.txtMotivo.visibility = if (hayMotivo) View.VISIBLE else View.GONE
+        binding.txtMotivo.text = movie.motivo.orEmpty()
 
         mostrarTrailer(movie.videoId)
 
