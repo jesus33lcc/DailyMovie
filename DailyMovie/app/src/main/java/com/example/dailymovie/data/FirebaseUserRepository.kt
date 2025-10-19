@@ -407,7 +407,16 @@ class FirebaseUserRepository(
                     alTerminar(null)
                 } else {
                     val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    alTerminar(MovieOfTheDay(id, titulo, resena, formato.format(fecha), autor, video))
+                    alTerminar(
+                        MovieOfTheDay(
+                            id = id,
+                            title = titulo,
+                            review = resena,
+                            date = formato.format(fecha),
+                            author = autor,
+                            videoId = video
+                        )
+                    )
                 }
             }
             .addOnFailureListener { alTerminar(null) }
