@@ -19,6 +19,7 @@ import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.MovieDetailsModel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
+import com.example.dailymovie.utils.Cifras
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
@@ -281,7 +282,7 @@ class MovieA : AppCompatActivity() {
         binding.txtAnioMovie.visibility = if (releaseYear.isEmpty()) View.GONE else View.VISIBLE
 
         binding.txtValoracionLabel.visibility = if (movie.voteAverage == 0.0) View.GONE else View.VISIBLE
-        binding.txtValoracionMovie.text = movie.voteAverage.toString()
+        binding.txtValoracionMovie.text = getString(R.string.nota_estrella, movie.voteAverage)
         binding.txtValoracionMovie.visibility = if (movie.voteAverage == 0.0) View.GONE else View.VISIBLE
 
         binding.txtOverviewLabel.visibility = if (movie.overview.isNullOrEmpty()) View.GONE else View.VISIBLE
@@ -293,15 +294,15 @@ class MovieA : AppCompatActivity() {
         binding.txtGenresMovie.visibility = if (movie.genres.isEmpty()) View.GONE else View.VISIBLE
 
         binding.txtRuntimeLabel.visibility = if (movie.runtime == 0) View.GONE else View.VISIBLE
-        binding.txtRuntimeMovie.text = "${movie.runtime} min"
+        binding.txtRuntimeMovie.text = Cifras.duracion(movie.runtime)
         binding.txtRuntimeMovie.visibility = if (movie.runtime == 0) View.GONE else View.VISIBLE
 
         binding.txtBudgetLabel.visibility = if (movie.budget == 0) View.GONE else View.VISIBLE
-        binding.txtBudgetMovie.text = "${movie.budget} USD"
+        binding.txtBudgetMovie.text = Cifras.dinero(movie.budget.toLong())
         binding.txtBudgetMovie.visibility = if (movie.budget == 0) View.GONE else View.VISIBLE
 
         binding.txtRevenueLabel.visibility = if (movie.revenue == 0L) View.GONE else View.VISIBLE
-        binding.txtRevenueMovie.text = "${movie.revenue} USD"
+        binding.txtRevenueMovie.text = Cifras.dinero(movie.revenue.toLong())
         binding.txtRevenueMovie.visibility = if (movie.revenue == 0L) View.GONE else View.VISIBLE
 
         binding.imgPosterMovie.cargarCartel(movie.posterPath)
