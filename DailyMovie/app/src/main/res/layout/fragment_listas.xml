@@ -89,6 +89,21 @@
                         app:tint="@android:color/black" />
                 </LinearLayout>
 
+                <!-- Cuando el usuario todavia no se ha hecho ninguna lista -->
+                <TextView
+                    android:id="@+id/txtSinListas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:gravity="center"
+                    android:text="Todavía no tienes listas tuyas.\n\nToca el + para hacerte una: «Para ver con Silvia», «Pendientes»…"
+                    android:textSize="16sp"
+                    android:lineSpacingExtra="4dp"
+                    android:fontFamily="@font/courier_prime"
+                    android:textColor="@color/colorTextPrimary"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/misListaPersonalizadas"
                     android:layout_width="match_parent"

@@ -58,6 +58,9 @@ class ListasF : Fragment() {
 
         viewModel.customLists.observe(viewLifecycleOwner, Observer { customLists ->
             customListsAdapter.submitList(customLists)
+            // Sin esto, quien entra por primera vez ve un hueco y el boton + sin mas.
+            binding.txtSinListas.visibility =
+                if (customLists.isEmpty()) View.VISIBLE else View.GONE
         })
 
         binding.btnNewLista.setOnClickListener {

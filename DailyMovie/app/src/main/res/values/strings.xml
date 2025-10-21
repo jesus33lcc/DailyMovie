@@ -29,4 +29,9 @@
 
     <!-- Buscador -->
     <string name="busqueda_sin_resultados">No hemos encontrado nada con «%1$s»</string>
+
+    <!-- Listas sin nada dentro. Antes era una pantalla en blanco -->
+    <string name="lista_vacia_favoritos">Todavía no tienes favoritos.\n\nToca el corazón en cualquier ficha y aparecerá aquí.</string>
+    <string name="lista_vacia_vistos">Aún no has marcado nada como visto.\n\nUsa el ojo en la ficha de lo que ya hayas visto.</string>
+    <string name="lista_vacia_propia">Esta lista está vacía.\n\nBusca algo y guárdalo aquí desde su ficha.</string>
 </resources>

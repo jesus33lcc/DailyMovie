@@ -12,6 +12,7 @@ import com.example.dailymovie.R
 import com.example.dailymovie.adapters.CustomMovieListAdapter
 import com.example.dailymovie.databinding.ActivityListMoviesBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.data.ListaFija
 import com.example.dailymovie.models.Guardado
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.utils.Avisos
@@ -70,8 +71,32 @@ class ListMoviesA : AppCompatActivity() {
         // que la lista se vuelve a pedir en vez de quedarse con la que llego en el Intent.
         movieViewModel.cargarListaCompleta(listName) { actualizadas ->
             movieList = actualizadas.toMutableList()
-            movieListAdapter.submitList(actualizadas)
+            movieListAdapter.submitList(actualizadas) { decidirSiHayAlgo() }
         }
+    }
+
+    /**
+     * Enseña la lista o el aviso de que esta vacia.
+     *
+     * El texto y el icono cambian segun de que lista se trate: en Favoritos lo util es decir
+     * donde esta el corazon, y en una lista propia, que se llena desde la ficha.
+     */
+    private fun decidirSiHayAlgo() {
+        val vacia = movieList.isEmpty()
+        binding.panelListaVacia.visibility = if (vacia) View.VISIBLE else View.GONE
+        binding.recyclerViewMovies.visibility = if (vacia) View.GONE else View.VISIBLE
+        if (!vacia) return
+
+        val (texto, icono) = when (ListaFija.desdeTitulo(listName)) {
+            ListaFija.FAVORITOS ->
+                R.string.lista_vacia_favoritos to R.drawable.ic_baseline_favorite_24
+            ListaFija.VISTOS ->
+                R.string.lista_vacia_vistos to R.drawable.ic_baseline_visibility_24
+            null ->
+                R.string.lista_vacia_propia to R.drawable.ic_baseline_list_24
+        }
+        binding.txtListaVacia.setText(texto)
+        binding.imgListaVacia.setImageResource(icono)
     }
 
     private fun abrirFicha(elemento: Guardado) {
@@ -123,7 +148,7 @@ class ListMoviesA : AppCompatActivity() {
      */
     private fun quitarConDeshacer(elemento: Guardado, position: Int) {
         movieList.remove(elemento)
-        movieListAdapter.submitList(movieList.toList())
+        movieListAdapter.submitList(movieList.toList()) { decidirSiHayAlgo() }
 
         Avisos.conDeshacer(
             vista = binding.root,
