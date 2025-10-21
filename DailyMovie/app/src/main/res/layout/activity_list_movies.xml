@@ -30,6 +30,47 @@
             android:text="Nombre de la Lista" />
     </LinearLayout>
 
+    <!--
+        Lo que se ve cuando la lista no tiene nada.
+
+        Antes se quedaba una pantalla en blanco con el titulo arriba, y no habia forma de
+        saber si estaba vacia, si fallaba algo o si todavia estaba cargando.
+    -->
+    <LinearLayout
+        android:id="@+id/panelListaVacia"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/titleContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/imgListaVacia"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:alpha="0.5"
+            android:contentDescription="Lista vacía"
+            app:tint="@color/colorPrimaryDark"
+            tools:src="@drawable/ic_baseline_favorite_24" />
+
+        <TextView
+            android:id="@+id/txtListaVacia"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:textSize="17sp"
+            android:lineSpacingExtra="4dp"
+            android:fontFamily="@font/courier_prime"
+            android:textColor="@color/white"
+            tools:text="Todavía no has guardado nada aquí" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewMovies"
         android:layout_width="0dp"
