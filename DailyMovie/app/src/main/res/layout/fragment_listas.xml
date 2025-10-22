@@ -1,10 +1,23 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Tus listas.
+
+    Antes esto eran cajas dentro de cajas dentro de cajas: cada bloque iba envuelto en un
+    rounded_border_box_big, dentro llevaba otro rounded_border_box solo para el titulo, y el
+    titulo "Listas" ocupaba una caja entera el solo. Cuatro niveles de marco para enseñar dos
+    listas, y el menta a pantalla completa cansaba la vista.
+
+    Ahora son dos secciones planas con su cabecera, como en Explorar, y el boton de crear es
+    un FAB abajo a la derecha, que es donde se busca.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.views.ListasF"
-    android:background="@color/colorBackground">
+    android:background="@color/colorBackground"
+    tools:context=".fragments.views.ListasF">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -15,105 +28,64 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:paddingBottom="88dp">
 
-            <LinearLayout
+            <TextView
+                style="@style/TituloDeSeccionExplorar"
+                android:text="Guardadas por ti" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/misListasCheckFav"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/rounded_border_box_big"
-                android:clipToOutline="true"
-                android:padding="16dp"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="24dp"
+                android:layoutAnimation="@anim/explore_animation"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_lista_list" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:background="@drawable/rounded_border_box"
-                    android:clipToOutline="true"
-                    android:layout_marginBottom="16dp">
+            <TextView
+                style="@style/TituloDeSeccionExplorar"
+                android:text="Tus listas" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Listas"
-                        android:textSize="25sp"
-                        android:fontFamily="@font/courier_prime_bold"
-                        android:textColor="@color/black" />
-                </LinearLayout>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/misListasCheckFav"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layoutAnimation="@anim/explore_animation"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_lista_list" />
-            </LinearLayout>
-
-            <LinearLayout
+            <!-- Cuando el usuario todavia no se ha hecho ninguna lista -->
+            <TextView
+                android:id="@+id/txtSinListas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/rounded_border_box_big"
-                android:clipToOutline="true"
-                android:padding="16dp">
+                android:padding="20dp"
+                android:gravity="center"
+                android:text="Todavía no tienes listas tuyas.\n\nToca el + para hacerte una: «Para ver en pareja», «Pendientes»…"
+                android:textSize="16sp"
+                android:lineSpacingExtra="4dp"
+                android:fontFamily="@font/courier_prime"
+                android:textColor="@color/white"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:background="@drawable/rounded_border_box"
-                    android:clipToOutline="true"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Mis Listas Personalizadas"
-                        android:textSize="25sp"
-                        android:fontFamily="@font/courier_prime_bold"
-                        android:textColor="@color/black" />
-
-                    <ImageButton
-                        android:id="@+id/btn_newLista"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:src="@drawable/ic_add"
-                        app:tint="@android:color/black" />
-                </LinearLayout>
-
-                <!-- Cuando el usuario todavia no se ha hecho ninguna lista -->
-                <TextView
-                    android:id="@+id/txtSinListas"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="20dp"
-                    android:gravity="center"
-                    android:text="Todavía no tienes listas tuyas.\n\nToca el + para hacerte una: «Para ver en pareja», «Pendientes»…"
-                    android:textSize="16sp"
-                    android:lineSpacingExtra="4dp"
-                    android:fontFamily="@font/courier_prime"
-                    android:textColor="@color/colorTextPrimary"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/misListaPersonalizadas"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:layoutAnimation="@anim/explore_animation"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_lista_list" />
-            </LinearLayout>
-
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/misListaPersonalizadas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:layoutAnimation="@anim/explore_animation"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_lista_list" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-</FrameLayout>
+
+    <!--
+        Crear lista. Va de FAB y no de icono perdido en una cabecera: es la unica accion de
+        la pantalla y aqui se encuentra sola.
+    -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_newLista"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:src="@drawable/ic_add"
+        android:contentDescription="Crear una lista"
+        app:backgroundTint="@color/colorPrimary"
+        app:tint="@color/colorTextPrimary" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
