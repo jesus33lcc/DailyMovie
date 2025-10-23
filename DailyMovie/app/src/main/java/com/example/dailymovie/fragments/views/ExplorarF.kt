@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.R
 import com.example.dailymovie.activities.views.MovieA
 import com.example.dailymovie.activities.views.PersonaA
@@ -136,6 +137,19 @@ class ExplorarF : Fragment() {
         binding.rvListaBusqueda.layoutManager = GridLayoutManager(context, columnasQueCaben())
         binding.rvListaBusqueda.adapter = resultadosAdapter
         binding.rvListaBusqueda.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
+
+        // Cargar mas segun se baja. Se avisa con una fila de margen para que la siguiente
+        // tanda este pedida antes de que el usuario llegue al final y vea el hueco.
+        binding.rvListaBusqueda.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(lista: RecyclerView, dx: Int, dy: Int) {
+                if (dy <= 0) return
+                val gestor = lista.layoutManager as? GridLayoutManager ?: return
+                val ultimoVisible = gestor.findLastVisibleItemPosition()
+                if (ultimoVisible >= gestor.itemCount - gestor.spanCount * 2) {
+                    explorarViewModel.cargarMas()
+                }
+            }
+        })
     }
 
     /** Las mismas columnas que en las listas: lo que quepa segun el ancho que haya. */

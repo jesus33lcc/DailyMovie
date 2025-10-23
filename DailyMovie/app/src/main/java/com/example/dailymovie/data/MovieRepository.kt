@@ -19,8 +19,13 @@ interface MovieRepository {
 
     fun buscar(consulta: String, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
 
-    /** Busca peliculas, series y gente de una vez. */
-    fun buscarTodo(consulta: String, alTerminar: (Resultado<List<Hallazgo>>) -> Unit)
+    /**
+     * Busca peliculas, series y gente de una vez.
+     *
+     * @param pagina cual de las tandas de 20 se pide. TMDB pagina de veinte en veinte y hasta
+     *   ahora solo se pedia la primera, asi que cualquier busqueda tenia un techo de 20.
+     */
+    fun buscarTodo(consulta: String, pagina: Int = 1, alTerminar: (Resultado<Pagina>) -> Unit)
 
     /** Lo que esta en tendencia esta semana, mezclando peliculas y series. */
     fun tendencias(alTerminar: (Resultado<List<Hallazgo>>) -> Unit)
@@ -38,10 +43,26 @@ interface MovieRepository {
     fun recomendadas(peliculaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
 
     /** Peliculas de un genero, ordenadas por popularidad. Alimenta la recomendacion. */
-    fun porGeneros(generos: List<Int>, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
+    fun porGeneros(
+        generos: List<Int>,
+        pagina: Int = 1,
+        alTerminar: (Resultado<List<MovieModel>>) -> Unit
+    )
 
     fun generos(alTerminar: (Resultado<List<com.example.dailymovie.models.GenreModel>>) -> Unit)
 }
+
+/**
+ * Una tanda de resultados y si detras hay mas.
+ *
+ * Hace falta para poder ir cargando segun se baja: sin saber si quedan paginas, o se pide de
+ * mas a lo tonto o se deja de pedir antes de tiempo.
+ */
+data class Pagina(
+    val hallazgos: List<Hallazgo>,
+    val pagina: Int,
+    val hayMas: Boolean
+)
 
 /**
  * Lo que devuelve el repositorio: o los datos, o el motivo por el que no hay datos.

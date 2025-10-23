@@ -64,7 +64,7 @@ class OnboardingViewModel(
         if (generosElegidos.isEmpty()) {
             peliculas.populares(alRecibir)
         } else {
-            peliculas.porGeneros(generosElegidos.toList(), alRecibir)
+            peliculas.porGeneros(generosElegidos.toList(), alTerminar = alRecibir)
         }
     }
 
