@@ -12,7 +12,15 @@ import com.google.gson.annotations.SerializedName
  */
 data class BusquedaMultiResponse(
     @SerializedName("results")
-    val resultados: List<ResultadoMulti> = emptyList()
+    val resultados: List<ResultadoMulti> = emptyList(),
+
+    /** En que pagina va esto. TMDB devuelve 20 resultados por pagina. */
+    @SerializedName("page")
+    val pagina: Int = 1,
+
+    /** Cuantas hay en total, para saber cuando dejar de pedir. */
+    @SerializedName("total_pages")
+    val totalDePaginas: Int = 1
 )
 
 data class ResultadoMulti(

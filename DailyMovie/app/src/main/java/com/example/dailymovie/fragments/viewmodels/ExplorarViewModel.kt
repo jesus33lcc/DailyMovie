@@ -64,6 +64,14 @@ class ExplorarViewModel(
     private var consultaActual = ""
     private var trabajoDeBusqueda: Job? = null
 
+    /** En que pagina va la busqueda y si detras hay mas. */
+    private var paginaActual = 1
+    private var hayMasPaginas = false
+    private var pidiendoMas = false
+
+    /** El genero que se esta explorando, si es que se llego por ahi y no escribiendo. */
+    private var generoEnCurso: GeneroExplorable? = null
+
     /**
      * Busca con freno.
      *
@@ -88,23 +96,68 @@ class ExplorarViewModel(
             return
         }
 
+        generoEnCurso = null
+        paginaActual = 1
+
         trabajoDeBusqueda = viewModelScope.launch {
             delay(ESPERA_ANTES_DE_BUSCAR)
             _cargando.value = true
-            peliculas.buscarTodo(limpia) { resultado ->
+            peliculas.buscarTodo(limpia, pagina = 1) { resultado ->
                 _cargando.value = false
                 when (resultado) {
                     is Resultado.Exito -> {
-                        todosLosResultados = resultado.datos
+                        todosLosResultados = resultado.datos.hallazgos
+                        hayMasPaginas = resultado.datos.hayMas
                         aplicarFiltro()
-                        _sinResultados.value = resultado.datos.isEmpty()
+                        _sinResultados.value = todosLosResultados.isEmpty()
                     }
                     is Resultado.Fallo -> {
                         todosLosResultados = emptyList()
+                        hayMasPaginas = false
                         _resultados.value = emptyList()
                         _sinResultados.value = false
                         _error.value = resultado.motivo
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * Pide la siguiente tanda y la añade a lo que ya hay.
+     *
+     * Hasta ahora solo se pedia la primera pagina, asi que cualquier busqueda se quedaba en
+     * veinte resultados y al llegar abajo no pasaba nada. La pantalla llama a esto cuando el
+     * usuario se acerca al final de la rejilla.
+     *
+     * Se protege con `pidiendoMas` porque el scroll dispara muchas veces seguidas y si no se
+     * pedirian tres o cuatro paginas iguales a la vez.
+     */
+    fun cargarMas() {
+        if (pidiendoMas || !hayMasPaginas) return
+        pidiendoMas = true
+        val siguiente = paginaActual + 1
+
+        val alRecibir: (List<Hallazgo>, Boolean) -> Unit = { nuevos, quedanMas ->
+            pidiendoMas = false
+            paginaActual = siguiente
+            hayMasPaginas = quedanMas
+            // Se filtran los repetidos: TMDB devuelve alguno dos veces entre paginas, y con
+            // el mismo id el comparador de la lista se queja.
+            val yaEstan = todosLosResultados.map { it.id to it.tipo }.toSet()
+            todosLosResultados = todosLosResultados + nuevos.filter { (it.id to it.tipo) !in yaEstan }
+            aplicarFiltro()
+        }
+
+        val genero = generoEnCurso
+        if (genero != null) {
+            cargarGeneroEnPagina(genero, siguiente, alRecibir)
+        } else {
+            peliculas.buscarTodo(consultaActual, siguiente) { resultado ->
+                if (resultado is Resultado.Exito) {
+                    alRecibir(resultado.datos.hallazgos, resultado.datos.hayMas)
+                } else {
+                    pidiendoMas = false
                 }
             }
         }
@@ -215,30 +268,52 @@ class ExplorarViewModel(
     fun explorarGenero(genero: GeneroExplorable) {
         trabajoDeBusqueda?.cancel()
         consultaActual = genero.nombre
+        generoEnCurso = genero
+        paginaActual = 1
         _cargando.value = true
 
+        cargarGeneroEnPagina(genero, 1) { hallazgos, quedanMas ->
+            _cargando.value = false
+            todosLosResultados = hallazgos
+            hayMasPaginas = quedanMas
+            aplicarFiltro()
+            _sinResultados.value = hallazgos.isEmpty()
+        }
+    }
+
+    /**
+     * Pide una pagina de un genero, en cine y en television a la vez.
+     *
+     * Se espera a que contesten los dos y se intercalan, para que la rejilla no salga con
+     * todas las peliculas primero y las series al final como si fueran dos grupos.
+     *
+     * @param pagina cual de las tandas de veinte se pide, en los dos sitios.
+     * @param alTerminar recibe lo encontrado y si conviene seguir pidiendo. Se da por hecho
+     *   que quedan mas mientras cualquiera de los dos siga devolviendo una pagina llena.
+     */
+    private fun cargarGeneroEnPagina(
+        genero: GeneroExplorable,
+        pagina: Int,
+        alTerminar: (List<Hallazgo>, Boolean) -> Unit
+    ) {
         var deCine: List<Hallazgo>? = if (genero.idPelicula == null) emptyList() else null
         var deSeries: List<Hallazgo>? = if (genero.idSerie == null) emptyList() else null
 
         fun publicarSiEstaTodo() {
             val cine = deCine ?: return
             val series = deSeries ?: return
-            _cargando.value = false
-            // Se alternan para que la rejilla no salga con todas las peliculas primero y
-            // las series al final, que pareceria que estan separadas.
-            todosLosResultados = intercalar(cine, series)
-            aplicarFiltro()
-            _sinResultados.value = todosLosResultados.isEmpty()
+            val quedanMas = cine.size >= POR_PAGINA || series.size >= POR_PAGINA
+            alTerminar(intercalar(cine, series), quedanMas)
         }
 
         genero.idPelicula?.let { id ->
-            peliculas.porGeneros(listOf(id)) { resultado ->
+            peliculas.porGeneros(listOf(id), pagina) { resultado ->
                 deCine = (resultado as? Resultado.Exito)?.datos?.map { Hallazgo.de(it) }.orEmpty()
                 publicarSiEstaTodo()
             }
         }
         genero.idSerie?.let { id ->
-            series.porGeneros(listOf(id)) { resultado ->
+            series.porGeneros(listOf(id), pagina) { resultado ->
                 deSeries = (resultado as? Resultado.Exito)?.datos?.map { Hallazgo.de(it) }.orEmpty()
                 publicarSiEstaTodo()
             }
@@ -275,6 +350,9 @@ class ExplorarViewModel(
     private companion object {
         /** Con una sola letra cualquier busqueda devuelve ruido. */
         const val MINIMO_PARA_BUSCAR = 2
+
+        /** Lo que devuelve TMDB en cada pagina. */
+        const val POR_PAGINA = 20
         const val ESPERA_ANTES_DE_BUSCAR = 350L
     }
 }

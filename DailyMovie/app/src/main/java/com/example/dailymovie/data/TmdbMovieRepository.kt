@@ -30,9 +30,23 @@ class TmdbMovieRepository(
     override fun buscar(consulta: String, alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
         listaDePeliculas(servicio.searchMovies(consulta, apiKey), alTerminar)
 
-    override fun buscarTodo(consulta: String, alTerminar: (Resultado<List<Hallazgo>>) -> Unit) {
-        servicio.buscarTodo(consulta, apiKey).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(aHallazgos(it.resultados))) },
+    override fun buscarTodo(
+        consulta: String,
+        pagina: Int,
+        alTerminar: (Resultado<Pagina>) -> Unit
+    ) {
+        servicio.buscarTodo(consulta, apiKey, page = pagina).enqueueSimple(
+            onExito = { respuesta ->
+                alTerminar(
+                    Resultado.Exito(
+                        Pagina(
+                            hallazgos = aHallazgos(respuesta.resultados),
+                            pagina = respuesta.pagina,
+                            hayMas = respuesta.pagina < respuesta.totalDePaginas
+                        )
+                    )
+                )
+            },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
@@ -112,10 +126,17 @@ class TmdbMovieRepository(
     override fun recomendadas(peliculaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
         listaDePeliculas(servicio.getRecommendedMovies(peliculaId, apiKey), alTerminar)
 
-    override fun porGeneros(generos: List<Int>, alTerminar: (Resultado<List<MovieModel>>) -> Unit) {
+    override fun porGeneros(
+        generos: List<Int>,
+        pagina: Int,
+        alTerminar: (Resultado<List<MovieModel>>) -> Unit
+    ) {
         // TMDB espera los generos separados por coma; con "|" seria "cualquiera de ellos"
         // y con "," "todos a la vez". Se usa la coma para afinar mas.
-        listaDePeliculas(servicio.descubrirPeliculas(apiKey, generos.joinToString(",")), alTerminar)
+        listaDePeliculas(
+            servicio.descubrirPeliculas(apiKey, generos.joinToString(","), page = pagina),
+            alTerminar
+        )
     }
 
     override fun detalles(peliculaId: Int, alTerminar: (Resultado<MovieDetailsResponse>) -> Unit) {

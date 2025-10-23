@@ -36,7 +36,11 @@ interface SerieRepository {
     fun generos(alTerminar: (Resultado<List<GenreModel>>) -> Unit)
 
     /** Series de un genero, ordenadas por popularidad. */
-    fun porGeneros(generos: List<Int>, alTerminar: (Resultado<List<SerieModel>>) -> Unit)
+    fun porGeneros(
+        generos: List<Int>,
+        pagina: Int = 1,
+        alTerminar: (Resultado<List<SerieModel>>) -> Unit
+    )
 }
 
 class TmdbSerieRepository(
@@ -112,6 +116,12 @@ class TmdbSerieRepository(
         )
     }
 
-    override fun porGeneros(generos: List<Int>, alTerminar: (Resultado<List<SerieModel>>) -> Unit) =
-        listaDeSeries(servicio.descubrirSeries(apiKey, generos.joinToString(",")), alTerminar)
+    override fun porGeneros(
+        generos: List<Int>,
+        pagina: Int,
+        alTerminar: (Resultado<List<SerieModel>>) -> Unit
+    ) = listaDeSeries(
+        servicio.descubrirSeries(apiKey, generos.joinToString(","), page = pagina),
+        alTerminar
+    )
 }
