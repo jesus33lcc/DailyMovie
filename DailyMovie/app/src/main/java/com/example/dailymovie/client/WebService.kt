@@ -117,15 +117,33 @@ interface WebService {
 
     // ---- Recomendacion ----
 
+    /**
+     * Peliculas que cumplen unos filtros.
+     *
+     * Los parametros con null no se mandan, asi que quien no filtra por algo no paga por ello:
+     * Retrofit se salta las consultas nulas y TMDB devuelve lo de siempre.
+     */
     @GET("discover/movie")
     fun descubrirPeliculas(
         @Query("api_key") apiKey: String,
-        @Query("with_genres") generos: String,
+        @Query("with_genres") generos: String? = null,
         @Query("sort_by") orden: String = "popularity.desc",
         @Query("vote_count.gte") votosMinimos: Int = 300,
+        @Query("vote_average.gte") notaMinima: Double? = null,
+        @Query("primary_release_year") ano: Int? = null,
+        @Query("with_watch_providers") plataformas: String? = null,
+        @Query("watch_region") region: String? = null,
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
         @Query("page") page: Int = 1
     ): Call<MoviesResponse>
+
+    /** Las plataformas de streaming que hay en el pais del usuario. */
+    @GET("watch/providers/movie")
+    fun getPlataformasDisponibles(
+        @Query("api_key") apiKey: String,
+        @Query("watch_region") region: String = LocaleUtil.getDeviceCountry(),
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<PlataformasResponse>
 
     @GET("genre/movie/list")
     fun getGeneros(
@@ -149,9 +167,13 @@ interface WebService {
     @GET("discover/tv")
     fun descubrirSeries(
         @Query("api_key") apiKey: String,
-        @Query("with_genres") generos: String,
+        @Query("with_genres") generos: String? = null,
         @Query("sort_by") orden: String = "popularity.desc",
         @Query("vote_count.gte") votosMinimos: Int = 100,
+        @Query("vote_average.gte") notaMinima: Double? = null,
+        @Query("first_air_date_year") ano: Int? = null,
+        @Query("with_watch_providers") plataformas: String? = null,
+        @Query("watch_region") region: String? = null,
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
         @Query("page") page: Int = 1
     ): Call<SeriesResponse>

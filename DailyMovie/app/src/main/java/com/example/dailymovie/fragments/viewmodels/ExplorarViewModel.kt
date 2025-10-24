@@ -9,6 +9,8 @@ import com.example.dailymovie.data.MovieRepository
 import com.example.dailymovie.data.Resultado
 import com.example.dailymovie.data.SerieRepository
 import com.example.dailymovie.data.UserRepository
+import com.example.dailymovie.client.response.PlataformaDisponible
+import com.example.dailymovie.models.FiltrosAvanzados
 import com.example.dailymovie.models.GeneroExplorable
 import com.example.dailymovie.models.GenreModel
 import com.example.dailymovie.models.Hallazgo
@@ -60,6 +62,13 @@ class ExplorarViewModel(
 
     var filtro = FiltroDeBusqueda()
         private set
+
+    /** Los filtros finos: año, nota y plataforma. */
+    var filtrosAvanzados = FiltrosAvanzados()
+        private set
+
+    private val _plataformas = MutableLiveData<List<PlataformaDisponible>>()
+    val plataformas: LiveData<List<PlataformaDisponible>> get() = _plataformas
 
     private var consultaActual = ""
     private var trabajoDeBusqueda: Job? = null
@@ -162,6 +171,59 @@ class ExplorarViewModel(
             }
         }
     }
+
+    /**
+     * Cambia los filtros finos y vuelve a pedir.
+     *
+     * Con filtros puestos se usa discover en vez de search, porque search no sabe filtrar por
+     * año ni por nota ni por plataforma: solo busca texto. La contrapartida es que discover no
+     * entiende de titulos, asi que lo escrito en la barra deja de contar mientras haya filtros.
+     */
+    fun cambiarFiltrosAvanzados(nuevos: FiltrosAvanzados) {
+        filtrosAvanzados = nuevos
+        paginaActual = 1
+
+        if (nuevos.estanVacios()) {
+            // Sin filtros se vuelve a lo de antes: lo escrito, o el genero que hubiera.
+            val genero = generoEnCurso
+            when {
+                genero != null -> explorarGenero(genero)
+                consultaActual.length >= MINIMO_PARA_BUSCAR -> buscar(consultaActual)
+                else -> {
+                    todosLosResultados = emptyList()
+                    aplicarFiltro()
+                }
+            }
+            return
+        }
+
+        _cargando.value = true
+        peliculas.descubrir(
+            generos = listOfNotNull(generoEnCurso?.idPelicula),
+            filtros = nuevos,
+            pagina = 1
+        ) { resultado ->
+            _cargando.value = false
+            if (resultado is Resultado.Exito) {
+                todosLosResultados = resultado.datos.map { Hallazgo.de(it) }
+                hayMasPaginas = resultado.datos.size >= POR_PAGINA
+                aplicarFiltro()
+                _sinResultados.value = todosLosResultados.isEmpty()
+            } else if (resultado is Resultado.Fallo) {
+                _error.value = resultado.motivo
+            }
+        }
+    }
+
+    fun cargarPlataformas() {
+        if (_plataformas.value?.isNotEmpty() == true) return
+        peliculas.plataformasDisponibles { resultado ->
+            if (resultado is Resultado.Exito) _plataformas.value = resultado.datos
+        }
+    }
+
+    /** Con filtros puestos, la busqueda por texto no manda: manda discover. */
+    fun hayBusquedaOFiltros() = hayBusquedaEnMarcha() || !filtrosAvanzados.estanVacios()
 
     fun cambiarFiltro(nuevo: FiltroDeBusqueda) {
         filtro = nuevo

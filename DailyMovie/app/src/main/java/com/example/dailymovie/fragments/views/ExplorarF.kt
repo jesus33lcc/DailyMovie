@@ -6,9 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -24,12 +27,14 @@ import com.example.dailymovie.databinding.FragmentExplorarBinding
 import com.example.dailymovie.fragments.viewmodels.ExplorarViewModel
 import com.example.dailymovie.fragments.viewmodels.OrdenDeBusqueda
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.models.FiltrosAvanzados
 import com.example.dailymovie.models.GeneroExplorable
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.utils.BusquedasRecientes
 import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.utils.Avisos
+import com.example.dailymovie.utils.DialogoDailyMovie
 
 /**
  * Explorar.
@@ -89,6 +94,7 @@ class ExplorarF : Fragment() {
 
         explorarViewModel.cargarTendencias()
         explorarViewModel.cargarGeneros()
+        explorarViewModel.cargarPlataformas()
     }
 
     override fun onResume() {
@@ -174,6 +180,8 @@ class ExplorarF : Fragment() {
             }
         }
 
+        binding.btnFiltros.setOnClickListener { mostrarFiltros() }
+
         binding.btnOrdenar.setOnClickListener { boton ->
             PopupMenu(ContextThemeWrapper(requireContext(), R.style.TemaPopupDailyMovie), boton).apply {
                 inflate(R.menu.menu_orden_busqueda)
@@ -190,6 +198,103 @@ class ExplorarF : Fragment() {
                 show()
             }
         }
+    }
+
+    /**
+     * El dialogo de filtros finos: año, nota minima y plataforma.
+     *
+     * Se avisa dentro de que con filtros puestos manda el catalogo y no lo escrito arriba,
+     * porque discover no sabe buscar por titulo y si no se dice parece que la busqueda se ha
+     * roto.
+     */
+    private fun mostrarFiltros() {
+        val contenido = layoutInflater.inflate(R.layout.dialogo_filtros, null)
+        val campoAno = contenido.findViewById<EditText>(R.id.campoAno)
+        val puestos = explorarViewModel.filtrosAvanzados
+
+        campoAno.setText(puestos.ano?.toString().orEmpty())
+
+        // Nota minima
+        var notaElegida = puestos.notaMinima
+        val chipsDeNota = listOf(
+            contenido.findViewById<TextView>(R.id.chipNotaCualquiera) to (null as Double?),
+            contenido.findViewById<TextView>(R.id.chipNota6) to 6.0,
+            contenido.findViewById<TextView>(R.id.chipNota7) to 7.0,
+            contenido.findViewById<TextView>(R.id.chipNota8) to 8.0
+        )
+        fun pintarNota() = chipsDeNota.forEach { (chip, nota) -> chip.isSelected = notaElegida == nota }
+        chipsDeNota.forEach { (chip, nota) ->
+            chip.setOnClickListener { notaElegida = nota; pintarNota() }
+        }
+        pintarNota()
+
+        // Plataformas del pais
+        var plataformaElegida = puestos.plataforma
+        var nombrePlataforma = puestos.nombrePlataforma
+        val contenedor = contenido.findViewById<LinearLayout>(R.id.contenedorPlataformas)
+        val chipsDePlataforma = mutableMapOf<Int?, TextView>()
+
+        fun pintarPlataformas() =
+            chipsDePlataforma.forEach { (id, chip) -> chip.isSelected = plataformaElegida == id }
+
+        fun anadirChipDePlataforma(id: Int?, nombre: String) {
+            val chip = chip(nombre) {
+                plataformaElegida = id
+                nombrePlataforma = if (id == null) null else nombre
+                pintarPlataformas()
+            }
+            chipsDePlataforma[id] = chip
+            contenedor.addView(chip)
+        }
+
+        anadirChipDePlataforma(null, "Cualquiera")
+        explorarViewModel.plataformas.value.orEmpty().take(12).forEach {
+            anadirChipDePlataforma(it.id, it.nombre)
+        }
+        pintarPlataformas()
+        contenido.findViewById<View>(R.id.tituloPlataformas).visibility =
+            if (chipsDePlataforma.size > 1) View.VISIBLE else View.GONE
+
+        DialogoDailyMovie.mostrar(
+            context = requireContext(),
+            titulo = "Filtrar",
+            contenido = contenido,
+            textoAceptar = "Aplicar",
+            textoCancelar = "Quitar filtros",
+            alCancelar = {
+                explorarViewModel.cambiarFiltrosAvanzados(FiltrosAvanzados())
+                pintarBotonDeFiltros()
+            }
+        ) { dialogo ->
+            dialogo.dismiss()
+            explorarViewModel.cambiarFiltrosAvanzados(
+                FiltrosAvanzados(
+                    ano = campoAno.text.toString().toIntOrNull(),
+                    notaMinima = notaElegida,
+                    plataforma = plataformaElegida,
+                    nombrePlataforma = nombrePlataforma
+                )
+            )
+            pintarBotonDeFiltros()
+            esconderTeclado()
+            decidirQueSeVe()
+        }
+    }
+
+    /**
+     * El boton de filtros se pinta en menta cuando hay alguno puesto.
+     *
+     * Sin esto no habia forma de saber que la busqueda venia recortada: se veian veinte
+     * resultados y parecia que no habia mas, cuando en realidad estaba filtrando por nota.
+     */
+    private fun pintarBotonDeFiltros() {
+        val hayFiltros = !explorarViewModel.filtrosAvanzados.estanVacios()
+        binding.btnFiltros.setColorFilter(
+            ContextCompat.getColor(
+                requireContext(),
+                if (hayFiltros) R.color.colorPrimary else R.color.white
+            )
+        )
     }
 
     private fun pintarChips() {
@@ -273,7 +378,7 @@ class ExplorarF : Fragment() {
      * porque cualquiera de esas cosas cambia lo que hay que enseñar.
      */
     private fun decidirQueSeVe() {
-        val buscando = explorarViewModel.hayBusquedaEnMarcha()
+        val buscando = explorarViewModel.hayBusquedaOFiltros()
         val hayResultados = !explorarViewModel.resultados.value.isNullOrEmpty()
         val nadaEncontrado = explorarViewModel.sinResultados.value == true
 

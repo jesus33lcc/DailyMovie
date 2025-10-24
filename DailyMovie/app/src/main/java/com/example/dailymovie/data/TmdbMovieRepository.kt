@@ -4,7 +4,9 @@ import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.WebService
 import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.CreditResponse
+import com.example.dailymovie.client.response.PlataformaDisponible
 import com.example.dailymovie.client.response.ResultadoMulti
+import com.example.dailymovie.models.FiltrosAvanzados
 import com.example.dailymovie.client.response.MovieDetailsResponse
 import com.example.dailymovie.client.response.ProviderResponse
 import com.example.dailymovie.models.GenreModel
@@ -171,6 +173,35 @@ class TmdbMovieRepository(
                     onError = { alTerminar(Resultado.Exito(locales)) }
                 )
             },
+            onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    override fun descubrir(
+        generos: List<Int>,
+        filtros: FiltrosAvanzados,
+        pagina: Int,
+        alTerminar: (Resultado<List<MovieModel>>) -> Unit
+    ) {
+        listaDePeliculas(
+            servicio.descubrirPeliculas(
+                apiKey = apiKey,
+                generos = generos.takeIf { it.isNotEmpty() }?.joinToString(","),
+                notaMinima = filtros.notaMinima,
+                ano = filtros.ano,
+                plataformas = filtros.plataforma?.toString(),
+                // TMDB exige la region cuando se filtra por plataforma: las mismas no estan
+                // en todos los paises y sin region no sabe de cual le hablas.
+                region = filtros.plataforma?.let { LocaleUtil.getDeviceCountry() },
+                page = pagina
+            ),
+            alTerminar
+        )
+    }
+
+    override fun plataformasDisponibles(alTerminar: (Resultado<List<PlataformaDisponible>>) -> Unit) {
+        servicio.getPlataformasDisponibles(apiKey).enqueueSimple(
+            onExito = { alTerminar(Resultado.Exito(it.plataformas.sortedBy { p -> p.prioridad })) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
