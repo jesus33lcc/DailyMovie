@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Los filtros finos del buscador.
+
+    Van dentro del dialogo comun, asi que aqui solo esta lo de dentro: el año, la nota minima
+    y la plataforma. Los tres se pueden dejar sin poner, que es lo mismo que decir "me da igual".
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/TituloDeSeccionExplorar"
+        android:layout_marginBottom="6dp"
+        android:textSize="16sp"
+        android:text="Año de estreno" />
+
+    <EditText
+        android:id="@+id/campoAno"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_border_edittext"
+        android:padding="12dp"
+        android:textSize="16sp"
+        android:maxLines="1"
+        android:maxLength="4"
+        android:inputType="number"
+        android:hint="Cualquiera"
+        android:fontFamily="@font/courier_prime"
+        android:textColor="@color/colorTextPrimary"
+        android:textColorHint="@color/colorAccent"
+        android:importantForAutofill="no" />
+
+    <TextView
+        style="@style/TituloDeSeccionExplorar"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="6dp"
+        android:textSize="16sp"
+        android:text="Nota mínima" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView android:id="@+id/chipNotaCualquiera" style="@style/ChipDeFiltro" android:text="Cualquiera" />
+        <TextView android:id="@+id/chipNota6" style="@style/ChipDeFiltro" android:text="6+" />
+        <TextView android:id="@+id/chipNota7" style="@style/ChipDeFiltro" android:text="7+" />
+        <TextView android:id="@+id/chipNota8" style="@style/ChipDeFiltro" android:text="8+" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tituloPlataformas"
+        style="@style/TituloDeSeccionExplorar"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="6dp"
+        android:textSize="16sp"
+        android:text="Dónde verla" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/contenedorPlataformas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:textSize="13sp"
+        android:fontFamily="@font/courier_prime"
+        android:textColor="@color/colorPrimaryDark"
+        android:text="Con filtros puestos se busca por catálogo, así que lo que hayas escrito arriba deja de contar." />
+</LinearLayout>

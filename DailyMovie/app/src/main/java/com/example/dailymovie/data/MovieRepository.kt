@@ -3,6 +3,8 @@ package com.example.dailymovie.data
 import com.example.dailymovie.client.response.CreditResponse
 import com.example.dailymovie.client.response.MovieDetailsResponse
 import com.example.dailymovie.client.response.ProviderResponse
+import com.example.dailymovie.client.response.PlataformaDisponible
+import com.example.dailymovie.models.FiltrosAvanzados
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
@@ -50,6 +52,22 @@ interface MovieRepository {
     )
 
     fun generos(alTerminar: (Resultado<List<com.example.dailymovie.models.GenreModel>>) -> Unit)
+
+    /**
+     * Peliculas que cumplen unos filtros, sin que haga falta escribir nada.
+     *
+     * @param generos ids de genero, o vacio para no filtrar por genero.
+     * @param filtros año, nota minima y plataforma. Los que vengan a null no se mandan.
+     */
+    fun descubrir(
+        generos: List<Int> = emptyList(),
+        filtros: FiltrosAvanzados = FiltrosAvanzados(),
+        pagina: Int = 1,
+        alTerminar: (Resultado<List<MovieModel>>) -> Unit
+    )
+
+    /** Las plataformas de streaming del pais del aparato, para poder filtrar por ellas. */
+    fun plataformasDisponibles(alTerminar: (Resultado<List<PlataformaDisponible>>) -> Unit)
 }
 
 /**
