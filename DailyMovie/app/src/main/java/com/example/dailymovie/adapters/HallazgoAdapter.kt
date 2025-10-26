@@ -48,9 +48,16 @@ class HallazgoAdapter(
             TipoDeHallazgo.PELICULA -> "PELÍCULA"
             TipoDeHallazgo.SERIE -> "SERIE"
             TipoDeHallazgo.PERSONA -> "GENTE"
+            TipoDeHallazgo.SAGA -> "SAGA"
         }
 
-        if (hallazgo.tipo == TipoDeHallazgo.PERSONA) {
+        if (hallazgo.tipo == TipoDeHallazgo.SAGA) {
+            // Una saga no tiene año ni nota propios: los tiene cada pelicula de dentro.
+            holder.subtitulo.text = "Todas las películas"
+            holder.subtitulo.setTextColor(ContextCompat.getColor(contexto, R.color.colorPrimary))
+            holder.nota.visibility = View.GONE
+            holder.imagen.cargarCartel(hallazgo.imagen)
+        } else if (hallazgo.tipo == TipoDeHallazgo.PERSONA) {
             // De una persona no hay nota que enseñar, y el subtitulo ya es su oficio.
             holder.subtitulo.text = hallazgo.subtitulo
             holder.nota.visibility = View.GONE

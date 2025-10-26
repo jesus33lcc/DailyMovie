@@ -29,6 +29,13 @@ interface MovieRepository {
      */
     fun buscarTodo(consulta: String, pagina: Int = 1, alTerminar: (Resultado<Pagina>) -> Unit)
 
+    /**
+     * Las peliculas de una saga, en orden de estreno.
+     *
+     * @param sagaId el id de coleccion de TMDB.
+     */
+    fun peliculasDeLaSaga(sagaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
+
     /** Lo que esta en tendencia esta semana, mezclando peliculas y series. */
     fun tendencias(alTerminar: (Resultado<List<Hallazgo>>) -> Unit)
 

@@ -108,6 +108,27 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<BusquedaMultiResponse>
 
+    /**
+     * Sagas por nombre.
+     *
+     * search/multi no las devuelve nunca, asi que buscando "El Padrino" jamas aparecia la
+     * triologia entera: habia que ir pelicula por pelicula.
+     */
+    @GET("search/collection")
+    fun buscarSagas(
+        @Query("query") consulta: String,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<BusquedaDeSagasResponse>
+
+    /** Las peliculas de una saga, por orden de estreno. */
+    @GET("collection/{id}")
+    fun getSaga(
+        @Path("id") sagaId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<DetalleDeSagaResponse>
+
     /** Lo que esta petando esta semana, para tener algo que enseñar sin buscar nada. */
     @GET("trending/all/week")
     fun getTendencias(

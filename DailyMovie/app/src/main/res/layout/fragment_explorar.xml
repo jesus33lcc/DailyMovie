@@ -112,6 +112,11 @@
                     tools:text="Series · 4" />
 
                 <TextView
+                    android:id="@+id/chipSagas"
+                    style="@style/ChipDeFiltro"
+                    tools:text="Sagas · 1" />
+
+                <TextView
                     android:id="@+id/chipPersonas"
                     style="@style/ChipDeFiltro"
                     tools:text="Gente · 4" />
