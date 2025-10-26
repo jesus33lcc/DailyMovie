@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Una saga entera.
+
+    Se llega buscando: al escribir "El Padrino" el buscador enseña ahora la trilogia arriba
+    del todo, y esta es la pantalla que abre. Las peliculas vienen en orden de estreno, que
+    es el orden en el que se quieren ver.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorBackground"
+    android:padding="16dp"
+    tools:context=".activities.views.SagaA">
+
+    <TextView
+        android:id="@+id/txtTituloSaga"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:fontFamily="@font/courier_prime_bold"
+        android:textColor="@color/white"
+        tools:text="El Padrino - Colección" />
+
+    <TextView
+        android:id="@+id/txtCuantas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textSize="15sp"
+        android:fontFamily="@font/courier_prime"
+        android:textColor="@color/colorPrimary"
+        tools:text="3 películas · 1972 - 1990" />
+
+    <ProgressBar
+        android:id="@+id/progresoSaga"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        android:indeterminateTint="@color/colorPrimary" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPeliculasDeLaSaga"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        tools:listitem="@layout/item_hallazgo" />
+</LinearLayout>

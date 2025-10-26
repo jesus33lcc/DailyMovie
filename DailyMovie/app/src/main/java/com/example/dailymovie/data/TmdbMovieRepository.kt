@@ -39,13 +39,48 @@ class TmdbMovieRepository(
     ) {
         servicio.buscarTodo(consulta, apiKey, page = pagina).enqueueSimple(
             onExito = { respuesta ->
+                val pagina = Pagina(
+                    hallazgos = aHallazgos(respuesta.resultados),
+                    pagina = respuesta.pagina,
+                    hayMas = respuesta.pagina < respuesta.totalDePaginas
+                )
+                // Las sagas van en otro endpoint y no estan paginadas, asi que solo se piden
+                // la primera vez. Si fallan no pasa nada: se devuelve lo que haya llegado.
+                if (pagina.pagina > 1) {
+                    alTerminar(Resultado.Exito(pagina))
+                    return@enqueueSimple
+                }
+                servicio.buscarSagas(consulta, apiKey).enqueueSimple(
+                    onExito = { sagas ->
+                        val encontradas = sagas.resultados.take(3).map { Hallazgo.de(it) }
+                        alTerminar(
+                            Resultado.Exito(pagina.copy(hallazgos = encontradas + pagina.hallazgos))
+                        )
+                    },
+                    onError = { alTerminar(Resultado.Exito(pagina)) }
+                )
+            },
+            onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    override fun peliculasDeLaSaga(
+        sagaId: Int,
+        alTerminar: (Resultado<List<MovieModel>>) -> Unit
+    ) {
+        servicio.getSaga(sagaId, apiKey).enqueueSimple(
+            onExito = { saga ->
                 alTerminar(
                     Resultado.Exito(
-                        Pagina(
-                            hallazgos = aHallazgos(respuesta.resultados),
-                            pagina = respuesta.pagina,
-                            hayMas = respuesta.pagina < respuesta.totalDePaginas
-                        )
+                        saga.peliculas.map {
+                            MovieModel(
+                                id = it.id,
+                                title = it.titulo.orEmpty(),
+                                releaseDate = it.estreno.orEmpty(),
+                                voteAverage = it.nota,
+                                posterPath = it.cartel
+                            )
+                        }
                     )
                 )
             },
@@ -86,6 +121,9 @@ class TmdbMovieRepository(
                     TipoDeHallazgo.SERIE -> item.primeraEmision.orEmpty()
                     // De la gente interesa a que se dedica, no una fecha
                     TipoDeHallazgo.PERSONA -> traducirOficio(item.oficio)
+                    // search/multi no devuelve sagas: llegan del endpoint de colecciones y
+                    // se construyen aparte, con su propia fabrica.
+                    TipoDeHallazgo.SAGA -> ""
                 },
                 imagen = if (tipo == TipoDeHallazgo.PERSONA) item.foto else item.cartel,
                 nota = item.nota ?: 0.0,

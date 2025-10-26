@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /** Lo que puede salir en una busqueda. */
-enum class TipoDeHallazgo { PELICULA, SERIE, PERSONA }
+enum class TipoDeHallazgo { PELICULA, SERIE, PERSONA, SAGA }
 
 /**
  * Un resultado de busqueda, sea lo que sea.
@@ -52,6 +52,19 @@ data class Hallazgo(
             imagen = pelicula.poster,
             nota = pelicula.valoracion,
             tipo = TipoDeHallazgo.PELICULA
+        )
+
+        /** Una saga entera, para poder abrirla y ver sus peliculas en orden. */
+        fun de(saga: com.example.dailymovie.client.response.SagaResponse) = Hallazgo(
+            id = saga.id,
+            titulo = saga.nombre,
+            subtitulo = "",
+            imagen = saga.cartel,
+            nota = 0.0,
+            tipo = TipoDeHallazgo.SAGA,
+            // Por encima de todo lo demas: si buscas "El Padrino" lo primero que quieres ver
+            // es la trilogia, no la tercera parte suelta.
+            relevancia = Double.MAX_VALUE
         )
 
         fun de(serie: SerieModel) = Hallazgo(

@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.R
 import com.example.dailymovie.activities.views.MovieA
 import com.example.dailymovie.activities.views.PersonaA
+import com.example.dailymovie.activities.views.SagaA
 import com.example.dailymovie.activities.views.SerieA
 import com.example.dailymovie.adapters.HallazgoAdapter
 import com.example.dailymovie.databinding.FragmentExplorarBinding
@@ -303,6 +304,7 @@ class ExplorarF : Fragment() {
             Triple(binding.chipTodo, null as TipoDeHallazgo?, "Todo"),
             Triple(binding.chipPeliculas, TipoDeHallazgo.PELICULA, "Películas"),
             Triple(binding.chipSeries, TipoDeHallazgo.SERIE, "Series"),
+            Triple(binding.chipSagas, TipoDeHallazgo.SAGA, "Sagas"),
             Triple(binding.chipPersonas, TipoDeHallazgo.PERSONA, "Gente")
         ).forEach { (chip, tipo, nombre) ->
             val cuantos = explorarViewModel.cuantosHayDe(tipo)
@@ -458,6 +460,10 @@ class ExplorarF : Fragment() {
                 Intent(context, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, hallazgo.id)
             TipoDeHallazgo.PERSONA ->
                 Intent(context, PersonaA::class.java).putExtra(PersonaA.EXTRA_PERSONA_ID, hallazgo.id)
+            TipoDeHallazgo.SAGA ->
+                Intent(context, SagaA::class.java)
+                    .putExtra(SagaA.EXTRA_SAGA_ID, hallazgo.id)
+                    .putExtra(SagaA.EXTRA_NOMBRE, hallazgo.titulo)
         }
         startActivity(destino)
     }
