@@ -109,6 +109,19 @@ interface WebService {
     ): Call<BusquedaMultiResponse>
 
     /**
+     * La gente del cine mas conocida ahora mismo.
+     *
+     * Se usa en el onboarding cuando el usuario no ha marcado ninguna pelicula: sin nada de
+     * donde tirar, las caras populares son lo unico que le va a sonar.
+     */
+    @GET("person/popular")
+    fun getPersonasPopulares(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
+        @Query("page") page: Int = 1
+    ): Call<PersonasPopularesResponse>
+
+    /**
      * Sagas por nombre.
      *
      * search/multi no las devuelve nunca, asi que buscando "El Padrino" jamas aparecia la

@@ -4,6 +4,7 @@ import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.WebService
 import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.PeliculaDePersona
+import com.example.dailymovie.client.response.PersonaPopular
 import com.example.dailymovie.models.PersonModel
 import com.example.dailymovie.utils.Constantes
 
@@ -11,6 +12,14 @@ import com.example.dailymovie.utils.Constantes
 interface PersonRepository {
     fun ficha(personaId: Int, alTerminar: (Resultado<PersonModel>) -> Unit)
     fun filmografia(personaId: Int, alTerminar: (Resultado<Filmografia>) -> Unit)
+
+    /**
+     * Caras conocidas para elegir en el onboarding.
+     *
+     * @param alTerminar recibe la lista ya limpia de gente sin foto, que en una rejilla de
+     *   caras es justo lo que no se puede enseñar.
+     */
+    fun populares(alTerminar: (Resultado<List<PersonaPopular>>) -> Unit)
 }
 
 /**
@@ -34,6 +43,15 @@ class TmdbPersonRepository(
     override fun ficha(personaId: Int, alTerminar: (Resultado<PersonModel>) -> Unit) {
         servicio.getPersona(personaId, apiKey).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it)) },
+            onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    override fun populares(alTerminar: (Resultado<List<PersonaPopular>>) -> Unit) {
+        servicio.getPersonasPopulares(apiKey).enqueueSimple(
+            onExito = { respuesta ->
+                alTerminar(Resultado.Exito(respuesta.resultados.filter { !it.foto.isNullOrBlank() }))
+            },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
