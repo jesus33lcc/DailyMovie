@@ -55,9 +55,15 @@ class OnboardingA : AppCompatActivity() {
         }
 
         viewModel.peliculasSugeridas.observe(this) { peliculas ->
-            if (paso == PASO_GENEROS) return@observe
+            if (paso != PASO_PELICULAS) return@observe
             pintar(peliculas.map { Elegible(it.id, it.title, it.posterPath) },
                 viewModel::peliculaEstaElegida, viewModel::marcarPelicula)
+        }
+
+        viewModel.personasSugeridas.observe(this) { gente ->
+            if (paso != PASO_PERSONAS) return@observe
+            pintar(gente.map { Elegible(it.id, it.nombre, it.foto, esCara = true) },
+                viewModel::personaEstaElegida, viewModel::marcarPersona)
         }
 
         viewModel.guardado.observe(this) { guardado ->
@@ -76,7 +82,7 @@ class OnboardingA : AppCompatActivity() {
     private fun mostrarPaso() {
         when (paso) {
             PASO_GENEROS -> {
-                binding.onboardingPaso.text = "Paso 1 de 2"
+                binding.onboardingPaso.text = "Paso 1 de 3"
                 binding.onboardingTitulo.text = "¿Qué géneros te gustan?"
                 binding.onboardingExplicacion.text =
                     "Elige los que más veas. Con esto elegimos la película que te " +
@@ -85,13 +91,22 @@ class OnboardingA : AppCompatActivity() {
                 viewModel.cargarGeneros()
             }
             PASO_PELICULAS -> {
-                binding.onboardingPaso.text = "Paso 2 de 2"
+                binding.onboardingPaso.text = "Paso 2 de 3"
                 binding.onboardingTitulo.text = "¿Alguna de estas te suena?"
                 binding.onboardingExplicacion.text =
                     "Marca las que ya has visto y te gustaron. Así no te las volvemos a " +
                         "recomendar y afinamos con las demás."
-                binding.onboardingSiguiente.text = "Terminar"
+                binding.onboardingSiguiente.text = "Siguiente"
                 viewModel.cargarPeliculasSugeridas()
+            }
+            PASO_PERSONAS -> {
+                binding.onboardingPaso.text = "Paso 3 de 3"
+                binding.onboardingTitulo.text = "¿A quién sigues?"
+                binding.onboardingExplicacion.text =
+                    "Actores y directores que te gustan. Cuando estrenen algo nuevo, te lo " +
+                        "enseñamos al abrir la app."
+                binding.onboardingSiguiente.text = "Terminar"
+                viewModel.cargarPersonasSugeridas()
             }
         }
     }
@@ -106,7 +121,11 @@ class OnboardingA : AppCompatActivity() {
                 paso = PASO_PELICULAS
                 mostrarPaso()
             }
-            PASO_PELICULAS -> terminar()
+            PASO_PELICULAS -> {
+                paso = PASO_PERSONAS
+                mostrarPaso()
+            }
+            PASO_PERSONAS -> terminar()
         }
     }
 
@@ -152,5 +171,6 @@ class OnboardingA : AppCompatActivity() {
         const val EXTRA_DESDE_AJUSTES = "DESDE_AJUSTES"
         private const val PASO_GENEROS = 0
         private const val PASO_PELICULAS = 1
+        private const val PASO_PERSONAS = 2
     }
 }

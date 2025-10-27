@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarCartel
+import com.example.dailymovie.utils.cargarFotoDePersona
 
 /**
  * Algo que el usuario puede marcar en el onboarding.
@@ -19,7 +20,14 @@ data class Elegible(
     val id: Int,
     val nombre: String,
     /** Ruta de TMDB (poster o foto). Null en los generos, que no tienen imagen. */
-    val imagen: String?
+    val imagen: String?,
+    /**
+     * Si la imagen es la cara de una persona y no un cartel.
+     *
+     * Cambia el relleno de cuando no hay foto: en una pelicula sin cartel se enseña una
+     * imagen tachada, pero en una persona sin foto queda mejor la silueta.
+     */
+    val esCara: Boolean = false
 )
 
 class ElegibleAdapter(
@@ -43,7 +51,11 @@ class ElegibleAdapter(
             holder.marco.visibility = View.GONE
         } else {
             holder.marco.visibility = View.VISIBLE
-            holder.imagen.cargarCartel(elemento.imagen)
+            if (elemento.esCara) {
+                holder.imagen.cargarFotoDePersona(elemento.imagen)
+            } else {
+                holder.imagen.cargarCartel(elemento.imagen)
+            }
         }
 
         pintarMarca(holder, estaElegido(elemento.id))

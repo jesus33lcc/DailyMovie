@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dailymovie.data.Dependencias
 import com.example.dailymovie.data.Gustos
+import com.example.dailymovie.client.response.PersonaPopular
 import com.example.dailymovie.data.MovieRepository
+import com.example.dailymovie.data.PersonRepository
 import com.example.dailymovie.data.Resultado
 import com.example.dailymovie.data.UserRepository
 import com.example.dailymovie.models.GenreModel
@@ -19,7 +21,8 @@ import com.example.dailymovie.models.MovieModel
  */
 class OnboardingViewModel(
     private val peliculas: MovieRepository = Dependencias.peliculas,
-    private val usuario: UserRepository = Dependencias.usuario
+    private val usuario: UserRepository = Dependencias.usuario,
+    private val personas: PersonRepository = Dependencias.personas
 ) : ViewModel() {
 
     private val _generos = MutableLiveData<List<GenreModel>>()
@@ -27,6 +30,9 @@ class OnboardingViewModel(
 
     private val _peliculasSugeridas = MutableLiveData<List<MovieModel>>()
     val peliculasSugeridas: LiveData<List<MovieModel>> get() = _peliculasSugeridas
+
+    private val _personasSugeridas = MutableLiveData<List<PersonaPopular>>()
+    val personasSugeridas: LiveData<List<PersonaPopular>> get() = _personasSugeridas
 
     private val _guardado = MutableLiveData<Boolean?>()
     val guardado: LiveData<Boolean?> get() = _guardado
@@ -73,6 +79,58 @@ class OnboardingViewModel(
     }
 
     fun peliculaEstaElegida(id: Int) = id in peliculasElegidas
+
+    /**
+     * La gente que se ofrece en el tercer paso.
+     *
+     * Primero se mira quien sale en las peliculas que el usuario acaba de marcar: si ha
+     * elegido tres de Nolan, lo suyo es proponerle a Nolan y no al actor de moda de esta
+     * semana. Solo cuando no ha marcado ninguna se tira de los populares de TMDB.
+     */
+    fun cargarPersonasSugeridas() {
+        _cargando.value = true
+        if (peliculasElegidas.isEmpty()) {
+            personas.populares { resultado ->
+                _cargando.value = false
+                if (resultado is Resultado.Exito) _personasSugeridas.value = resultado.datos
+            }
+            return
+        }
+
+        // Se piden los creditos de unas pocas: con mas de cuatro peticiones la pantalla
+        // tardaria demasiado y las caras se repetirian igualmente.
+        val aConsultar = peliculasElegidas.take(4)
+        val encontradas = linkedMapOf<Int, PersonaPopular>()
+        var pendientes = aConsultar.size
+
+        aConsultar.forEach { peliculaId ->
+            peliculas.reparto(peliculaId) { resultado ->
+                if (resultado is Resultado.Exito) {
+                    resultado.datos.cast.take(6)
+                        .filter { !it.profilePath.isNullOrBlank() }
+                        .forEach {
+                            encontradas.putIfAbsent(
+                                it.id,
+                                PersonaPopular(it.id, it.name, it.profilePath, it.knownForDepartment)
+                            )
+                        }
+                    resultado.datos.crew
+                        .filter { it.job == "Director" && !it.profilePath.isNullOrBlank() }
+                        .forEach {
+                            encontradas.putIfAbsent(
+                                it.id,
+                                PersonaPopular(it.id, it.name, it.profilePath, "Directing")
+                            )
+                        }
+                }
+                pendientes--
+                if (pendientes == 0) {
+                    _cargando.value = false
+                    _personasSugeridas.value = encontradas.values.toList()
+                }
+            }
+        }
+    }
 
     fun marcarPersona(id: Int, elegida: Boolean) {
         if (elegida) personasElegidas.add(id) else personasElegidas.remove(id)
