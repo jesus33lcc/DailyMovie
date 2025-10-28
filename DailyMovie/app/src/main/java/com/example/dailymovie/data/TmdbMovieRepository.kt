@@ -215,6 +215,18 @@ class TmdbMovieRepository(
         )
     }
 
+    override fun deLaGente(
+        personas: List<Int>,
+        alTerminar: (Resultado<List<MovieModel>>) -> Unit
+    ) {
+        listaDePeliculas(
+            // Con "|" vale con que salga cualquiera de ellos; con "," tendrian que estar
+            // todos en la misma pelicula, que casi nunca pasa.
+            servicio.descubrirPeliculas(apiKey, gente = personas.joinToString("|")),
+            alTerminar
+        )
+    }
+
     override fun descubrir(
         generos: List<Int>,
         filtros: FiltrosAvanzados,

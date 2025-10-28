@@ -4,17 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dailymovie.data.Dependencias
-import com.example.dailymovie.data.Gustos
+import com.example.dailymovie.data.Recomendador
 import com.example.dailymovie.data.MovieRepository
 import com.example.dailymovie.data.Resultado
 import com.example.dailymovie.data.UserRepository
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.utils.ErrorCarga
+import java.util.Calendar
 
 class HomeViewModel(
     private val peliculas: MovieRepository = Dependencias.peliculas,
-    private val usuario: UserRepository = Dependencias.usuario
+    private val usuario: UserRepository = Dependencias.usuario,
+    private val recomendador: Recomendador = Recomendador()
 ) : ViewModel() {
 
     private val _nowPlayingMovies = MutableLiveData<List<MovieModel>>()
@@ -75,37 +77,22 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * Pide una recomendacion al Recomendador, que es quien sabe combinar gustos, gente
+     * seguida y favoritos.
+     *
+     * La semilla es el dia del año: la portada cambia de un dia para otro, pero no cada vez
+     * que se abre la app. Si cambiara a cada rato no seria "la pelicula del dia" de nadie.
+     */
     private fun recomendarSegunGustos() {
-        usuario.gustos { gustos ->
-            if (gustos == null || gustos.generos.isEmpty()) {
-                elegirEntrePopulares()
-            } else {
-                recomendarPorGeneros(gustos)
-            }
-        }
-    }
-
-    private fun recomendarPorGeneros(gustos: Gustos) {
-        peliculas.porGeneros(gustos.generos) { resultado ->
-            val candidata = (resultado as? Resultado.Exito)?.datos
-                ?.firstOrNull { it.id !in gustos.peliculas }
-            if (candidata == null) {
-                elegirEntrePopulares()
-            } else {
-                publicarRecomendada(candidata, MOTIVO_GUSTOS)
-            }
-        }
-    }
-
-    private fun elegirEntrePopulares() {
-        peliculas.populares { resultado ->
-            val candidata = (resultado as? Resultado.Exito)?.datos?.firstOrNull()
-            if (candidata == null) {
+        val diaDelAno = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
+        recomendador.paraHoy(diaDelAno) { propuesta ->
+            if (propuesta == null) {
                 _motivoRecomendacion.value = null
                 _movieOfTheDay.value = null
                 peticionTerminada()
             } else {
-                publicarRecomendada(candidata, MOTIVO_POPULAR)
+                publicarRecomendada(propuesta.pelicula, propuesta.motivo)
             }
         }
     }
@@ -160,7 +147,5 @@ class HomeViewModel(
 
     private companion object {
         const val TOTAL_PETICIONES = 5
-        const val MOTIVO_GUSTOS = "Porque te gusta este tipo de cine"
-        const val MOTIVO_POPULAR = "De lo más visto ahora mismo"
     }
 }

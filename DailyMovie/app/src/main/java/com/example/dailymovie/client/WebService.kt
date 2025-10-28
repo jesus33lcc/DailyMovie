@@ -166,6 +166,9 @@ interface WebService {
         @Query("vote_average.gte") notaMinima: Double? = null,
         @Query("primary_release_year") ano: Int? = null,
         @Query("with_watch_providers") plataformas: String? = null,
+        // Sale en la pelicula, delante o detras de la camara. Alimenta el "porque sigues a
+        // Nolan" de la portada.
+        @Query("with_people") gente: String? = null,
         @Query("watch_region") region: String? = null,
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
         @Query("page") page: Int = 1
@@ -207,6 +210,9 @@ interface WebService {
         @Query("vote_average.gte") notaMinima: Double? = null,
         @Query("first_air_date_year") ano: Int? = null,
         @Query("with_watch_providers") plataformas: String? = null,
+        // Sale en la pelicula, delante o detras de la camara. Alimenta el "porque sigues a
+        // Nolan" de la portada.
+        @Query("with_people") gente: String? = null,
         @Query("watch_region") region: String? = null,
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
         @Query("page") page: Int = 1
