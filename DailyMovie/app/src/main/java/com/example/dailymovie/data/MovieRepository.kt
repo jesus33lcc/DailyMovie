@@ -51,6 +51,13 @@ interface MovieRepository {
     fun similares(peliculaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
     fun recomendadas(peliculaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
 
+    /**
+     * Peliculas en las que sale alguna de esas personas, delante o detras de la camara.
+     *
+     * @param personas ids de TMDB. Basta con que salga una de ellas, no hacen falta todas.
+     */
+    fun deLaGente(personas: List<Int>, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
+
     /** Peliculas de un genero, ordenadas por popularidad. Alimenta la recomendacion. */
     fun porGeneros(
         generos: List<Int>,
