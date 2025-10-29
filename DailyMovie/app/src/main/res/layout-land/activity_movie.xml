@@ -481,6 +481,68 @@
                     android:orientation="horizontal" />
             </LinearLayout>
 
+            <!--
+                Cuando la pelicula es parte de una saga.
+
+                Va justo antes de "Similares" porque es lo mas cercano que hay: quien ve la
+                segunda parte casi siempre quiere el resto, no algo que se le parezca.
+            -->
+            <LinearLayout
+                android:id="@+id/sectionSaga"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/imgSaga"
+                    android:layout_width="60dp"
+                    android:layout_height="90dp"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Cartel de la saga" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Forma parte de"
+                        android:fontFamily="@font/courier_prime"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorAccent" />
+
+                    <TextView
+                        android:id="@+id/txtSaga"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/courier_prime_bold"
+                        android:textSize="19sp"
+                        android:textColor="@color/black"
+                        tools:text="El padrino - Colección" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Ver todas las películas"
+                        android:fontFamily="@font/courier_prime"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorAccent" />
+                </LinearLayout>
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/sectionSimilarMovies"
                 android:layout_width="match_parent"
@@ -537,6 +599,40 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:scrollbars="horizontal" />
+            </LinearLayout>
+
+            <!--
+                Lo que ha escrito la gente en TMDB.
+
+                Va al final del todo: es lo que menos gente lee y ademas puede ocupar mucho,
+                asi que no debe empujar hacia abajo lo importante.
+            -->
+            <LinearLayout
+                android:id="@+id/sectionResenas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lo que dice la gente"
+                    android:fontFamily="@font/courier_prime_bold"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="6dp"
+                    android:textColor="@color/black" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewResenas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_resena" />
             </LinearLayout>
 
         </LinearLayout>

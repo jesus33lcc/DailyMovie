@@ -260,6 +260,29 @@ class MovieA : AppCompatActivity() {
         )
     }
 
+    /**
+     * La saga a la que pertenece la pelicula, si pertenece a alguna.
+     *
+     * TMDB lo da en belongs_to_collection sin coste extra, asi que no hace falta pedir nada
+     * mas: solo se enseña la fila y al tocarla se abre la saga entera.
+     */
+    private fun mostrarSaga(saga: com.example.dailymovie.models.CollectionModel?) {
+        if (saga == null) {
+            binding.sectionSaga.visibility = View.GONE
+            return
+        }
+        binding.sectionSaga.visibility = View.VISIBLE
+        binding.txtSaga.text = saga.name
+        binding.imgSaga.cargarCartel(saga.posterPath)
+        binding.sectionSaga.setOnClickListener {
+            startActivity(
+                Intent(this, SagaA::class.java)
+                    .putExtra(SagaA.EXTRA_SAGA_ID, saga.id)
+                    .putExtra(SagaA.EXTRA_NOMBRE, saga.name)
+            )
+        }
+    }
+
     private fun displayMovieDetails(movie: MovieDetailsModel) {
         binding.txtTituloMovie.text = movie.title
         binding.txtTaglineMovie.text = movie.tagline
@@ -306,6 +329,7 @@ class MovieA : AppCompatActivity() {
         binding.txtRevenueMovie.visibility = if (movie.revenue == 0L) View.GONE else View.VISIBLE
 
         binding.imgPosterMovie.cargarCartel(movie.posterPath)
+        mostrarSaga(movie.belongsToCollection)
 
         val hasContent = binding.txtDirectorMovie.text.isNotEmpty() ||
                 binding.txtRuntimeMovie.text.isNotEmpty() ||
