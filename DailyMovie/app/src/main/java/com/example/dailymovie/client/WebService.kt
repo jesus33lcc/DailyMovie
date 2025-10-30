@@ -234,6 +234,19 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<PersonCreditsResponse>
 
+    /**
+     * Lo que ha escrito la gente sobre una pelicula.
+     *
+     * No se pide con append_to_response junto a los detalles porque solo se necesitan al
+     * bajar del todo en la ficha, y cargarlas de golpe haria la primera peticion mas pesada
+     * para todo el mundo.
+     */
+    @GET("movie/{movie_id}/reviews")
+    fun getResenas(
+        @Path("movie_id") peliculaId: Int,
+        @Query("api_key") apiKey: String
+    ): Call<ResenasResponse>
+
     // ---- Series ----
 
     @GET("search/tv")

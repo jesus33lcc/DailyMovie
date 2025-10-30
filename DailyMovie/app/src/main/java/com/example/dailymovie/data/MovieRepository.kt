@@ -1,6 +1,7 @@
 package com.example.dailymovie.data
 
 import com.example.dailymovie.client.response.CreditResponse
+import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.client.response.MovieDetailsResponse
 import com.example.dailymovie.client.response.ProviderResponse
 import com.example.dailymovie.client.response.PlataformaDisponible
@@ -50,6 +51,13 @@ interface MovieRepository {
     fun videos(peliculaId: Int, alTerminar: (Resultado<List<VideoModel>>) -> Unit)
     fun similares(peliculaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
     fun recomendadas(peliculaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
+
+    /**
+     * Las reseñas que ha escrito la gente de TMDB sobre una pelicula.
+     *
+     * @param alTerminar recibe las reseñas con texto, que las vacias no aportan nada.
+     */
+    fun resenas(peliculaId: Int, alTerminar: (Resultado<List<ResenaResponse>>) -> Unit)
 
     /**
      * Peliculas en las que sale alguna de esas personas, delante o detras de la camara.

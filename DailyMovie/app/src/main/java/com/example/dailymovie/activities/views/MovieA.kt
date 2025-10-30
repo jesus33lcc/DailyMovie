@@ -23,6 +23,8 @@ import com.example.dailymovie.utils.Cifras
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
+import com.example.dailymovie.adapters.ResenaAdapter
+import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.databinding.ActivityMovieBinding
 import com.example.dailymovie.adapters.ImagenAdapter
 import com.example.dailymovie.graphics.SpacingItemDecoration
@@ -79,6 +81,8 @@ class MovieA : AppCompatActivity() {
                     displaySimilarMovies(it)
                 }
             })
+
+            movieViewModel.resenas.observe(this) { mostrarResenas(it) }
 
             movieViewModel.recommendedMovies.observe(this, Observer { recommendedMovies ->
                 recommendedMovies?.let {
@@ -281,6 +285,22 @@ class MovieA : AppCompatActivity() {
                     .putExtra(SagaA.EXTRA_NOMBRE, saga.name)
             )
         }
+    }
+
+    /**
+     * Las reseñas que ha escrito la gente en TMDB.
+     *
+     * Se enseñan como mucho cinco: son textos largos y con mas de eso la ficha se convierte
+     * en un foro. Quien quiera leerlas todas las tiene en la web de TMDB.
+     */
+    private fun mostrarResenas(resenas: List<ResenaResponse>) {
+        if (resenas.isEmpty()) {
+            binding.sectionResenas.visibility = View.GONE
+            return
+        }
+        binding.sectionResenas.visibility = View.VISIBLE
+        binding.recyclerViewResenas.layoutManager = LinearLayoutManager(this)
+        binding.recyclerViewResenas.adapter = ResenaAdapter(resenas.take(5))
     }
 
     private fun displayMovieDetails(movie: MovieDetailsModel) {
