@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Una reseña escrita por alguien de TMDB.
+
+    Empieza recortada a seis lineas: hay gente que escribe folios enteros y si se dejara
+    suelta una sola reseña ocuparia mas que toda la ficha. Al tocarla se abre entera.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="10dp"
+    android:padding="12dp"
+    android:background="@drawable/rounded_border_box"
+    android:clipToOutline="true"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/txtAutorResena"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="16sp"
+            android:fontFamily="@font/courier_prime_bold"
+            android:textColor="@color/colorTextPrimary"
+            tools:text="jesus33lcc" />
+
+        <TextView
+            android:id="@+id/txtNotaResena"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textSize="15sp"
+            android:fontFamily="@font/courier_prime_bold"
+            android:textColor="@color/colorAccent"
+            tools:text="★ 9,0" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtFechaResena"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:fontFamily="@font/courier_prime"
+        android:textColor="@color/colorAccent"
+        tools:text="12 de marzo de 2024" />
+
+    <TextView
+        android:id="@+id/txtTextoResena"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:maxLines="6"
+        android:ellipsize="end"
+        android:textSize="15sp"
+        android:lineSpacingExtra="2dp"
+        android:fontFamily="@font/courier_prime"
+        android:textColor="@color/colorTextPrimary"
+        tools:text="Una obra maestra del cine..." />
+
+    <TextView
+        android:id="@+id/txtLeerResena"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Leer entera"
+        android:textSize="14sp"
+        android:fontFamily="@font/courier_prime_bold"
+        android:textColor="@color/colorPrimaryDark" />
+</LinearLayout>

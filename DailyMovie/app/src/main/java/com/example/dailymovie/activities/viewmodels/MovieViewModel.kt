@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.dailymovie.client.response.CreditResponse
 import com.example.dailymovie.client.response.MovieDetailsResponse
 import com.example.dailymovie.client.response.ProviderResponse
+import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.data.Dependencias
 import com.example.dailymovie.data.ListaFija
 import com.example.dailymovie.data.MovieRepository
@@ -32,6 +33,9 @@ class MovieViewModel(
     val movieVideos: LiveData<List<VideoModel>> get() = _movieVideos
     private val _similarMovies = MutableLiveData<List<MovieModel>>()
     val similarMovies: LiveData<List<MovieModel>> get() = _similarMovies
+
+    private val _resenas = MutableLiveData<List<ResenaResponse>>()
+    val resenas: LiveData<List<ResenaResponse>> get() = _resenas
     private val _recommendedMovies = MutableLiveData<List<MovieModel>>()
     val recommendedMovies: LiveData<List<MovieModel>> get() = _recommendedMovies
 
@@ -56,6 +60,10 @@ class MovieViewModel(
         peliculas.reparto(peliculaId) { siVaBien(it) { datos -> _movieCredits.value = datos } }
         peliculas.videos(peliculaId) { siVaBien(it) { datos -> _movieVideos.value = datos } }
         peliculas.similares(peliculaId) { siVaBien(it) { datos -> _similarMovies.value = datos } }
+        // Las reseñas no cuentan como error si fallan: la ficha se ve igual de bien sin ellas.
+        peliculas.resenas(peliculaId) { resultado ->
+            if (resultado is Resultado.Exito) _resenas.value = resultado.datos
+        }
         peliculas.recomendadas(peliculaId) { siVaBien(it) { datos -> _recommendedMovies.value = datos } }
     }
 

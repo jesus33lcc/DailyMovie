@@ -4,6 +4,7 @@ import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.WebService
 import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.CreditResponse
+import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.client.response.PlataformaDisponible
 import com.example.dailymovie.client.response.ResultadoMulti
 import com.example.dailymovie.models.FiltrosAvanzados
@@ -210,6 +211,15 @@ class TmdbMovieRepository(
                     onExito = { alTerminar(Resultado.Exito(locales + trailersPrimero(it.results))) },
                     onError = { alTerminar(Resultado.Exito(locales)) }
                 )
+            },
+            onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    override fun resenas(peliculaId: Int, alTerminar: (Resultado<List<ResenaResponse>>) -> Unit) {
+        servicio.getResenas(peliculaId, apiKey).enqueueSimple(
+            onExito = { respuesta ->
+                alTerminar(Resultado.Exito(respuesta.resultados.filter { it.texto.isNotBlank() }))
             },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
