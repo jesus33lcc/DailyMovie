@@ -8,6 +8,7 @@ import com.example.dailymovie.client.response.ProviderResponse
 import com.example.dailymovie.models.FiltrosAvanzados
 import com.example.dailymovie.models.GenreModel
 import com.example.dailymovie.models.Hallazgo
+import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.models.PersonModel
@@ -57,6 +58,12 @@ class RecomendadorTest {
             referenciaPedida = peliculaId
             alTerminar(parecidas)
         }
+
+        // El recomendador no las usa; estan aqui solo porque la interfaz las pide.
+        override fun resenas(
+            peliculaId: Int,
+            alTerminar: (Resultado<List<ResenaResponse>>) -> Unit
+        ) = alTerminar(Resultado.Exito(emptyList()))
 
         override fun porGeneros(
             generos: List<Int>,
