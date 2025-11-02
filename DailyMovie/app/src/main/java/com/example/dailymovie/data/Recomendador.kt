@@ -49,9 +49,15 @@ class Recomendador(
     fun paraHoy(semilla: Int, alTerminar: (Recomendacion?) -> Unit) {
         usuario.gustos { gustos ->
             usuario.vistas { vistas ->
-                val descartadas = vistas.map { it.id }.toSet() + gustos?.peliculas.orEmpty()
-                val guion = ordenDeVias(semilla, gustos)
-                intentar(guion, 0, semilla, gustos, descartadas, alTerminar)
+                usuario.favoritas { favoritas ->
+                    // Nada de lo que el usuario ya tiene guardado o ya ha visto: recomendarle
+                    // su propia lista de favoritos sería quedar en ridículo.
+                    val descartadas = vistas.map { it.id }.toSet() +
+                        favoritas.map { it.id } +
+                        gustos?.peliculas.orEmpty()
+                    val guion = ordenDeVias(semilla, gustos, favoritas.isNotEmpty())
+                    intentar(guion, 0, semilla, gustos, favoritas, descartadas, alTerminar)
+                }
             }
         }
     }
@@ -63,11 +69,13 @@ class Recomendador(
      * el usuario no marcó a nadie. Entre las que quedan se rota con la semilla, para que dos
      * días seguidos no salga lo mismo.
      */
-    private fun ordenDeVias(semilla: Int, gustos: Gustos?): List<Via> {
+    private fun ordenDeVias(semilla: Int, gustos: Gustos?, hayFavoritas: Boolean): List<Via> {
         val personales = mutableListOf<Via>()
         if (!gustos?.personas.isNullOrEmpty()) personales += Via.GENTE
         if (!gustos?.generos.isNullOrEmpty()) personales += Via.GENEROS
-        personales += Via.FAVORITAS
+        // Sin favoritos esta vía no puede dar nada, y si entrara igualmente se comería un
+        // turno de cada tres para acabar cayendo a la siguiente.
+        if (hayFavoritas) personales += Via.FAVORITAS
 
         // Se rota, no se baraja: así todas las vías personales acaban saliendo y ninguna se
         // come siempre el turno.
@@ -82,6 +90,7 @@ class Recomendador(
         cual: Int,
         semilla: Int,
         gustos: Gustos?,
+        favoritas: List<MovieModel>,
         descartadas: Set<Int>,
         alTerminar: (Recomendacion?) -> Unit
     ) {
@@ -89,13 +98,15 @@ class Recomendador(
             alTerminar(null)
             return
         }
-        val siguiente = { intentar(guion, cual + 1, semilla, gustos, descartadas, alTerminar) }
+        val siguiente = {
+            intentar(guion, cual + 1, semilla, gustos, favoritas, descartadas, alTerminar)
+        }
 
         when (guion[cual]) {
             Via.GENTE -> porLaGente(semilla, gustos, descartadas) { it?.let(alTerminar) ?: siguiente() }
-            Via.FAVORITAS -> porFavoritas(semilla, descartadas) { it?.let(alTerminar) ?: siguiente() }
+            Via.FAVORITAS -> porFavoritas(semilla, favoritas, descartadas) { it?.let(alTerminar) ?: siguiente() }
             Via.GENEROS -> porGeneros(semilla, gustos, descartadas) { it?.let(alTerminar) ?: siguiente() }
-            Via.POPULARES -> porPopulares(descartadas) { it?.let(alTerminar) ?: siguiente() }
+            Via.POPULARES -> porPopulares(semilla, descartadas) { it?.let(alTerminar) ?: siguiente() }
         }
     }
 
@@ -136,23 +147,20 @@ class Recomendador(
 
     private fun porFavoritas(
         semilla: Int,
+        favoritas: List<MovieModel>,
         descartadas: Set<Int>,
         alTerminar: (Recomendacion?) -> Unit
     ) {
-        usuario.favoritas { favoritas ->
-            if (favoritas.isEmpty()) {
-                alTerminar(null)
-                return@favoritas
-            }
-            val referencia = favoritas[semilla % favoritas.size]
-            peliculas.recomendadas(referencia.id) { resultado ->
-                // La propia referencia también se descarta: recomendar la favorita que ya
-                // tienes guardada sería el colmo.
-                val candidata = elegir(resultado, semilla, descartadas + referencia.id)
-                alTerminar(
-                    candidata?.let { Recomendacion(it, "Porque te gustó ${referencia.title}") }
-                )
-            }
+        if (favoritas.isEmpty()) {
+            alTerminar(null)
+            return
+        }
+        val referencia = favoritas[semilla % favoritas.size]
+        peliculas.recomendadas(referencia.id) { resultado ->
+            val candidata = elegir(resultado, semilla, descartadas)
+            alTerminar(
+                candidata?.let { Recomendacion(it, "Porque te gustó ${referencia.title}") }
+            )
         }
     }
 
@@ -173,12 +181,15 @@ class Recomendador(
         }
     }
 
-    private fun porPopulares(descartadas: Set<Int>, alTerminar: (Recomendacion?) -> Unit) {
+    private fun porPopulares(
+        semilla: Int,
+        descartadas: Set<Int>,
+        alTerminar: (Recomendacion?) -> Unit
+    ) {
         peliculas.populares { resultado ->
-            // Aquí no se rota: si se ha llegado hasta abajo es que no sabemos nada del
-            // usuario, y lo que toca es enseñarle lo que ve todo el mundo.
-            val candidata = (resultado as? Resultado.Exito)?.datos
-                ?.firstOrNull { it.id !in descartadas }
+            // Pasa por el mismo filtro que las demás: esta vía existe para que la portada
+            // nunca falle, así que es la última que puede permitirse devolver algo sin cartel.
+            val candidata = elegir(resultado, semilla, descartadas)
             alTerminar(candidata?.let { Recomendacion(it, MOTIVO_POPULAR) })
         }
     }
