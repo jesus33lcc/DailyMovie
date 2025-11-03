@@ -227,7 +227,13 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<PersonResponse>
 
-    @GET("person/{person_id}/movie_credits")
+    /**
+     * Todo lo que ha hecho una persona: peliculas y series.
+     *
+     * Antes se pedia movie_credits, asi que en la ficha de un actor de series no salia nada.
+     * combined_credits trae las dos cosas y dice en media_type cual es cada una.
+     */
+    @GET("person/{person_id}/combined_credits")
     fun getFilmografia(
         @Path("person_id") personaId: Int,
         @Query("api_key") apiKey: String,

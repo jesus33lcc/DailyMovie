@@ -42,8 +42,65 @@ data class PeliculaDePersona(
 
     /** El puesto que ocupa, si viene de "crew": Director, Writer... */
     @SerializedName("job")
-    val puesto: String?
-)
+    val puesto: String?,
+
+    /**
+     * El titulo cuando es una serie: combined_credits usa "name" en vez de "title".
+     *
+     * Se guarda aparte y no se mezcla con [titulo] porque hace falta saber cual de los dos
+     * ha venido para decidir si al tocarla se abre la ficha de pelicula o la de serie.
+     */
+    @SerializedName("name")
+    val nombreDeSerie: String? = null,
+
+    @SerializedName("first_air_date")
+    val primeraEmision: String? = null,
+
+    @SerializedName("media_type")
+    val tipo: String? = null,
+
+    /**
+     * Lo conocido que es este trabajo.
+     *
+     * Es con lo que se ordena la filmografia. Ordenar por nota no vale: los making-of y los
+     * bloopers tienen un 10 con dos votos y se comian el primer puesto de la ficha, asi que
+     * un actor de series salia encabezado por un documental de rodaje.
+     */
+    @SerializedName("popularity")
+    val popularidad: Double = 0.0,
+
+    @SerializedName("vote_count")
+    val votos: Int = 0,
+
+    /**
+     * Que puesto ocupa en el reparto: 0 es el protagonista.
+     *
+     * Sirve para separar los papeles de verdad de los cameos. Sin esto, la ficha de Pedro
+     * Pascal empezaba por "Ley y orden", donde sale un capitulo, solo porque la serie tiene
+     * treinta temporadas y mucha popularidad.
+     */
+    @SerializedName("order")
+    val puestoEnElReparto: Int? = null,
+
+    /**
+     * En cuantos episodios sale, cuando es una serie.
+     *
+     * En television el puesto del reparto no significa gran cosa: en "Ley y orden" Pedro
+     * Pascal sale en un episodio y aun asi aparece bien colocado en la ficha de ese capitulo.
+     * Lo que separa un papel fijo de una aparicion suelta es cuantos episodios hace.
+     */
+    @SerializedName("episode_count")
+    val episodios: Int? = null
+) {
+    /** Si esto es una serie y no una pelicula. */
+    val esSerie: Boolean get() = tipo == "tv"
+
+    /** El titulo, venga de donde venga. */
+    val comoSeLlama: String get() = (titulo ?: nombreDeSerie).orEmpty()
+
+    /** La fecha, venga de donde venga. */
+    val cuandoSalio: String get() = (estreno ?: primeraEmision).orEmpty()
+}
 
 /** Lista de generos de TMDB, para el onboarding y la recomendacion. */
 data class GenresResponse(
