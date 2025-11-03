@@ -11,6 +11,7 @@ import com.example.dailymovie.utils.cargarFotoDePersona
 import com.example.dailymovie.activities.viewmodels.PersonaViewModel
 import com.example.dailymovie.adapters.HallazgoAdapter
 import com.example.dailymovie.models.Hallazgo
+import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.data.Filmografia
 import com.example.dailymovie.databinding.ActivityPersonaBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
@@ -118,13 +119,21 @@ class PersonaA : AppCompatActivity() {
     /** La filmografia con la misma tarjeta que el resto del catalogo. */
     private fun pintarFilmografia(
         lista: androidx.recyclerview.widget.RecyclerView,
-        peliculas: List<com.example.dailymovie.client.response.PeliculaDePersona>
+        trabajos: List<com.example.dailymovie.client.response.PeliculaDePersona>
     ) {
         val adaptador = lista.adapter as? HallazgoAdapter
-            ?: HallazgoAdapter { hallazgo ->
-                startActivity(Intent(this, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id))
-            }.also { lista.adapter = it }
-        adaptador.submitList(peliculas.map { Hallazgo.de(it) })
+            ?: HallazgoAdapter { hallazgo -> abrirFicha(hallazgo) }.also { lista.adapter = it }
+        adaptador.submitList(trabajos.map { Hallazgo.de(it) })
+    }
+
+    /** Las series abren la ficha de serie; todo lo demas, la de pelicula. */
+    private fun abrirFicha(hallazgo: Hallazgo) {
+        val destino = if (hallazgo.tipo == TipoDeHallazgo.SERIE) {
+            Intent(this, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, hallazgo.id)
+        } else {
+            Intent(this, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
+        }
+        startActivity(destino)
     }
 
     companion object {

@@ -44,14 +44,19 @@ data class Hallazgo(
             tipo = TipoDeHallazgo.PELICULA
         )
 
-        /** Una pelicula de la filmografia de alguien. */
-        fun de(pelicula: com.example.dailymovie.client.response.PeliculaDePersona) = Hallazgo(
-            id = pelicula.id,
-            titulo = pelicula.titulo.orEmpty(),
-            subtitulo = pelicula.estreno.orEmpty(),
-            imagen = pelicula.poster,
-            nota = pelicula.valoracion,
-            tipo = TipoDeHallazgo.PELICULA
+        /**
+         * Algo de la filmografia de alguien, sea pelicula o serie.
+         *
+         * Desde que se pide combined_credits en vez de movie_credits, en la ficha de una
+         * persona salen las dos cosas, y el tipo decide que ficha se abre al tocarla.
+         */
+        fun de(trabajo: com.example.dailymovie.client.response.PeliculaDePersona) = Hallazgo(
+            id = trabajo.id,
+            titulo = trabajo.comoSeLlama,
+            subtitulo = trabajo.cuandoSalio,
+            imagen = trabajo.poster,
+            nota = trabajo.valoracion,
+            tipo = if (trabajo.esSerie) TipoDeHallazgo.SERIE else TipoDeHallazgo.PELICULA
         )
 
         /** Una saga entera, para poder abrirla y ver sus peliculas en orden. */

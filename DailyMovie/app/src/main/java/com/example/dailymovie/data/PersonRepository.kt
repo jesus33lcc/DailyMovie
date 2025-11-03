@@ -35,6 +35,9 @@ data class Filmografia(
     fun estaVacia() = actuando.isEmpty() && dirigiendo.isEmpty()
 }
 
+private const val PUESTOS_PRINCIPALES = 5
+private const val EPISODIOS_PARA_SER_FIJO = 4
+
 class TmdbPersonRepository(
     private val servicio: WebService = RetrofitClient.webService,
     private val apiKey: String = Constantes.API_KEY
@@ -45,6 +48,29 @@ class TmdbPersonRepository(
             onExito = { alTerminar(Resultado.Exito(it)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
+    }
+
+    /**
+     * Si merece la pena enseñar este trabajo en la ficha.
+     *
+     * Se cae lo que no tiene titulo o cartel, que en una rejilla de carteles es un hueco, y
+     * lo que nadie ha votado: TMDB guarda muchisimo material de relleno (promocionales,
+     * apariciones de un minuto) que no dice nada de la carrera de la persona.
+     */
+    private fun esEnseñable(trabajo: PeliculaDePersona) =
+        trabajo.comoSeLlama.isNotBlank() && !trabajo.poster.isNullOrBlank() && trabajo.votos > 0
+
+    /**
+     * Si el papel es de los importantes.
+     *
+     * En cine se mira el puesto del reparto, que TMDB numera empezando por el protagonista.
+     * En television eso no vale, porque cada capitulo tiene su propio reparto: ahi lo que
+     * dice si el papel es fijo o una aparicion es en cuantos episodios sale.
+     */
+    private fun esPapelDePeso(trabajo: PeliculaDePersona) = if (trabajo.esSerie) {
+        (trabajo.episodios ?: 0) >= EPISODIOS_PARA_SER_FIJO
+    } else {
+        (trabajo.puestoEnElReparto ?: 0) <= PUESTOS_PRINCIPALES
     }
 
     override fun populares(alTerminar: (Resultado<List<PersonaPopular>>) -> Unit) {
@@ -64,11 +90,16 @@ class TmdbPersonRepository(
                         Filmografia(
                             // Las mas valoradas primero: es lo que la gente busca de un actor.
                             actuando = respuesta.actuaciones
-                                .filter { it.titulo != null }
-                                .sortedByDescending { it.valoracion },
+                                .filter { esEnseñable(it) }
+                                // Primero los papeles de peso y dentro de ellos lo mas
+                                // conocido: es el orden en el que la gente reconoce a alguien.
+                                .sortedWith(
+                                    compareBy<PeliculaDePersona> { esPapelDePeso(it).not() }
+                                        .thenByDescending { it.popularidad }
+                                ),
                             dirigiendo = respuesta.trabajos
-                                .filter { it.titulo != null && it.puesto == "Director" }
-                                .sortedByDescending { it.valoracion }
+                                .filter { esEnseñable(it) && it.puesto == "Director" }
+                                .sortedByDescending { it.popularidad }
                         )
                     )
                 )
