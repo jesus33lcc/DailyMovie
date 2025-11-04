@@ -14,7 +14,36 @@
         <item name="itemTextAppearanceActive">@style/BottomNavViewItemStyle</item>
         <item name="itemTextAppearanceInactive">@style/BottomNavViewItemStyle</item>
     </style>
-    <style name="Theme.DailyMovie" parent="Base.Theme.DailyMovie" />
+    <style name="Theme.DailyMovie" parent="Base.Theme.DailyMovie">
+        <item name="android:windowAnimationStyle">@style/AnimacionDeVentana</item>
+    </style>
+
+    <!--
+        Como entran y salen las pantallas.
+
+        Por defecto Android hace un empujon lateral que en una app de fichas queda raro: aqui
+        casi siempre se abre algo "encima" (una pelicula, una persona, una saga), asi que la
+        nueva sube desde abajo y la de detras se queda apagada al fondo.
+    -->
+    <style name="AnimacionDeVentana" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/entrar_ficha</item>
+        <item name="android:activityOpenExitAnimation">@anim/salir_ficha</item>
+        <item name="android:activityCloseEnterAnimation">@anim/volver_entrar</item>
+        <item name="android:activityCloseExitAnimation">@anim/volver_salir</item>
+    </style>
+
+    <!--
+        La pantalla de arranque.
+
+        Sin esto, entre que se toca el icono y se pinta la primera pantalla se veia un
+        rectangulo blanco del sistema, que con el azul marino de la app cantaba mucho. Ahora
+        se ve el logo sobre el fondo de la app y el salto no se nota.
+    -->
+    <style name="Theme.DailyMovie.Arranque" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/colorBackground</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.DailyMovie</item>
+    </style>
     <style name="BottomNavViewItemStyle" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/white</item>
@@ -84,5 +113,13 @@
         <item name="android:textSize">19sp</item>
         <item name="android:fontFamily">@font/courier_prime_bold</item>
         <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <!-- Un cartel de mentira, del mismo tamaño que los de verdad. -->
+    <style name="CartelFantasma">
+        <item name="android:layout_width">@dimen/poster_ancho</item>
+        <item name="android:layout_height">@dimen/poster_alto</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:background">@drawable/fondo_fantasma</item>
     </style>
 </resources>

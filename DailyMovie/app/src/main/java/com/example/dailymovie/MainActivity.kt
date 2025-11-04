@@ -2,6 +2,7 @@ package com.example.dailymovie
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import android.os.Bundle
 import com.example.dailymovie.activities.views.PrincipalA
 import com.example.dailymovie.activities.views.RegistroA
@@ -14,6 +15,9 @@ import com.example.dailymovie.utils.Analitica
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Tiene que ir antes del super: es lo que sustituye la ventana blanca del sistema
+        // por el logo sobre el fondo de la app.
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 

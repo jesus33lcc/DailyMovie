@@ -87,6 +87,11 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:5.0.0-rc01")
 
+    // Pantalla de arranque con el logo, en vez del fondo blanco del sistema
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    // Esqueletos de carga (el brillo que recorre los huecos mientras llega el contenido)
+    implementation("com.facebook.shimmer:shimmer:0.5.0")
+
     // Galeria de imagenes a pantalla completa
     implementation("androidx.viewpager2:viewpager2:1.1.0")
 
