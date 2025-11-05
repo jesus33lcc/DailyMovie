@@ -19,6 +19,7 @@ import com.example.dailymovie.utils.cargarFotogramaDeUrl
 import com.example.dailymovie.adapters.HallazgoAdapter
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.databinding.FragmentHomeBinding
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.utils.Trailers
@@ -35,6 +36,14 @@ class HomeF : Fragment() {
     private lateinit var homeViewModel: HomeViewModel
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
+    /**
+     * Si todavia no ha llegado nada.
+     *
+     * Marca la diferencia entre la primera carga, donde se enseñan los huecos con brillo, y
+     * un refresco posterior, donde ya hay carteles y lo que toca es la rueda de arriba.
+     */
+    private var primeraCarga = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,17 +67,23 @@ class HomeF : Fragment() {
         binding.recyclerViewUpcoming.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding.recyclerViewUpcoming.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
 
+        // Cada fila apaga su propio hueco cuando le llegan sus peliculas, en vez de esperar
+        // a que terminen las cuatro: si una tarda mas, las demas ya se ven.
         homeViewModel.nowPlayingMovies.observe(viewLifecycleOwner, Observer { movies ->
             pintarTira(binding.recyclerViewNowPlaying, movies.map { Hallazgo.de(it) })
+            apagarFantasma(binding.fantasmaNowPlaying.root)
         })
         homeViewModel.popularMovies.observe(viewLifecycleOwner, Observer { movies ->
             pintarTira(binding.recyclerViewPopular, movies.map { Hallazgo.de(it) })
+            apagarFantasma(binding.fantasmaPopular.root)
         })
         homeViewModel.topRatedMovies.observe(viewLifecycleOwner, Observer { movies ->
             pintarTira(binding.recyclerViewTopRated, movies.map { Hallazgo.de(it) })
+            apagarFantasma(binding.fantasmaTopRated.root)
         })
         homeViewModel.upcomingMovies.observe(viewLifecycleOwner, Observer { movies ->
             pintarTira(binding.recyclerViewUpcoming, movies.map { Hallazgo.de(it) })
+            apagarFantasma(binding.fantasmaUpcoming.root)
         })
 
         homeViewModel.movieOfTheDay.observe(viewLifecycleOwner, Observer { movie ->
@@ -86,7 +101,9 @@ class HomeF : Fragment() {
         })
 
         homeViewModel.cargando.observe(viewLifecycleOwner, Observer { cargando ->
-            binding.swipeRefreshLayout.isRefreshing = cargando
+            // La rueda de "tirar para refrescar" solo cuando ya hay algo en pantalla: la
+            // primera vez el que avisa de que se esta cargando es el hueco con brillo.
+            binding.swipeRefreshLayout.isRefreshing = cargando && !primeraCarga
         })
 
         homeViewModel.cargarPortada()
@@ -121,6 +138,19 @@ class HomeF : Fragment() {
                 Intent(context, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
         }
         startActivity(destino)
+    }
+
+    /**
+     * Quita el hueco con brillo de una fila, ya con sus peliculas dentro.
+     *
+     * El brillo se para ademas de esconderse: un ShimmerFrameLayout invisible sigue animando
+     * y gastando bateria si solo se le pone GONE.
+     */
+    private fun apagarFantasma(fantasma: View) {
+        if (fantasma.visibility == View.GONE) return
+        (fantasma as? ShimmerFrameLayout)?.stopShimmer()
+        fantasma.visibility = View.GONE
+        primeraCarga = false
     }
 
     private fun setupSwipeRefreshLayout() {
