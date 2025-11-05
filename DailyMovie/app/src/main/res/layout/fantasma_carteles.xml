@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    El hueco que se enseña mientras llegan los carteles.
+
+    Antes, mientras TMDB contestaba, las filas de la portada estaban vacias y parecia que la
+    app se habia colgado o que no habia nada. Esto pone cuatro carteles falsos con un brillo
+    que los recorre, asi se ve que algo esta pasando y ademas la pantalla no da un salto de
+    altura cuando llegan los de verdad.
+-->
+<com.facebook.shimmer.ShimmerFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    app:shimmer_base_alpha="0.85"
+    app:shimmer_highlight_alpha="1.0"
+    app:shimmer_duration="1400">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <View style="@style/CartelFantasma" />
+        <View style="@style/CartelFantasma" />
+        <View style="@style/CartelFantasma" />
+        <View style="@style/CartelFantasma" />
+    </LinearLayout>
+</com.facebook.shimmer.ShimmerFrameLayout>

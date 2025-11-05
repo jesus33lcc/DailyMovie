@@ -212,7 +212,11 @@
                     android:fontFamily="@font/courier_prime_bold"
                     android:textColor="@color/black" />
 
-                <androidx.recyclerview.widget.RecyclerView
+                                <include
+                    android:id="@+id/fantasmaNowPlaying"
+                    layout="@layout/fantasma_carteles" />
+
+<androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewNowPlaying"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -238,7 +242,11 @@
                     android:fontFamily="@font/courier_prime_bold"
                     android:textColor="@color/black" />
 
-                <androidx.recyclerview.widget.RecyclerView
+                                <include
+                    android:id="@+id/fantasmaPopular"
+                    layout="@layout/fantasma_carteles" />
+
+<androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewPopular"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -264,7 +272,11 @@
                     android:fontFamily="@font/courier_prime_bold"
                     android:textColor="@color/black" />
 
-                <androidx.recyclerview.widget.RecyclerView
+                                <include
+                    android:id="@+id/fantasmaTopRated"
+                    layout="@layout/fantasma_carteles" />
+
+<androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewTopRated"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -291,7 +303,11 @@
                     android:fontFamily="@font/courier_prime_bold"
                     android:textColor="@color/black" />
 
-                <androidx.recyclerview.widget.RecyclerView
+                                <include
+                    android:id="@+id/fantasmaUpcoming"
+                    layout="@layout/fantasma_carteles" />
+
+<androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewUpcoming"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
