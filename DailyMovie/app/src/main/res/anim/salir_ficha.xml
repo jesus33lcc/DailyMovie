@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    La que se queda detras se apaga un poco, no se va.
+
+    Asi la pantalla nueva parece que se pone encima, que es lo que de verdad pasa, en vez de
+    dar la sensacion de haber cambiado de sitio.
+-->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:interpolator/fast_out_slow_in">
+    <alpha android:fromAlpha="1.0" android:toAlpha="0.7" android:duration="260" />
+    <scale android:fromXScale="1.0" android:toXScale="0.97"
+        android:fromYScale="1.0" android:toYScale="0.97"
+        android:pivotX="50%" android:pivotY="50%" android:duration="260" />
+</set>
