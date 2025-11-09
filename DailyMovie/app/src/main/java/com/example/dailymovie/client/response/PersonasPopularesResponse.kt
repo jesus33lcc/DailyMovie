@@ -13,6 +13,14 @@ data class PersonasPopularesResponse(
     val resultados: List<PersonaPopular> = emptyList()
 )
 
+/**
+ * Una cara para la rejilla del onboarding.
+ *
+ * La foto puede faltar, y ahi no vale con enseñar un hueco: en una pantalla que va de elegir
+ * caras, una tarjeta sin foto no se puede ni reconocer. El repositorio se las quita antes.
+ *
+ * El oficio llega siempre en ingles ("Acting", "Directing") aunque se pida en español.
+ */
 data class PersonaPopular(
     @SerializedName("id")
     val id: Int,

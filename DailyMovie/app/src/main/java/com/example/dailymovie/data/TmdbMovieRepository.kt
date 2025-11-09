@@ -24,6 +24,11 @@ import retrofit2.Call
  *
  * La clave de la API se queda aqui dentro. Antes la pasaba cada llamante, asi que cualquier
  * pantalla tenia que saber de ella; ahora los ViewModels solo piden peliculas.
+ *
+ * @param servicio quien habla con TMDB. Se puede cambiar por un doble en los tests, que es
+ *   justo para lo que existe la interfaz.
+ * @param apiKey la clave de TMDB. Sale de local.properties via BuildConfig, asi que no esta en
+ *   el codigo, y se lee aqui para que nadie de arriba tenga que pasarla.
  */
 class TmdbMovieRepository(
     private val servicio: WebService = RetrofitClient.webService,

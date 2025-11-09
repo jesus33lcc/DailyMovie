@@ -13,6 +13,12 @@ data class ResenasResponse(
     val resultados: List<ResenaResponse> = emptyList()
 )
 
+/**
+ * Una reseña escrita por un usuario de TMDB.
+ *
+ * El [texto] puede venir en blanco, y una tarjeta con solo el nombre del autor no aporta nada:
+ * el repositorio se queda unicamente con las que tienen algo escrito.
+ */
 data class ResenaResponse(
     @SerializedName("id")
     val id: String,
@@ -30,6 +36,12 @@ data class ResenaResponse(
     val detallesDelAutor: DetallesDelAutor?
 )
 
+/**
+ * Quien escribio la reseña: su nota y su avatar.
+ *
+ * Todo el bloque puede faltar, no solo los campos de dentro, asi que hay que llegar hasta aqui
+ * con cuidado antes de dar por hecho que hay nota.
+ */
 data class DetallesDelAutor(
     /** La nota que le puso, sobre 10. Puede no haberla puesto. */
     @SerializedName("rating")

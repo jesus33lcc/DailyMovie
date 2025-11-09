@@ -21,21 +21,98 @@ import retrofit2.Call
  * ("name" en vez de "title").
  */
 interface SerieRepository {
+
+    /**
+     * Busca series por titulo.
+     *
+     * @param consulta lo que ha escrito el usuario.
+     * @param alTerminar recibe las series que encajan, o un fallo si no hubo red o TMDB
+     *   contesto con error. Que no haya coincidencias no es un fallo: llega una lista vacia.
+     */
     fun buscar(consulta: String, alTerminar: (Resultado<List<SerieModel>>) -> Unit)
+
+    /**
+     * Las series mas vistas del momento.
+     *
+     * @param alTerminar recibe las series, o un fallo si no se pudo pedir.
+     */
     fun populares(alTerminar: (Resultado<List<SerieModel>>) -> Unit)
+
+    /**
+     * Las series mejor valoradas segun los votos de TMDB.
+     *
+     * @param alTerminar recibe las series, o un fallo si no se pudo pedir.
+     */
     fun mejorValoradas(alTerminar: (Resultado<List<SerieModel>>) -> Unit)
+
+    /**
+     * Las series que estan emitiendo capitulos estos dias.
+     *
+     * @param alTerminar recibe las series, o un fallo si no se pudo pedir.
+     */
     fun enEmision(alTerminar: (Resultado<List<SerieModel>>) -> Unit)
 
+    /**
+     * La ficha de una serie.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param alTerminar recibe los detalles con las temporadas solo enumeradas, sin los
+     *   episodios dentro: cada temporada se pide aparte con [temporada].
+     */
     fun detalles(serieId: Int, alTerminar: (Resultado<SerieDetailsResponse>) -> Unit)
+
+    /**
+     * Una temporada con todos sus episodios.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param numero el numero de temporada que da TMDB. La 0 existe y son los especiales, asi
+     *   que no se puede dar por hecho que la primera sea la 1.
+     * @param alTerminar recibe la temporada con sus episodios, o un fallo si no se pudo pedir.
+     */
     fun temporada(serieId: Int, numero: Int, alTerminar: (Resultado<SeasonResponse>) -> Unit)
+
+    /**
+     * Quien sale y quien trabaja en una serie.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param alTerminar recibe el reparto y el equipo por separado, contando toda la emision y
+     *   no un capitulo suelto.
+     */
     fun reparto(serieId: Int, alTerminar: (Resultado<CreditResponse>) -> Unit)
+
+    /**
+     * Los videos de una serie.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param alTerminar recibe los videos con los trailers delante y el resto detras. A
+     *   diferencia de las peliculas, aqui no se pide una segunda vuelta en ingles.
+     */
     fun videos(serieId: Int, alTerminar: (Resultado<List<VideoModel>>) -> Unit)
+
+    /**
+     * Donde se puede ver una serie.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param alTerminar recibe las plataformas de todos los paises a la vez; hay que quedarse
+     *   con las del pais del aparato. Que ese pais no venga no es un fallo: es que ahi no esta.
+     */
     fun plataformas(serieId: Int, alTerminar: (Resultado<ProviderResponse>) -> Unit)
 
-    /** Los generos de series, que tienen sus propios ids distintos a los de cine. */
+    /**
+     * Los generos de series, que tienen sus propios ids distintos a los de cine.
+     *
+     * @param alTerminar recibe los generos con el nombre ya en el idioma del aparato. Estos
+     *   ids solo valen para [porGeneros] de series; en cine dan cualquier cosa.
+     */
     fun generos(alTerminar: (Resultado<List<GenreModel>>) -> Unit)
 
-    /** Series de un genero, ordenadas por popularidad. */
+    /**
+     * Series de un genero, ordenadas por popularidad.
+     *
+     * @param generos ids de genero de series, no los de cine.
+     * @param pagina cual de las tandas de 20 se pide.
+     * @param alTerminar recibe las series, o un fallo si no se pudo pedir.
+     */
     fun porGeneros(
         generos: List<Int>,
         pagina: Int = 1,
@@ -43,6 +120,13 @@ interface SerieRepository {
     )
 }
 
+/**
+ * La implementacion de verdad: pide las series a TMDB.
+ *
+ * @param servicio quien habla con TMDB. Se puede cambiar por un doble en los tests.
+ * @param apiKey la clave de TMDB. Se lee aqui, en el constructor, para que nadie de las capas
+ *   de arriba tenga que conocerla ni pasarla.
+ */
 class TmdbSerieRepository(
     private val servicio: WebService = RetrofitClient.webService,
     private val apiKey: String = Constantes.API_KEY

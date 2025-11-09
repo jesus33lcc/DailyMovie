@@ -6,6 +6,19 @@ import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.ProductionCompanyModel
 import com.google.gson.annotations.SerializedName
 
+/**
+ * La ficha completa de una pelicula, tal cual la manda TMDB.
+ *
+ * Los nombres estan en ingles porque es codigo heredado y se ha respetado el idioma que ya
+ * tenia; lo que se añadio despues (los tres extras del final) si va en español.
+ *
+ * Ojo con los tres ultimos campos: son opcionales porque solo llegan si la peticion pidio
+ * `append_to_response`. Si alguien llama al endpoint sin ese parametro, la galeria, la
+ * clasificacion por edad y el id de IMDb vienen a null y las secciones de la ficha se quedan
+ * vacias sin que falle nada.
+ *
+ * `budget` y `revenue` valen 0 cuando TMDB no sabe la cifra, que no es lo mismo que gratis.
+ */
 data class MovieDetailsResponse(
     @SerializedName("adult")
     val adult: Boolean,
@@ -104,6 +117,13 @@ data class ImagenesResponse(
     val logos: List<ImagenTmdb>
 )
 
+/**
+ * Una imagen suelta de la galeria.
+ *
+ * [ruta] es un trozo de camino, no una URL: hay que pegarle delante la base de imagenes de
+ * TMDB y el tamaño que se quiera. El ancho y el alto vienen para poder elegir las buenas sin
+ * tener que descargarlas antes.
+ */
 data class ImagenTmdb(
     @SerializedName("file_path")
     val ruta: String,
@@ -127,6 +147,12 @@ data class FechasDeEstrenoResponse(
     val porPais: List<EstrenoEnPais>
 )
 
+/**
+ * Los estrenos de una pelicula en un pais concreto.
+ *
+ * Hay varios por pais porque TMDB cuenta por separado el cine, el digital y el fisico, y no
+ * todos traen clasificacion.
+ */
 data class EstrenoEnPais(
     @SerializedName("iso_3166_1")
     val pais: String,
@@ -135,6 +161,12 @@ data class EstrenoEnPais(
     val estrenos: List<EstrenoConClasificacion>
 )
 
+/**
+ * Un estreno con su clasificacion por edad.
+ *
+ * La clasificacion llega muchas veces como cadena vacia en vez de faltar, asi que no basta con
+ * comprobar que no es null para darla por buena.
+ */
 data class EstrenoConClasificacion(
     @SerializedName("certification")
     val clasificacion: String?,

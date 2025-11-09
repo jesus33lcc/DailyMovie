@@ -10,7 +10,24 @@ import com.example.dailymovie.utils.Constantes
 
 /** Fichas de actores y directores, con su filmografia. */
 interface PersonRepository {
+
+    /**
+     * Los datos de una persona: nombre, foto, biografia y fechas.
+     *
+     * @param personaId el id de TMDB de la persona.
+     * @param alTerminar recibe la ficha, o un fallo si no hubo red o TMDB contesto con error.
+     */
     fun ficha(personaId: Int, alTerminar: (Resultado<PersonModel>) -> Unit)
+
+    /**
+     * Lo que ha hecho esa persona, ya listo para enseñar.
+     *
+     * @param personaId el id de TMDB de la persona.
+     * @param alTerminar recibe la filmografia partida en lo que ha actuado y lo que ha
+     *   dirigido, ya sin relleno y ordenada por lo que la gente reconoce primero. Si falla,
+     *   llega el motivo. Que la persona no tenga nada que enseñar no es un fallo: viene una
+     *   filmografia vacia.
+     */
     fun filmografia(personaId: Int, alTerminar: (Resultado<Filmografia>) -> Unit)
 
     /**
@@ -32,12 +49,24 @@ data class Filmografia(
     val actuando: List<PeliculaDePersona>,
     val dirigiendo: List<PeliculaDePersona>
 ) {
+    /** Si no hay nada que enseñar, para poder poner el aviso en vez de dos huecos. */
     fun estaVacia() = actuando.isEmpty() && dirigiendo.isEmpty()
 }
 
 private const val PUESTOS_PRINCIPALES = 5
 private const val EPISODIOS_PARA_SER_FIJO = 4
 
+/**
+ * La implementacion de verdad: pide las fichas a TMDB.
+ *
+ * Su trabajo no es solo traer datos, es tirar lo que no vale. TMDB devuelve la filmografia en
+ * bruto, con promocionales y apariciones de un minuto mezcladas con los papeles de verdad, y
+ * puesta tal cual en la ficha da una idea equivocada de la carrera de la persona.
+ *
+ * @param servicio quien habla con TMDB. Se puede cambiar por un doble en los tests.
+ * @param apiKey la clave de TMDB. Se lee aqui, en el constructor, para que nadie de las capas
+ *   de arriba tenga que conocerla ni pasarla.
+ */
 class TmdbPersonRepository(
     private val servicio: WebService = RetrofitClient.webService,
     private val apiKey: String = Constantes.API_KEY

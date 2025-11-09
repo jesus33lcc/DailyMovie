@@ -22,6 +22,13 @@ import java.util.Locale
  *   users/{uid}                      -> favorites, watched, history (arrays) y tastes (mapa)
  *   users/{uid}/lists/{nombre}       -> movies (array). El id del documento ES el nombre
  *   dailymovie/{id}                  -> la pelicula curada del dia
+ *
+ * Aqui no se lanza nunca una excepcion hacia fuera: si algo falla, la lectura avisa con la
+ * lista vacia y la escritura con un false. Es a proposito, porque en estas pantallas al
+ * usuario no le sirve de nada saber si fue la red o las reglas de Firestore.
+ *
+ * @param auth quien lleva la sesion. Se puede cambiar por un doble en los tests.
+ * @param db la base de datos. Igual, se puede sustituir para probar sin tocar Firebase.
  */
 class FirebaseUserRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
