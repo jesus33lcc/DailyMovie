@@ -13,6 +13,12 @@ data class PlataformasResponse(
     val plataformas: List<PlataformaDisponible> = emptyList()
 )
 
+/**
+ * Una plataforma de streaming del pais del usuario.
+ *
+ * El [id] es el que hay que mandarle luego a discover para filtrar, y no es el mismo en todos
+ * los paises: por eso la lista se pide cada vez en vez de tenerla escrita a mano.
+ */
 data class PlataformaDisponible(
     @SerializedName("provider_id")
     val id: Int,

@@ -23,6 +23,14 @@ data class BusquedaMultiResponse(
     val totalDePaginas: Int = 1
 )
 
+/**
+ * Un resultado de la busqueda mezclada, sea lo que sea.
+ *
+ * Casi todo viene opcional porque el mismo tipo tiene que valer para una pelicula, una serie y
+ * una persona, y cada una trae unos campos distintos. Antes de fiarse de nada hay que mirar
+ * [tipo]: es lo unico que dice de que se esta hablando. Y de vez en cuando TMDB cuela entradas
+ * a medias, sin titulo o sin tipo, asi que el repositorio las tira antes de llegar a la vista.
+ */
 data class ResultadoMulti(
     @SerializedName("id")
     val id: Int,

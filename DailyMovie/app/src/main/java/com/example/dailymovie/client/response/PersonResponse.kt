@@ -20,6 +20,17 @@ data class PersonCreditsResponse(
     val trabajos: List<PeliculaDePersona>
 )
 
+/**
+ * Un trabajo de la filmografia: puede ser una pelicula o una serie.
+ *
+ * Es el mismo tipo para las dos cosas porque combined_credits las devuelve mezcladas, y eso
+ * obliga a tener los campos duplicados: el titulo llega en "title" si es cine y en "name" si es
+ * television, y la fecha igual. Para no repetir esa comprobacion en cada pantalla estan
+ * [comoSeLlama], [cuandoSalio] y [esSerie].
+ *
+ * TMDB devuelve aqui muchisimo relleno (promocionales, apariciones de un minuto, making-of),
+ * asi que el repositorio filtra y ordena antes de que esto llegue a la ficha.
+ */
 data class PeliculaDePersona(
     @SerializedName("id")
     val id: Int,

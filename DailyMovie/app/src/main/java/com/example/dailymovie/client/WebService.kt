@@ -8,7 +8,37 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+/**
+ * Los endpoints de TMDB que usa la app, tal cual los entiende Retrofit.
+ *
+ * Es la capa mas baja: aqui no se decide nada, solo se describe que URL hay que pedir y con
+ * que parametros. Quien filtra, ordena o traduce lo que llega son los repositorios, y son los
+ * unicos que deberian llamar aqui. Una vista o un ViewModel que importe esto se salta la
+ * interfaz del repositorio y deja de poder probarse sin internet.
+ *
+ * Tres cosas que se repiten en casi todas las funciones y conviene saber una sola vez:
+ *
+ *  - **Ninguna funcion sale a la red al llamarla.** Devuelven un `Call` sin disparar, y quien
+ *    lo lanza es `enqueueSimple`, que es donde estan resueltos los fallos.
+ *  - **`apiKey` la pone siempre el repositorio.** Sale de `local.properties` via `BuildConfig`,
+ *    asi que no esta en el codigo ni la conoce nadie de la capa de arriba.
+ *  - **`language` ya viene puesto** con el idioma del aparato, y `page` con la primera tanda.
+ *    Se pasan solo cuando hace falta otra cosa, como pedir los videos tambien en ingles.
+ */
 interface WebService {
+
+    /**
+     * Busca peliculas por titulo.
+     *
+     * Es la busqueda antigua, la que solo ve cine. La pantalla de buscar usa [buscarTodo]; esta
+     * se queda para los sitios donde solo interesan peliculas.
+     *
+     * @param title lo que ha escrito el usuario.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param include_adult si entra tambien el cine para adultos.
+     * @param language idioma de los titulos y sinopsis; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("search/movie")
     fun searchMovies(
         @Query("query") title: String,
@@ -18,6 +48,19 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<MoviesResponse>
 
+    /**
+     * La ficha completa de una pelicula.
+     *
+     * @param movieId el id de TMDB de la pelicula.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de la sinopsis y el titulo; por defecto el del aparato.
+     * @param extras que mas se trae de paso en la misma peticion. Cambiarlo deja campos de
+     *   [MovieDetailsResponse] a null, porque son justo los que llegan por aqui.
+     * @param idiomasDeImagen de que idiomas se quieren los carteles y logos. El "null" del
+     *   final no es un despiste: asi TMDB incluye las imagenes sin idioma, que son la mayoria
+     *   de los fondos.
+     * @return los detalles con la galeria, la clasificacion por edad y los ids externos dentro.
+     */
     @GET("movie/{movie_id}")
     fun getMovieDetails(
         @Path("movie_id") movieId: Int,
@@ -30,6 +73,13 @@ interface WebService {
         @Query("include_image_language") idiomasDeImagen: String = "es,en,null"
     ): Call<MovieDetailsResponse>
 
+    /**
+     * Lo que hay ahora mismo en los cines.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("movie/now_playing")
     fun getNowPlayingMovies(
         @Query("api_key") apiKey: String,
@@ -37,6 +87,13 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<MoviesResponse>
 
+    /**
+     * Lo mas visto del momento. Es la red de seguridad de la portada: siempre devuelve algo.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("movie/popular")
     fun getPopularMovies(
         @Query("api_key") apiKey: String,
@@ -44,6 +101,13 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<MoviesResponse>
 
+    /**
+     * Las mejor valoradas de siempre segun los votos de TMDB.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("movie/top_rated")
     fun getTopRatedMovies(
         @Query("api_key") apiKey: String,
@@ -51,6 +115,13 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<MoviesResponse>
 
+    /**
+     * Lo que esta por estrenarse.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("movie/upcoming")
     fun getUpcomingMovies(
         @Query("api_key") apiKey: String,
@@ -58,18 +129,43 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<MoviesResponse>
 
+    /**
+     * Donde se puede ver una pelicula: suscripcion, alquiler o compra.
+     *
+     * No lleva idioma porque la respuesta viene partida por paises, y del monton hay que
+     * quedarse con el del aparato.
+     *
+     * @param movieId el id de TMDB de la pelicula.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @return las plataformas de todos los paises a la vez, con el codigo de pais como clave.
+     */
     @GET("movie/{movie_id}/watch/providers")
     fun getMovieProviders(
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String
     ): Call<ProviderResponse>
 
+    /**
+     * Quien sale y quien trabaja en una pelicula.
+     *
+     * @param movieId el id de TMDB de la pelicula.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @return el reparto y el equipo por separado, que TMDB los da en dos listas distintas.
+     */
     @GET("movie/{movie_id}/credits")
     fun getMovieCredits(
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String
     ): Call<CreditResponse>
 
+    /**
+     * Los videos de una pelicula: trailers, clips y detras de las camaras.
+     *
+     * @param movieId el id de TMDB de la pelicula.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language de que idioma se quieren. Aqui si se pasa a mano: TMDB tiene muchisimos
+     *   mas trailers en "en-US" que en español, asi que el repositorio pide las dos cosas.
+     */
     @GET("movie/{movie_id}/videos")
     fun getMovieVideos(
         @Path("movie_id") movieId: Int,
@@ -77,6 +173,14 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<VideoResponse>
 
+    /**
+     * Peliculas parecidas, segun los generos y las palabras clave que comparten.
+     *
+     * @param movieId el id de TMDB de la pelicula de la que se parte.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("movie/{movie_id}/similar")
     fun getSimilarMovies(
         @Path("movie_id") movieId: Int,
@@ -85,6 +189,17 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<MoviesResponse>
 
+    /**
+     * Peliculas que le gustaron a quien vio esta.
+     *
+     * No es lo mismo que [getSimilarMovies]: aquellas se parecen en los datos, estas salen de
+     * lo que de verdad ve la gente. Por eso son las que alimentan el "porque te gusto X".
+     *
+     * @param movieId el id de TMDB de la pelicula de la que se parte.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("movie/{movie_id}/recommendations")
     fun getRecommendedMovies(
         @Path("movie_id") movieId: Int,
@@ -98,6 +213,14 @@ interface WebService {
     /**
      * El unico endpoint que busca peliculas, series y gente a la vez, ya ordenadas por lo
      * que mas encaja con lo escrito. Antes se usaba search/movie, que solo veia peliculas.
+     *
+     * @param consulta lo que ha escrito el usuario.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param incluirAdulto aqui va a false a proposito, que esto es la busqueda general.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide. Es lo que permite ir cargando segun se baja.
+     * @return los tres tipos mezclados en la misma lista; hay que mirar `media_type` de cada
+     *   resultado para saber que es.
      */
     @GET("search/multi")
     fun buscarTodo(
@@ -113,6 +236,10 @@ interface WebService {
      *
      * Se usa en el onboarding cuando el usuario no ha marcado ninguna pelicula: sin nada de
      * donde tirar, las caras populares son lo unico que le va a sonar.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
      */
     @GET("person/popular")
     fun getPersonasPopulares(
@@ -126,6 +253,12 @@ interface WebService {
      *
      * search/multi no las devuelve nunca, asi que buscando "El Padrino" jamas aparecia la
      * triologia entera: habia que ir pelicula por pelicula.
+     *
+     * @param consulta lo que ha escrito el usuario.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @return solo la cabecera de cada saga (nombre y cartel), sin las peliculas de dentro:
+     *   para eso hay que ir luego a [getSaga].
      */
     @GET("search/collection")
     fun buscarSagas(
@@ -134,7 +267,13 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<BusquedaDeSagasResponse>
 
-    /** Las peliculas de una saga, por orden de estreno. */
+    /**
+     * Las peliculas de una saga, por orden de estreno.
+     *
+     * @param sagaId el id de coleccion de TMDB, que no tiene nada que ver con el de pelicula.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     */
     @GET("collection/{id}")
     fun getSaga(
         @Path("id") sagaId: Int,
@@ -142,7 +281,14 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<DetalleDeSagaResponse>
 
-    /** Lo que esta petando esta semana, para tener algo que enseñar sin buscar nada. */
+    /**
+     * Lo que esta petando esta semana, para tener algo que enseñar sin buscar nada.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @return peliculas, series y gente mezcladas, igual que [buscarTodo], y por eso comparten
+     *   el mismo tipo de resultado.
+     */
     @GET("trending/all/week")
     fun getTendencias(
         @Query("api_key") apiKey: String,
@@ -156,6 +302,21 @@ interface WebService {
      *
      * Los parametros con null no se mandan, asi que quien no filtra por algo no paga por ello:
      * Retrofit se salta las consultas nulas y TMDB devuelve lo de siempre.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param generos ids separados por coma para pedir que esten todos, o por "|" para que
+     *   valga con cualquiera. El repositorio usa la coma, que afina mas.
+     * @param orden como se ordena lo que vuelve, en el formato de TMDB (`campo.desc`).
+     * @param votosMinimos suelo de votos para que la nota signifique algo. Sin esto, discover
+     *   se llena de peliculas con un 10 puesto por cuatro personas.
+     * @param notaMinima nota de 0 a 10, o null para no filtrar.
+     * @param ano solo lo estrenado ese año, o null para no filtrar.
+     * @param plataformas ids de plataforma de streaming. Si va, hay que mandar tambien
+     *   [region] o TMDB no sabe de que pais le hablas.
+     * @param gente ids de actores o directores.
+     * @param region codigo de pais para las plataformas.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
      */
     @GET("discover/movie")
     fun descubrirPeliculas(
@@ -174,7 +335,14 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<MoviesResponse>
 
-    /** Las plataformas de streaming que hay en el pais del usuario. */
+    /**
+     * Las plataformas de streaming que hay en el pais del usuario.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param region de que pais se quieren; por defecto el del aparato. Es importante: los ids
+     *   de plataforma no son los mismos en todos los paises.
+     * @param language idioma de los textos; por defecto el del aparato.
+     */
     @GET("watch/providers/movie")
     fun getPlataformasDisponibles(
         @Query("api_key") apiKey: String,
@@ -182,6 +350,12 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<PlataformasResponse>
 
+    /**
+     * Los generos de cine con sus ids, que es lo que hay que mandar luego a discover.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language en que idioma vienen los nombres; por defecto el del aparato.
+     */
     @GET("genre/movie/list")
     fun getGeneros(
         @Query("api_key") apiKey: String,
@@ -194,6 +368,9 @@ interface WebService {
      * Van aparte de los de cine porque TMDB usa otros ids: "Accion" es el 28 en peliculas,
      * pero en series no existe como tal y esta dentro de "Action & Adventure", que es el
      * 10759. Con el id de pelicula, discover/tv devuelve cualquier cosa.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language en que idioma vienen los nombres; por defecto el del aparato.
      */
     @GET("genre/tv/list")
     fun getGenerosDeSeries(
@@ -201,6 +378,22 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<GenresResponse>
 
+    /**
+     * Igual que [descubrirPeliculas] pero de series, con sus propios campos de fecha.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param generos ids de genero de series, que no son los de cine.
+     * @param orden como se ordena lo que vuelve, en el formato de TMDB (`campo.desc`).
+     * @param votosMinimos suelo de votos. Aqui es mas bajo que en cine porque las series
+     *   reunen menos votos y con 300 se quedaban fuera casi todas.
+     * @param notaMinima nota de 0 a 10, o null para no filtrar.
+     * @param ano solo lo que empezo a emitirse ese año, o null para no filtrar.
+     * @param plataformas ids de plataforma de streaming; necesita [region].
+     * @param gente ids de actores o directores.
+     * @param region codigo de pais para las plataformas.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("discover/tv")
     fun descubrirSeries(
         @Query("api_key") apiKey: String,
@@ -220,6 +413,15 @@ interface WebService {
 
     // ---- Personas (actores y directores) ----
 
+    /**
+     * La ficha de una persona: nombre, foto, biografia y fechas.
+     *
+     * @param personaId el id de TMDB de la persona.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de la biografia; por defecto el del aparato. Ojo: TMDB devuelve
+     *   el oficio siempre en ingles aunque se le pida en español, y eso se traduce a mano
+     *   mas arriba.
+     */
     @GET("person/{person_id}")
     fun getPersona(
         @Path("person_id") personaId: Int,
@@ -232,6 +434,12 @@ interface WebService {
      *
      * Antes se pedia movie_credits, asi que en la ficha de un actor de series no salia nada.
      * combined_credits trae las dos cosas y dice en media_type cual es cada una.
+     *
+     * @param personaId el id de TMDB de la persona.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los titulos; por defecto el del aparato.
+     * @return todo en bruto y sin filtrar, incluidos promocionales y apariciones de un minuto.
+     *   Quien decide que merece la pena enseñar es el repositorio.
      */
     @GET("person/{person_id}/combined_credits")
     fun getFilmografia(
@@ -246,6 +454,11 @@ interface WebService {
      * No se pide con append_to_response junto a los detalles porque solo se necesitan al
      * bajar del todo en la ficha, y cargarlas de golpe haria la primera peticion mas pesada
      * para todo el mundo.
+     *
+     * @param peliculaId el id de TMDB de la pelicula.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @return las reseñas tal cual, casi siempre en ingles: no lleva idioma porque las escribe
+     *   la gente de TMDB y no hay traduccion que pedir.
      */
     @GET("movie/{movie_id}/reviews")
     fun getResenas(
@@ -255,6 +468,14 @@ interface WebService {
 
     // ---- Series ----
 
+    /**
+     * Busca series por titulo.
+     *
+     * @param titulo lo que ha escrito el usuario.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("search/tv")
     fun buscarSeries(
         @Query("query") titulo: String,
@@ -263,6 +484,13 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<SeriesResponse>
 
+    /**
+     * Las series mas vistas del momento.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("tv/popular")
     fun getSeriesPopulares(
         @Query("api_key") apiKey: String,
@@ -270,6 +498,13 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<SeriesResponse>
 
+    /**
+     * Las series mejor valoradas segun los votos de TMDB.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("tv/top_rated")
     fun getSeriesMejorValoradas(
         @Query("api_key") apiKey: String,
@@ -277,6 +512,13 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<SeriesResponse>
 
+    /**
+     * Las series que estan emitiendo capitulos estos dias.
+     *
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     * @param page que tanda de 20 se pide.
+     */
     @GET("tv/on_the_air")
     fun getSeriesEnEmision(
         @Query("api_key") apiKey: String,
@@ -284,6 +526,16 @@ interface WebService {
         @Query("page") page: Int = 1
     ): Call<SeriesResponse>
 
+    /**
+     * La ficha de una serie, con la lista de temporadas.
+     *
+     * Las temporadas vienen solo enumeradas, sin los episodios dentro: para eso hay que pedir
+     * cada una con [getTemporada].
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de la sinopsis y el titulo; por defecto el del aparato.
+     */
     @GET("tv/{tv_id}")
     fun getSerieDetalles(
         @Path("tv_id") serieId: Int,
@@ -291,6 +543,15 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<SerieDetailsResponse>
 
+    /**
+     * Una temporada con todos sus episodios.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param numeroTemporada el numero que le da TMDB. La 0 existe y son los especiales, asi
+     *   que no se puede dar por hecho que la primera sea la 1.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     */
     @GET("tv/{tv_id}/season/{season_number}")
     fun getTemporada(
         @Path("tv_id") serieId: Int,
@@ -299,6 +560,13 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<SeasonResponse>
 
+    /**
+     * El reparto de una serie, contando toda la emision y no un capitulo suelto.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language idioma de los textos; por defecto el del aparato.
+     */
     @GET("tv/{tv_id}/credits")
     fun getSerieCreditos(
         @Path("tv_id") serieId: Int,
@@ -306,6 +574,14 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<CreditResponse>
 
+    /**
+     * Los videos de una serie: trailers, adelantos y clips.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param language de que idioma se quieren; por defecto el del aparato. A diferencia de
+     *   las peliculas, aqui no se pide una segunda vuelta en ingles.
+     */
     @GET("tv/{tv_id}/videos")
     fun getSerieVideos(
         @Path("tv_id") serieId: Int,
@@ -313,6 +589,16 @@ interface WebService {
         @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
     ): Call<VideoResponse>
 
+    /**
+     * Donde se puede ver una serie.
+     *
+     * No lleva idioma, igual que en peliculas: la respuesta viene partida por paises y hay que
+     * quedarse con el del aparato.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @return las plataformas de todos los paises, con el codigo de pais como clave.
+     */
     @GET("tv/{tv_id}/watch/providers")
     fun getSerieProviders(
         @Path("tv_id") serieId: Int,

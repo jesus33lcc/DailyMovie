@@ -15,6 +15,12 @@ import retrofit2.Response
  *
  * Retrofit avisa en el hilo principal, asi que desde `onExito` se puede tocar LiveData
  * con `.value` sin problemas.
+ *
+ * @param onExito recibe el cuerpo de la respuesta ya convertido. Solo se llama si el servidor
+ *   contesto bien y ademas vino cuerpo: si TMDB devuelve un 200 vacio, esto no salta.
+ * @param onError recibe por que no hay datos: [ErrorCarga.SIN_CONEXION] si la peticion ni
+ *   siquiera salio, y [ErrorCarga.RESPUESTA_INVALIDA] si contesto pero con un codigo de error
+ *   o sin cuerpo. Uno de los dos bloques se llama siempre, nunca los dos.
  */
 fun <T> Call<T>.enqueueSimple(
     onExito: (T) -> Unit,

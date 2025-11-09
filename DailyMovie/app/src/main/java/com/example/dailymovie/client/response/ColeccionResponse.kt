@@ -13,6 +13,12 @@ data class BusquedaDeSagasResponse(
     val resultados: List<SagaResponse> = emptyList()
 )
 
+/**
+ * La cabecera de una saga en los resultados de busqueda.
+ *
+ * Aqui todavia no vienen las peliculas de dentro: para eso hay que pedir el detalle con el
+ * [id], que es un id de coleccion y no vale como id de pelicula.
+ */
 data class SagaResponse(
     @SerializedName("id")
     val id: Int,
@@ -46,6 +52,12 @@ data class DetalleDeSagaResponse(
     val peliculas: List<PeliculaDeSaga> = emptyList()
 )
 
+/**
+ * Una de las peliculas que forman la saga.
+ *
+ * Trae menos campos que la ficha completa, los justos para pintar el cartel de la lista. Si el
+ * usuario toca una, se pide su ficha aparte con el mismo [id], que aqui si es de pelicula.
+ */
 data class PeliculaDeSaga(
     @SerializedName("id")
     val id: Int,
