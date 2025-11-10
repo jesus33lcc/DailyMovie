@@ -19,6 +19,7 @@ import com.example.dailymovie.adapters.VideoAdapter
 import com.example.dailymovie.client.response.SeasonResponse
 import com.example.dailymovie.client.response.SerieDetailsResponse
 import com.example.dailymovie.databinding.ActivitySerieBinding
+import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.utils.Constantes
@@ -49,6 +50,10 @@ class SerieA : AppCompatActivity() {
         setContentView(binding.root)
 
         val serieId = intent.getIntExtra(EXTRA_SERIE_ID, -1)
+
+        // El mismo nombre que el cartel de la tarjeta desde la que se ha llegado, para que
+        // la imagen viaje hasta aqui en vez de aparecer de golpe.
+        binding.imgPosterSerie.transitionName = "cartel_${TipoDeHallazgo.SERIE}_$serieId"
         if (serieId == -1) {
             Avisos.breve(binding.root, "No se ha podido abrir la serie")
             finish()

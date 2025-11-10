@@ -24,7 +24,13 @@ import com.example.dailymovie.utils.cargarFotoDePersona
  * año y no se enseña nota, que TMDB no da nota de la gente.
  */
 class HallazgoAdapter(
-    private val alTocar: (Hallazgo) -> Unit
+    /**
+     * Que hacer al tocar una tarjeta.
+     *
+     * Ademas del hallazgo se pasa su cartel, que hace falta para la animacion de abrir la
+     * ficha: el cartel de la tarjeta y el de la ficha son "el mismo" y viaja de uno a otro.
+     */
+    private val alTocar: (Hallazgo, View) -> Unit
 ) : ListAdapter<Hallazgo, HallazgoAdapter.Holder>(COMPARADOR) {
 
     class Holder(vista: View) : RecyclerView.ViewHolder(vista) {
@@ -83,11 +89,17 @@ class HallazgoAdapter(
             holder.imagen.cargarCartel(hallazgo.imagen)
         }
 
-        holder.itemView.setOnClickListener { alTocar(hallazgo) }
+        // El nombre lleva el tipo ademas del id porque TMDB repite ids entre peliculas y
+        // series, y dos vistas con el mismo nombre rompen la animacion.
+        holder.imagen.transitionName = nombreDeTransicion(hallazgo)
+        holder.itemView.setOnClickListener { alTocar(hallazgo, holder.imagen) }
     }
 
-    private companion object {
-        val COMPARADOR = object : DiffUtil.ItemCallback<Hallazgo>() {
+    companion object {
+        /** El nombre que une el cartel de la tarjeta con el de la ficha que se abre. */
+        fun nombreDeTransicion(hallazgo: Hallazgo) = "cartel_${hallazgo.tipo}_${hallazgo.id}"
+
+        private val COMPARADOR = object : DiffUtil.ItemCallback<Hallazgo>() {
             // El id se repite entre tipos en TMDB, asi que hay que mirar tambien que es.
             override fun areItemsTheSame(vieja: Hallazgo, nueva: Hallazgo) =
                 vieja.id == nueva.id && vieja.tipo == nueva.tipo

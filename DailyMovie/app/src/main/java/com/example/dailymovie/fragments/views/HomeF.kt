@@ -17,6 +17,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarFotogramaDeUrl
 import com.example.dailymovie.adapters.HallazgoAdapter
+import com.example.dailymovie.utils.abrirConCartel
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -126,18 +127,18 @@ class HomeF : Fragment() {
             lista.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
         }
         val adaptador = lista.adapter as? HallazgoAdapter
-            ?: HallazgoAdapter { abrirFicha(it) }.also { lista.adapter = it }
+            ?: HallazgoAdapter { hallazgo, cartel -> abrirFicha(hallazgo, cartel) }.also { lista.adapter = it }
         adaptador.submitList(hallazgos)
     }
 
-    private fun abrirFicha(hallazgo: Hallazgo) {
+    private fun abrirFicha(hallazgo: Hallazgo, cartel: View) {
         val destino = when (hallazgo.tipo) {
             TipoDeHallazgo.SERIE ->
                 Intent(context, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, hallazgo.id)
             else ->
                 Intent(context, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
         }
-        startActivity(destino)
+        requireActivity().abrirConCartel(destino, cartel, HallazgoAdapter.nombreDeTransicion(hallazgo))
     }
 
     /**

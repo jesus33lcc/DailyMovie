@@ -14,6 +14,7 @@ import com.example.dailymovie.databinding.ActivitySagaBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.utils.Avisos
+import com.example.dailymovie.utils.abrirConCartel
 import com.example.dailymovie.utils.Fechas
 
 /**
@@ -38,9 +39,11 @@ class SagaA : AppCompatActivity() {
 
         binding.txtTituloSaga.text = intent.getStringExtra(EXTRA_NOMBRE).orEmpty()
 
-        val adaptador = HallazgoAdapter { hallazgo ->
-            startActivity(
-                Intent(this, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
+        val adaptador = HallazgoAdapter { hallazgo, cartel ->
+            abrirConCartel(
+                Intent(this, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id),
+                cartel,
+                HallazgoAdapter.nombreDeTransicion(hallazgo)
             )
         }
         binding.rvPeliculasDeLaSaga.layoutManager = GridLayoutManager(this, columnasQueCaben())

@@ -16,6 +16,8 @@
     </style>
     <style name="Theme.DailyMovie" parent="Base.Theme.DailyMovie">
         <item name="android:windowAnimationStyle">@style/AnimacionDeVentana</item>
+        <!-- Hace falta para que el cartel pueda viajar de la tarjeta a la ficha -->
+        <item name="android:windowContentTransitions">true</item>
     </style>
 
     <!--

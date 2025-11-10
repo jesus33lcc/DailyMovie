@@ -24,6 +24,7 @@ import com.example.dailymovie.activities.views.PersonaA
 import com.example.dailymovie.activities.views.SagaA
 import com.example.dailymovie.activities.views.SerieA
 import com.example.dailymovie.adapters.HallazgoAdapter
+import com.example.dailymovie.utils.abrirConCartel
 import com.example.dailymovie.databinding.FragmentExplorarBinding
 import com.example.dailymovie.fragments.viewmodels.ExplorarViewModel
 import com.example.dailymovie.fragments.viewmodels.OrdenDeBusqueda
@@ -140,7 +141,7 @@ class ExplorarF : Fragment() {
     }
 
     private fun prepararResultados() {
-        resultadosAdapter = HallazgoAdapter { hallazgo -> abrir(hallazgo) }
+        resultadosAdapter = HallazgoAdapter { hallazgo, cartel -> abrir(hallazgo, cartel) }
         binding.rvListaBusqueda.layoutManager = GridLayoutManager(context, columnasQueCaben())
         binding.rvListaBusqueda.adapter = resultadosAdapter
         binding.rvListaBusqueda.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
@@ -345,7 +346,7 @@ class ExplorarF : Fragment() {
             if (binding.rvTendencias.itemDecorationCount == 0) {
                 binding.rvTendencias.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
             }
-            val adaptador = HallazgoAdapter { abrir(it) }
+            val adaptador = HallazgoAdapter { hallazgo, cartel -> abrir(hallazgo, cartel) }
             binding.rvTendencias.adapter = adaptador
             adaptador.submitList(tendencias)
         }
@@ -360,7 +361,7 @@ class ExplorarF : Fragment() {
             if (binding.rvHistorial.itemDecorationCount == 0) {
                 binding.rvHistorial.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
             }
-            val adaptadorHistorial = HallazgoAdapter { abrir(it) }
+            val adaptadorHistorial = HallazgoAdapter { hallazgo, cartel -> abrir(hallazgo, cartel) }
             binding.rvHistorial.adapter = adaptadorHistorial
             adaptadorHistorial.submitList(historial.map { Hallazgo.de(it) })
         }
@@ -452,7 +453,7 @@ class ExplorarF : Fragment() {
 
     // ---------------- Ir a la ficha ----------------
 
-    private fun abrir(hallazgo: Hallazgo) {
+    private fun abrir(hallazgo: Hallazgo, cartel: View? = null) {
         val destino = when (hallazgo.tipo) {
             TipoDeHallazgo.PELICULA ->
                 Intent(context, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
@@ -465,7 +466,12 @@ class ExplorarF : Fragment() {
                     .putExtra(SagaA.EXTRA_SAGA_ID, hallazgo.id)
                     .putExtra(SagaA.EXTRA_NOMBRE, hallazgo.titulo)
         }
-        startActivity(destino)
+        if (cartel == null) {
+            startActivity(destino)
+        } else {
+            requireActivity()
+                .abrirConCartel(destino, cartel, HallazgoAdapter.nombreDeTransicion(hallazgo))
+        }
     }
 
     private fun esconderTeclado() {
