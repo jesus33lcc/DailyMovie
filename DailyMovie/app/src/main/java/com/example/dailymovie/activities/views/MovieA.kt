@@ -16,6 +16,7 @@ import com.example.dailymovie.utils.cargarCartel
 import com.example.dailymovie.adapters.*
 import com.example.dailymovie.client.response.*
 import com.example.dailymovie.models.Hallazgo
+import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.models.MovieDetailsModel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
@@ -24,6 +25,7 @@ import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.adapters.ResenaAdapter
+import com.example.dailymovie.utils.abrirConCartel
 import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.databinding.ActivityMovieBinding
 import com.example.dailymovie.adapters.ImagenAdapter
@@ -44,6 +46,10 @@ class MovieA : AppCompatActivity() {
         setContentView(binding.root)
 
         val movieId = intent.getIntExtra(EXTRA_MOVIE_ID, -1)
+
+        // El mismo nombre que lleva el cartel de la tarjeta desde la que se ha llegado: es
+        // lo que hace que la imagen crezca hasta aqui en vez de aparecer de golpe.
+        binding.imgPosterMovie.transitionName = "cartel_${TipoDeHallazgo.PELICULA}_$movieId"
 
         if (movieId != -1) {
             movieViewModel.cargarPelicula(movieId)
@@ -138,8 +144,12 @@ class MovieA : AppCompatActivity() {
     }
 
     /** Abre otra pelicula desde las tiras de similares y recomendadas. */
-    private fun abrirOtra(hallazgo: Hallazgo) {
-        startActivity(Intent(this, MovieA::class.java).putExtra(EXTRA_MOVIE_ID, hallazgo.id))
+    private fun abrirOtra(hallazgo: Hallazgo, cartel: View) {
+        abrirConCartel(
+            Intent(this, MovieA::class.java).putExtra(EXTRA_MOVIE_ID, hallazgo.id),
+            cartel,
+            HallazgoAdapter.nombreDeTransicion(hallazgo)
+        )
     }
 
     private fun shareMovie(movie: MovieModel) {
@@ -443,7 +453,7 @@ class MovieA : AppCompatActivity() {
 
     private fun displaySimilarMovies(similarMovies: List<MovieModel>) {
         if (similarMovies.isNotEmpty()) {
-            val adapter = HallazgoAdapter { abrirOtra(it) }.also { it.submitList(similarMovies.map { p -> Hallazgo.de(p) }) }
+            val adapter = HallazgoAdapter { hallazgo, cartel -> abrirOtra(hallazgo, cartel) }.also { it.submitList(similarMovies.map { p -> Hallazgo.de(p) }) }
             binding.recyclerViewSimilarMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewSimilarMovies.adapter = adapter
             binding.sectionSimilarMovies.visibility = View.VISIBLE
@@ -455,7 +465,7 @@ class MovieA : AppCompatActivity() {
 
     private fun displayRecommendedMovies(recommendedMovies: List<MovieModel>) {
         if (recommendedMovies.isNotEmpty()) {
-            val adapter = HallazgoAdapter { abrirOtra(it) }.also { it.submitList(recommendedMovies.map { p -> Hallazgo.de(p) }) }
+            val adapter = HallazgoAdapter { hallazgo, cartel -> abrirOtra(hallazgo, cartel) }.also { it.submitList(recommendedMovies.map { p -> Hallazgo.de(p) }) }
             binding.recyclerViewRecommendedMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
             binding.recyclerViewRecommendedMovies.adapter = adapter
             binding.sectionRecommendedMovies.visibility = View.VISIBLE
