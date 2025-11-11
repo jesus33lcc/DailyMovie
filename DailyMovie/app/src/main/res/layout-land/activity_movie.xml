@@ -105,7 +105,7 @@
                         android:orientation="horizontal"
                         android:gravity="center"
                         android:layout_marginTop="8dp"
-                        android:weightSum="4">
+                        android:weightSum="5">
 
                         <ImageButton
                             android:id="@+id/btnFavorite"
@@ -157,6 +157,20 @@
                             android:padding="2dp"
                             android:contentDescription="Compartir"
                             app:tint="@color/white" />
+
+                <ImageButton
+                    android:id="@+id/btnEnlaces"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_button"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_enlace"
+                    android:scaleType="centerInside"
+                    android:padding="2dp"
+                    android:contentDescription="Ver en otras webs"
+                    android:visibility="gone"
+                    app:tint="@color/white" />
                     </LinearLayout>
                 </LinearLayout>
 

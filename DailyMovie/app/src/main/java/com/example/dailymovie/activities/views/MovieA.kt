@@ -21,6 +21,9 @@ import com.example.dailymovie.models.MovieDetailsModel
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Cifras
+import android.net.Uri
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.appcompat.widget.PopupMenu
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
@@ -150,6 +153,50 @@ class MovieA : AppCompatActivity() {
             cartel,
             HallazgoAdapter.nombreDeTransicion(hallazgo)
         )
+    }
+
+    /**
+     * El boton que lleva a la pelicula fuera de la app.
+     *
+     * TMDB devuelve el id de IMDb y la web oficial en la misma peticion de los detalles, asi
+     * que no cuesta nada ofrecerlos: es donde la gente va a mirar la ficha "de verdad" o a
+     * comprar la entrada. Si no viene ninguno de los dos, el boton ni aparece.
+     */
+    private fun prepararEnlaces(movie: MovieDetailsModel) {
+        val enlaces = buildList {
+            movie.imdbId?.takeIf { it.isNotBlank() }
+                ?.let { add("Ver en IMDb" to "https://www.imdb.com/title/$it/") }
+            movie.homepage?.takeIf { it.isNotBlank() }
+                ?.let { add("Web oficial" to it) }
+            add("Ver en TMDB" to "${Constantes.BASE_MOVIE_URL}${movie.id}")
+        }
+
+        binding.btnEnlaces.visibility = View.VISIBLE
+        binding.btnEnlaces.setOnClickListener { boton ->
+            PopupMenu(ContextThemeWrapper(this, R.style.TemaPopupDailyMovie), boton).apply {
+                enlaces.forEachIndexed { posicion, (titulo, _) -> menu.add(0, posicion, posicion, titulo) }
+                setOnMenuItemClickListener { opcion ->
+                    abrirEnElNavegador(enlaces[opcion.itemId].second)
+                    true
+                }
+                show()
+            }
+        }
+    }
+
+    /**
+     * Abre una direccion fuera de la app.
+     *
+     * Puede no haber navegador (una tablet muy pelada, un perfil restringido), asi que se
+     * avisa en vez de dejar que reviente.
+     */
+    private fun abrirEnElNavegador(direccion: String) {
+        val intento = Intent(Intent.ACTION_VIEW, Uri.parse(direccion))
+        if (intento.resolveActivity(packageManager) != null) {
+            startActivity(intento)
+        } else {
+            Avisos.breve(binding.root, "No hay ningún navegador para abrirlo")
+        }
     }
 
     private fun shareMovie(movie: MovieModel) {
@@ -360,6 +407,7 @@ class MovieA : AppCompatActivity() {
 
         binding.imgPosterMovie.cargarCartel(movie.posterPath)
         mostrarSaga(movie.belongsToCollection)
+        prepararEnlaces(movie)
 
         val hasContent = binding.txtDirectorMovie.text.isNotEmpty() ||
                 binding.txtRuntimeMovie.text.isNotEmpty() ||
