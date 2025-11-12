@@ -1,7 +1,18 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Una fila de la pantalla de Listas.
+
+    Era un RelativeLayout con las vistas encadenadas unas a otras, y al meter el contador se
+    rompio: en Favoritos y Vistos los tres puntos van ocultos, y RelativeLayout coloca lo que
+    depende de una vista GONE donde no toca, asi que el nombre desaparecia. Con una fila y el
+    nombre llevandose el hueco que sobra ya no hay nada que encadenar.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:padding="8dp"
     android:background="@drawable/rounded_button"
     android:clipToOutline="true">
@@ -10,34 +21,16 @@
         android:id="@+id/iconoTypeLista_img"
         android:layout_width="68dp"
         android:layout_height="73dp"
-        android:layout_centerVertical="true"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="16dp"
+        android:contentDescription="@null"
         tools:src="@drawable/ic_baseline_image_24" />
-
-    <!-- Los tres puntos, a la derecha del todo. Solo salen en las listas del usuario:
-         Favoritos y Vistos vienen con la app y no se pueden borrar -->
-    <ImageButton
-        android:id="@+id/btnOpcionesLista"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_tres_puntos"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:scaleType="centerInside"
-        android:contentDescription="Más opciones"
-        android:visibility="gone"
-        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/nombreLista_txt"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toEndOf="@id/iconoTypeLista_img"
-        android:layout_toStartOf="@id/btnOpcionesLista"
+        android:layout_weight="1"
         android:text="Nombre lista"
         android:textColor="@color/white"
         android:textSize="20sp"
@@ -45,4 +38,32 @@
         android:ellipsize="end"
         android:fontFamily="@font/courier_prime_bold" />
 
-</RelativeLayout>
+    <!-- Cuantas cosas tiene guardadas. Aparece un instante despues del nombre, en cuanto
+         Firestore contesta -->
+    <TextView
+        android:id="@+id/cuantasLista_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
+        android:fontFamily="@font/courier_prime"
+        android:visibility="gone"
+        tools:text="12"
+        tools:visibility="visible" />
+
+    <!-- Los tres puntos. Solo salen en las listas del usuario: Favoritos y Vistos vienen
+         con la app y no se pueden borrar -->
+    <ImageButton
+        android:id="@+id/btnOpcionesLista"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_tres_puntos"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside"
+        android:contentDescription="Más opciones"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</LinearLayout>
