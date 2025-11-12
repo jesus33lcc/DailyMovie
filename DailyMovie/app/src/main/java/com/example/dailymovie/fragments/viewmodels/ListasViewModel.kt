@@ -31,11 +31,44 @@ class ListasViewModel(
             ListaModel(ListaFija.FAVORITOS.titulo, R.drawable.ic_baseline_favorite_24),
             ListaModel(ListaFija.VISTOS.titulo, R.drawable.ic_baseline_visibility_24)
         )
+        // Los numeros se piden aparte y en cuanto llegan se vuelve a publicar la lista. Asi
+        // los nombres salen al momento y el contador aparece un instante despues, en vez de
+        // tener la pantalla en blanco esperando a dos consultas mas.
+        usuario.favoritas { favoritas ->
+            usuario.vistas { vistas ->
+                _favoriteAndWatchedLists.value = listOf(
+                    ListaModel(ListaFija.FAVORITOS.titulo, R.drawable.ic_baseline_favorite_24, favoritas.size),
+                    ListaModel(ListaFija.VISTOS.titulo, R.drawable.ic_baseline_visibility_24, vistas.size)
+                )
+            }
+        }
     }
 
     private fun cargarListasDelUsuario() {
         usuario.listasDelUsuario { nombres ->
             _customLists.value = nombres.map { ListaModel(it, R.drawable.ic_baseline_list_24) }
+            contarListasDelUsuario(nombres)
+        }
+    }
+
+    /**
+     * Pone el numero de peliculas a cada lista del usuario.
+     *
+     * Cada lista es un documento aparte en Firestore, asi que hay que pedirlas una a una.
+     * Se publica cuando han contestado todas para no repintar la pantalla N veces.
+     */
+    private fun contarListasDelUsuario(nombres: List<String>) {
+        if (nombres.isEmpty()) return
+        val cuentas = mutableMapOf<String, Int>()
+        nombres.forEach { nombre ->
+            usuario.peliculasDeLista(nombre) { peliculas ->
+                cuentas[nombre] = peliculas.size
+                if (cuentas.size == nombres.size) {
+                    _customLists.value = nombres.map {
+                        ListaModel(it, R.drawable.ic_baseline_list_24, cuentas[it])
+                    }
+                }
+            }
         }
     }
 

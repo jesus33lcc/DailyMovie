@@ -31,6 +31,7 @@ class MovieListAdapter(
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val iconoTypeListaImg: ImageView = view.findViewById(R.id.iconoTypeLista_img)
         val nombreListaTxt: TextView = view.findViewById(R.id.nombreLista_txt)
+        val cuantasTxt: TextView = view.findViewById(R.id.cuantasLista_txt)
         val opciones: ImageButton = view.findViewById(R.id.btnOpcionesLista)
     }
 
@@ -42,6 +43,10 @@ class MovieListAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val lista = getItem(position)
         holder.nombreListaTxt.text = lista.nombre
+        // Mientras no se sepa el numero no se enseña nada: un "0" mientras carga haria
+        // pensar que la lista esta vacia cuando igual tiene veinte peliculas.
+        holder.cuantasTxt.visibility = if (lista.cuantas == null) View.GONE else View.VISIBLE
+        holder.cuantasTxt.text = lista.cuantas?.toString().orEmpty()
         holder.iconoTypeListaImg.setImageResource(lista.icono)
         holder.itemView.setOnClickListener {
             itemClickListener(lista)
