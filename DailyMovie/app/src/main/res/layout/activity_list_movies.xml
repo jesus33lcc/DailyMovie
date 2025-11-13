@@ -7,27 +7,64 @@
     android:background="@color/colorBackground"
     tools:context=".activities.views.ListMoviesA">
 
+    <!--
+        La cabecera.
+
+        Era una caja blanca a todo el ancho con el nombre dentro, que no se parecia a ninguna
+        otra pantalla de la app. Ahora es plana sobre el azul marino, como en Explorar y en
+        Listas, con la flecha para volver y el numero de peliculas debajo.
+    -->
     <LinearLayout
         android:id="@+id/titleContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@drawable/rounded_border_box"
-        android:clipToOutline="true"
-        android:padding="16dp"
-        android:layout_margin="16dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="8dp"
+        android:paddingTop="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:id="@+id/listTitle"
-            android:layout_width="wrap_content"
+        <ImageButton
+            android:id="@+id/btnVolverLista"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerInside"
+            android:contentDescription="Volver"
+            app:tint="@color/white" />
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:fontFamily="@font/courier_prime_bold"
-            android:textColor="@color/black"
-            android:text="Nombre de la Lista" />
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/listTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:fontFamily="@font/courier_prime_bold"
+                android:textColor="@color/white"
+                android:text="Nombre de la Lista" />
+
+            <TextView
+                android:id="@+id/listCuantas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:fontFamily="@font/courier_prime"
+                android:textColor="@color/colorPrimary"
+                android:visibility="gone"
+                tools:text="12 películas"
+                tools:visibility="visible" />
+        </LinearLayout>
     </LinearLayout>
 
     <!--
