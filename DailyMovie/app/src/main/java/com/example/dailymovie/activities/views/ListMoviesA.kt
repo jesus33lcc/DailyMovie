@@ -33,6 +33,7 @@ class ListMoviesA : AppCompatActivity() {
 
         listName = intent.getStringExtra(EXTRA_NOMBRE) ?: ""
         binding.listTitle.text = listName
+        binding.btnVolverLista.setOnClickListener { finish() }
 
         // Lo que llega en el Intent son solo peliculas; las series entran en onResume, que es
         // quien pide la lista completa.
@@ -72,7 +73,14 @@ class ListMoviesA : AppCompatActivity() {
         movieViewModel.cargarListaCompleta(listName) { actualizadas ->
             movieList = actualizadas.toMutableList()
             movieListAdapter.submitList(actualizadas) { decidirSiHayAlgo() }
+            pintarCuantasHay(actualizadas.size)
         }
+    }
+
+    /** El "12 películas" de debajo del titulo, que no se enseña si la lista esta vacia. */
+    private fun pintarCuantasHay(cuantas: Int) {
+        binding.listCuantas.visibility = if (cuantas == 0) View.GONE else View.VISIBLE
+        binding.listCuantas.text = if (cuantas == 1) "1 película" else "$cuantas películas"
     }
 
     /**
