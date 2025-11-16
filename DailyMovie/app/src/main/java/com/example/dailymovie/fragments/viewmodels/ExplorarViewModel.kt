@@ -158,11 +158,25 @@ class ExplorarViewModel(
             aplicarFiltro()
         }
 
+        // Las paginas siguientes tienen que venir de donde vino la primera. Si no se mira
+        // esto, con filtros puestos la pagina 1 llega filtrada por discover y la 2 sin
+        // filtrar por search, asi que al bajar aparecian resultados que el filtro habia
+        // quitado.
         val genero = generoEnCurso
-        if (genero != null) {
-            cargarGeneroEnPagina(genero, siguiente, alRecibir)
-        } else {
-            peliculas.buscarTodo(consultaActual, siguiente) { resultado ->
+        when {
+            !filtrosAvanzados.estanVacios() -> peliculas.descubrir(
+                generos = listOfNotNull(genero?.idPelicula),
+                filtros = filtrosAvanzados,
+                pagina = siguiente
+            ) { resultado ->
+                if (resultado is Resultado.Exito) {
+                    alRecibir(resultado.datos.map { Hallazgo.de(it) }, resultado.datos.size >= POR_PAGINA)
+                } else {
+                    pidiendoMas = false
+                }
+            }
+            genero != null -> cargarGeneroEnPagina(genero, siguiente, alRecibir)
+            else -> peliculas.buscarTodo(consultaActual, siguiente) { resultado ->
                 if (resultado is Resultado.Exito) {
                     alRecibir(resultado.datos.hallazgos, resultado.datos.hayMas)
                 } else {
