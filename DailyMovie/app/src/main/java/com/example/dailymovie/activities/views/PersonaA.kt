@@ -66,6 +66,18 @@ class PersonaA : AppCompatActivity() {
     }
 
     private fun pintarFicha(persona: PersonModel) {
+        // A un director se le conoce por lo que dirige, no por los documentales de rodaje en
+        // los que sale de si mismo. En su ficha va primero "Ha dirigido".
+        if (persona.oficio == "Directing") {
+            val padre = binding.seccionDirigiendo.parent as? android.view.ViewGroup
+            padre?.let { contenedor ->
+                contenedor.removeView(binding.seccionDirigiendo)
+                contenedor.addView(
+                    binding.seccionDirigiendo,
+                    contenedor.indexOfChild(binding.seccionActuando)
+                )
+            }
+        }
         binding.txtNombrePersona.text = persona.nombre
         binding.txtOficioPersona.text = traducirOficio(persona.oficio)
         binding.txtDatosPersona.text = datosDeVida(persona)
