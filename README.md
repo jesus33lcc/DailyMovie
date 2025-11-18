@@ -4,14 +4,19 @@ Una app de Android para buscar películas y series, guardarlas en listas y descu
 
 La idea es sencilla: abres la app y lo primero que ves es una película elegida para ti. No la misma para todo el mundo, sino una que encaje con lo que te gusta. A partir de ahí puedes tirar del hilo: entrar en su ficha, ver el tráiler, mirar quién sale, abrir la ficha de ese actor y acabar descubriendo otra película suya que no conocías.
 
-<!-- TODO: capturas de pantalla -->
-
 ## Qué se puede hacer
 
 **Descubrir**
-- La portada te enseña una película recomendada según tus gustos, con su tráiler y su sinopsis
+- La portada te enseña una película recomendada según tus gustos, con su tráiler y su sinopsis, y te dice por qué te la enseña: "Porque sigues a Christopher Nolan", "Porque te gustó El Padrino"
 - Cuatro listas siempre al día: en cartelera, populares, mejor valoradas y próximos estrenos
-- Buscador de películas, que guarda lo que has mirado antes
+- Un botón de "no sé qué ver, sorpréndeme" para cuando llevas veinte minutos dando vueltas
+
+**Buscar**
+- Películas, series y gente del cine a la vez, y va buscando solo mientras escribes
+- Sagas: si buscas "El Padrino" te sale la trilogía entera antes que las películas sueltas
+- Filtros de año, nota mínima y plataforma de streaming, con las que de verdad hay en tu país
+- Ordenar por lo que más encaja, por nota o por año, y seguir bajando para ver más
+- Guarda lo que has buscado antes, para no volver a escribirlo
 
 **Series**
 - Sección propia con las series en emisión, populares y mejor valoradas
@@ -23,14 +28,17 @@ La idea es sencilla: abres la app y lo primero que ves es una película elegida 
 - Reparto y director, y tocando a cualquiera se abre su ficha con su biografía y su filmografía
 - Galería de imágenes de la película, que se ven a pantalla completa
 - Tráilers, películas similares y recomendadas
+- A qué saga pertenece, para ver el resto de una sentada
+- Lo que ha escrito la gente sobre ella, y enlaces a IMDb y a su web oficial
 
 **Tus listas**
 - Favoritos y vistos
-- Listas propias con el nombre que quieras
+- Listas propias con el nombre que quieras, y cada una dice cuántas películas tiene
 - Historial de lo que has buscado
 
 **Tu cuenta**
 - Registro con correo o entrando con Google
+- Al registrarte, tres preguntas para saber qué te gusta: géneros, películas y a quién sigues. Todo opcional, y se cambia cuando quieras desde Ajustes
 - Puedes borrar tu cuenta y todos tus datos cuando quieras
 
 ## Cómo funciona por dentro
@@ -59,6 +67,8 @@ Esa última capa es una interfaz a propósito. Los ViewModels reciben `MovieRepo
 | Pantallas | ViewBinding, sin Compose |
 | Navegación | Navigation Component + BottomNavigation |
 | Cuentas y datos | Firebase Auth, Firestore y Google Sign-In |
+| Huecos de carga | Shimmer |
+| Pantalla de arranque | core-splashscreen |
 
 ## Cómo compilarlo
 
@@ -103,7 +113,9 @@ Y lo pegas en la consola de Firebase, en la configuración del proyecto. Sin ese
 
 **Los tráilers se abren en YouTube.** No se reproducen dentro de la app, y no es por dejadez: YouTube ya no permite reproducir sus vídeos incrustados en un WebView de Android. Se probó con la librería del reproductor, cargando la URL directamente, con un iframe, tocando la cabecera Referer y el User-Agent, y aceptando las cookies. Siempre daba "vídeo no disponible", en dos dispositivos distintos. Así que se enseña la miniatura y al tocarla se abre YouTube. Volver a reproducirlos dentro sigue siendo el objetivo.
 
-**La película del día tiene tres caminos.** Si hay una elegida a mano para hoy, se enseña esa. Si no, se busca una según los géneros que marcaste al registrarte. Y si nunca dijiste tus gustos, se enseña la más popular del momento. Así la portada nunca se queda vacía.
+**La película del día tiene varios caminos.** Si hay una elegida a mano para hoy, se enseña esa. Si no, entra el recomendador, que prueba cuatro vías de más personal a menos: algo de un actor o director que sigues, algo parecido a una de tus favoritas, algo de tus géneros, y en último caso lo más popular del momento. Si una vía no da nada se cae a la siguiente, así la portada nunca se queda vacía. Y como la elección va con el día del año, cambia de un día para otro pero no cada vez que abres la app: si cambiara a cada rato no sería "la película del día" de nadie.
+
+**El diseño no es casualidad.** Azul marino de sala a oscuras (`#1c2541`), menta y teal para lo que importa (`#6fffe9`, `#5bc0be`) y una tipografía monoespaciada, Courier Prime, en toda la app, que le da ese aire de créditos escritos a máquina. No es lo habitual en Android, y esa es justo la gracia.
 
 ## De dónde viene esto
 
