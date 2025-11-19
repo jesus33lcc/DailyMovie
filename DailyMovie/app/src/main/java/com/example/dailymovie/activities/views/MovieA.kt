@@ -25,6 +25,7 @@ import android.net.Uri
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.PopupMenu
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.utils.rebotar
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.adapters.ResenaAdapter
@@ -128,14 +129,14 @@ class MovieA : AppCompatActivity() {
         updateWatchedButtonIcon(movie.id, btnWatched)
 
         btnFavorite.setOnClickListener {
-            movieViewModel.toggleFavorite(movieModel) { isFavorite ->
-                updateFavoriteButtonIcon(movie.id, btnFavorite)
+            movieViewModel.toggleFavorite(movieModel) {
+                updateFavoriteButtonIcon(movie.id, btnFavorite, conRebote = true)
             }
         }
 
         btnWatched.setOnClickListener {
-            movieViewModel.toggleWatched(movieModel) { isWatched ->
-                updateWatchedButtonIcon(movie.id, btnWatched)
+            movieViewModel.toggleWatched(movieModel) {
+                updateWatchedButtonIcon(movie.id, btnWatched, conRebote = true)
             }
         }
         btnAddList.setOnClickListener {
@@ -208,20 +209,35 @@ class MovieA : AppCompatActivity() {
         startActivity(Intent.createChooser(shareIntent, "Compartir pelicula via"))
     }
 
-    private fun updateFavoriteButtonIcon(movieId: Int, button: ImageButton) {
+    /**
+     * @param conRebote si el icono cambia porque el usuario acaba de pulsar. Al entrar en la
+     *   ficha tambien se pinta, y ahi un boton dando saltos solo distrae.
+     */
+    private fun updateFavoriteButtonIcon(
+        movieId: Int,
+        button: ImageButton,
+        conRebote: Boolean = false
+    ) {
         movieViewModel.esFavorita(movieId) { isFavorite ->
             runOnUiThread {
                 val icon = if (isFavorite) R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
                 button.setImageResource(icon)
+                if (conRebote) button.rebotar()
             }
         }
     }
 
-    private fun updateWatchedButtonIcon(movieId: Int, button: ImageButton) {
+    /** @param conRebote lo mismo que en [updateFavoriteButtonIcon]. */
+    private fun updateWatchedButtonIcon(
+        movieId: Int,
+        button: ImageButton,
+        conRebote: Boolean = false
+    ) {
         movieViewModel.estaVista(movieId) { isWatched ->
             runOnUiThread {
                 val icon = if (isWatched) R.drawable.ic_baseline_visibility_24 else R.drawable.ic_baseline_visibility_off_24
                 button.setImageResource(icon)
+                if (conRebote) button.rebotar()
             }
         }
     }
