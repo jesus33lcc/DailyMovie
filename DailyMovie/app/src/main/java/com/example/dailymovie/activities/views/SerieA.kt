@@ -24,6 +24,7 @@ import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.DialogoDailyMovie
+import com.example.dailymovie.utils.rebotar
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.utils.LocaleUtil
 import com.example.dailymovie.utils.mensaje
@@ -206,30 +207,37 @@ class SerieA : AppCompatActivity() {
         pintarIconoVista(guardable.id)
 
         binding.btnFavoritaSerie.setOnClickListener {
-            viewModel.cambiarFavorita(guardable) { pintarIconoFavorita(guardable.id) }
+            viewModel.cambiarFavorita(guardable) { pintarIconoFavorita(guardable.id, conRebote = true) }
         }
         binding.btnVistaSerie.setOnClickListener {
-            viewModel.cambiarVista(guardable) { pintarIconoVista(guardable.id) }
+            viewModel.cambiarVista(guardable) { pintarIconoVista(guardable.id, conRebote = true) }
         }
         binding.btnAnadirListaSerie.setOnClickListener { elegirListas(guardable) }
         binding.btnCompartirSerie.setOnClickListener { compartir(guardable) }
     }
 
-    private fun pintarIconoFavorita(serieId: Int) {
+    /**
+     * @param conRebote si el icono cambia porque el usuario acaba de pulsar. Al abrir la
+     *   ficha tambien se pinta, y ahi un boton dando saltos solo distrae.
+     */
+    private fun pintarIconoFavorita(serieId: Int, conRebote: Boolean = false) {
         viewModel.esFavorita(serieId) { esFavorita ->
             binding.btnFavoritaSerie.setImageResource(
                 if (esFavorita) R.drawable.ic_baseline_favorite_24
                 else R.drawable.ic_baseline_favorite_border_24
             )
+            if (conRebote) binding.btnFavoritaSerie.rebotar()
         }
     }
 
-    private fun pintarIconoVista(serieId: Int) {
+    /** @param conRebote lo mismo que en [pintarIconoFavorita]. */
+    private fun pintarIconoVista(serieId: Int, conRebote: Boolean = false) {
         viewModel.estaVista(serieId) { estaVista ->
             binding.btnVistaSerie.setImageResource(
                 if (estaVista) R.drawable.ic_baseline_visibility_24
                 else R.drawable.ic_baseline_visibility_off_24
             )
+            if (conRebote) binding.btnVistaSerie.rebotar()
         }
     }
 
