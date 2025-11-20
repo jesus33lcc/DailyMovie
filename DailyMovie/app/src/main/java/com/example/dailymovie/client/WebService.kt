@@ -552,6 +552,36 @@ interface WebService {
      * @param apiKey la clave de TMDB, que pone el repositorio.
      * @param language idioma de los textos; por defecto el del aparato.
      */
+    /**
+     * La clasificacion por edad de una serie, pais por pais.
+     *
+     * En peliculas viene dentro de los detalles con append_to_response; en series TMDB lo
+     * pone en un endpoint aparte, asi que hay que pedirlo a mano.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @return la lista de paises con su clasificacion. Hay que buscar la del pais del
+     *   usuario; el resto no le dicen nada.
+     */
+    @GET("tv/{tv_id}/content_ratings")
+    fun getClasificacionSerie(
+        @Path("tv_id") serieId: Int,
+        @Query("api_key") apiKey: String
+    ): Call<ClasificacionesSerieResponse>
+
+    /**
+     * Lo que ha escrito la gente sobre una serie.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @return las reseñas, casi siempre en ingles: es el idioma en el que las escriben.
+     */
+    @GET("tv/{tv_id}/reviews")
+    fun getResenasSerie(
+        @Path("tv_id") serieId: Int,
+        @Query("api_key") apiKey: String
+    ): Call<ResenasResponse>
+
     @GET("tv/{tv_id}/season/{season_number}")
     fun getTemporada(
         @Path("tv_id") serieId: Int,

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dailymovie.client.response.CreditResponse
 import com.example.dailymovie.client.response.ProviderResponse
+import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.client.response.SeasonResponse
 import com.example.dailymovie.client.response.SerieDetailsResponse
 import com.example.dailymovie.data.Dependencias
@@ -35,6 +36,12 @@ class SerieViewModel(
     private val _plataformas = MutableLiveData<ProviderResponse>()
     val plataformas: LiveData<ProviderResponse> get() = _plataformas
 
+    private val _clasificacionPorEdad = MutableLiveData<String?>()
+    val clasificacionPorEdad: LiveData<String?> get() = _clasificacionPorEdad
+
+    private val _resenas = MutableLiveData<List<ResenaResponse>>()
+    val resenas: LiveData<List<ResenaResponse>> get() = _resenas
+
     private val _error = MutableLiveData<ErrorCarga?>()
     val error: LiveData<ErrorCarga?> get() = _error
 
@@ -58,6 +65,9 @@ class SerieViewModel(
         series.reparto(id) { if (it is Resultado.Exito) _reparto.value = it.datos }
         series.videos(id) { if (it is Resultado.Exito) _videos.value = it.datos }
         series.plataformas(id) { if (it is Resultado.Exito) _plataformas.value = it.datos }
+        series.clasificacionPorEdad(id) { _clasificacionPorEdad.value = it }
+        // Las reseñas no cuentan como error si fallan: la ficha se ve igual de bien sin ellas.
+        series.resenas(id) { if (it is Resultado.Exito) _resenas.value = it.datos }
     }
 
     /** Los episodios se piden solo de la temporada que el usuario abre, no de todas. */

@@ -5,12 +5,14 @@ import com.example.dailymovie.client.WebService
 import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.CreditResponse
 import com.example.dailymovie.client.response.ProviderResponse
+import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.client.response.SeasonResponse
 import com.example.dailymovie.client.response.SerieDetailsResponse
 import com.example.dailymovie.models.GenreModel
 import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.utils.LocaleUtil
 import retrofit2.Call
 
 /**
@@ -99,6 +101,24 @@ interface SerieRepository {
     fun plataformas(serieId: Int, alTerminar: (Resultado<ProviderResponse>) -> Unit)
 
     /**
+     * La clasificacion por edad de la serie en el pais del usuario.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param alTerminar recibe la etiqueta ("16", "TV-MA") o null si esa serie no esta
+     *   clasificada aqui. Se manda null en vez de la de otro pais porque una clasificacion
+     *   extranjera confunde mas de lo que aclara.
+     */
+    fun clasificacionPorEdad(serieId: Int, alTerminar: (String?) -> Unit)
+
+    /**
+     * Las reseñas que ha escrito la gente sobre la serie.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param alTerminar recibe las reseñas con texto; las vacias se tiran.
+     */
+    fun resenas(serieId: Int, alTerminar: (Resultado<List<ResenaResponse>>) -> Unit)
+
+    /**
      * Los generos de series, que tienen sus propios ids distintos a los de cine.
      *
      * @param alTerminar recibe los generos con el nombre ya en el idioma del aparato. Estos
@@ -171,6 +191,31 @@ class TmdbSerieRepository(
                 val trailersPrimero = respuesta.results.filter { it.type == "Trailer" } +
                     respuesta.results.filter { it.type != "Trailer" }
                 alTerminar(Resultado.Exito(trailersPrimero))
+            },
+            onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    override fun clasificacionPorEdad(serieId: Int, alTerminar: (String?) -> Unit) {
+        servicio.getClasificacionSerie(serieId, apiKey).enqueueSimple(
+            onExito = { respuesta ->
+                alTerminar(
+                    respuesta.resultados
+                        .firstOrNull { it.pais == LocaleUtil.getDeviceCountry() }
+                        ?.clasificacion
+                        ?.takeIf { it.isNotBlank() }
+                )
+            },
+            // Sin clasificacion la ficha se ve igual de bien, asi que un fallo aqui no se
+            // convierte en un error para el usuario.
+            onError = { alTerminar(null) }
+        )
+    }
+
+    override fun resenas(serieId: Int, alTerminar: (Resultado<List<ResenaResponse>>) -> Unit) {
+        servicio.getResenasSerie(serieId, apiKey).enqueueSimple(
+            onExito = { respuesta ->
+                alTerminar(Resultado.Exito(respuesta.resultados.filter { it.texto.isNotBlank() }))
             },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
