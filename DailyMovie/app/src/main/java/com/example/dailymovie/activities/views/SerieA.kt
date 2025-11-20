@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.adapters.CreditAdapter
 import com.example.dailymovie.adapters.ListaCasillaAdapter
 import com.example.dailymovie.adapters.EpisodioAdapter
+import com.example.dailymovie.adapters.ResenaAdapter
 import com.example.dailymovie.adapters.ProviderAdapter
 import com.example.dailymovie.adapters.TemporadaAdapter
 import com.example.dailymovie.adapters.VideoAdapter
@@ -101,6 +102,23 @@ class SerieA : AppCompatActivity() {
             binding.seccionPlataformasSerie.visibility =
                 if (plataformas.isEmpty()) View.GONE else View.VISIBLE
             binding.recyclerPlataformasSerie.adapter = ProviderAdapter(plataformas)
+        }
+
+        viewModel.clasificacionPorEdad.observe(this) { clasificacion ->
+            // Si la serie no esta clasificada en este pais no se enseña nada: poner la de
+            // otro pais confundiria mas de lo que aclara.
+            binding.txtClasificacionSerie.visibility =
+                if (clasificacion.isNullOrBlank()) View.GONE else View.VISIBLE
+            binding.txtClasificacionSerie.text = clasificacion.orEmpty()
+        }
+
+        viewModel.resenas.observe(this) { resenas ->
+            binding.seccionResenasSerie.visibility =
+                if (resenas.isEmpty()) View.GONE else View.VISIBLE
+            if (resenas.isEmpty()) return@observe
+            binding.recyclerResenasSerie.layoutManager = LinearLayoutManager(this)
+            // Como mucho cinco, igual que en peliculas: con mas, la ficha se convierte en un foro.
+            binding.recyclerResenasSerie.adapter = ResenaAdapter(resenas.take(5))
         }
 
         viewModel.error.observe(this) { error ->
