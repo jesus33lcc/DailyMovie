@@ -3,8 +3,10 @@ package com.example.dailymovie.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarFotograma
@@ -12,9 +14,20 @@ import com.example.dailymovie.models.EpisodioModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.Fechas
 
-/** Los episodios de la temporada que este abierta. */
-class EpisodioAdapter(private val episodios: List<EpisodioModel>) :
-    RecyclerView.Adapter<EpisodioAdapter.Holder>() {
+/**
+ * Los episodios de la temporada que este abierta.
+ *
+ * @param episodios los de esa temporada, en orden.
+ * @param vistos los numeros de episodio que el usuario ya ha marcado. Se pasa el conjunto
+ *   entero en vez de preguntar uno a uno para no hacer una consulta por fila.
+ * @param alMarcar se llama al pulsar el ojo de un episodio, con su numero. Quien lo recibe
+ *   decide si se guarda y vuelve a pintar la lista.
+ */
+class EpisodioAdapter(
+    private val episodios: List<EpisodioModel>,
+    private val vistos: Set<Int> = emptySet(),
+    private val alMarcar: ((Int) -> Unit)? = null
+) : RecyclerView.Adapter<EpisodioAdapter.Holder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = Holder(
         LayoutInflater.from(parent.context).inflate(R.layout.item_episodio, parent, false)
@@ -33,6 +46,21 @@ class EpisodioAdapter(private val episodios: List<EpisodioModel>) :
         holder.datos.text = datosDelEpisodio(holder.itemView, episodio)
 
         holder.imagen.cargarFotograma(episodio.imagen)
+
+        val visto = episodio.numero in vistos
+        holder.visto.setImageResource(
+            if (visto) R.drawable.ic_baseline_visibility_24
+            else R.drawable.ic_baseline_visibility_off_24
+        )
+        holder.visto.setColorFilter(
+            ContextCompat.getColor(
+                holder.itemView.context,
+                if (visto) R.color.colorPrimaryDark else R.color.colorAccent
+            )
+        )
+        // Sin sesion no hay donde guardarlo, asi que el boton ni se enseña.
+        holder.visto.visibility = if (alMarcar == null) View.GONE else View.VISIBLE
+        holder.visto.setOnClickListener { alMarcar?.invoke(episodio.numero) }
     }
 
     /**
@@ -65,5 +93,6 @@ class EpisodioAdapter(private val episodios: List<EpisodioModel>) :
         val sinopsis: TextView = vista.findViewById(R.id.txtSinopsisEpisodio)
         val datos: TextView = vista.findViewById(R.id.txtDatosEpisodio)
         val imagen: ImageView = vista.findViewById(R.id.imgEpisodio)
+        val visto: ImageButton = vista.findViewById(R.id.btnEpisodioVisto)
     }
 }

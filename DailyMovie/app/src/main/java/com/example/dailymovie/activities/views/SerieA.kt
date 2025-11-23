@@ -85,6 +85,9 @@ class SerieA : AppCompatActivity() {
     private fun observarViewModel() {
         viewModel.detalles.observe(this) { pintarSerie(it) }
         viewModel.temporadaAbierta.observe(this) { pintarTemporada(it) }
+        viewModel.episodiosVistos.observe(this) {
+            temporadaEnPantalla?.let { temporada -> pintarEpisodios(temporada) }
+        }
 
         viewModel.reparto.observe(this) { creditos ->
             val hayReparto = creditos.cast.isNotEmpty()
@@ -189,19 +192,57 @@ class SerieA : AppCompatActivity() {
         else -> ""
     }
 
+    /**
+     * La temporada que se esta enseñando.
+     *
+     * Hace falta guardarla para poder repintar los episodios cuando cambie lo que el usuario
+     * ha marcado como visto, sin volver a pedirla a TMDB.
+     */
+    private var temporadaEnPantalla: SeasonResponse? = null
+
     private fun pintarTemporada(temporada: SeasonResponse?) {
         // Mientras se piden los episodios se enseña el indicador, que en series largas
         // tarda lo suyo.
         if (temporada == null) {
             binding.progressEpisodios.visibility = View.VISIBLE
             binding.recyclerEpisodios.adapter = null
+            temporadaEnPantalla = null
             return
         }
 
         binding.progressEpisodios.visibility = View.GONE
-        binding.txtTemporadaAbierta.text =
+        temporadaEnPantalla = temporada
+        pintarEpisodios(temporada)
+    }
+
+    /**
+     * Los episodios de la temporada abierta, con lo que ya se ha visto marcado.
+     *
+     * Se vuelve a llamar cada vez que cambia el conjunto de vistos, asi la cabecera
+     * ("3 de 13 vistos") y los ojos se quedan al dia sin volver a pedir nada a Firestore.
+     */
+    private fun pintarEpisodios(temporada: SeasonResponse) {
+        val vistosDeEstaTemporada = viewModel.episodiosVistos.value.orEmpty()
+            .filter { it.first == temporada.numero }
+            .map { it.second }
+            .toSet()
+
+        binding.txtTemporadaAbierta.text = if (vistosDeEstaTemporada.isEmpty()) {
             "${temporada.nombre} · ${temporada.episodios.size} episodios"
-        binding.recyclerEpisodios.adapter = EpisodioAdapter(temporada.episodios)
+        } else {
+            "${temporada.nombre} · ${vistosDeEstaTemporada.size} de ${temporada.episodios.size} vistos"
+        }
+
+        binding.recyclerEpisodios.adapter = EpisodioAdapter(
+            episodios = temporada.episodios,
+            vistos = vistosDeEstaTemporada,
+            // Sin sesion no hay donde guardarlo, asi que el adaptador esconde el boton.
+            alMarcar = if (viewModel.haySesion()) {
+                { numero -> viewModel.cambiarEpisodioVisto(temporada.numero, numero) }
+            } else {
+                null
+            }
+        )
     }
 
     /**
