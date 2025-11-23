@@ -80,4 +80,23 @@
             android:textColor="@color/colorTextPrimary"
             tools:text="Un profesor de quimica..." />
     </LinearLayout>
+
+    <!--
+        Marcar el episodio como visto.
+
+        Es un ImageButton y no un CheckBox porque el CheckBox de Material trae su propio color
+        y su propia animacion, y aqui hace falta el menta de la app. Va a la derecha del todo,
+        separado del texto, para que no se pulse sin querer al leer la sinopsis.
+    -->
+    <ImageButton
+        android:id="@+id/btnEpisodioVisto"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_baseline_visibility_off_24"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerInside"
+        android:padding="8dp"
+        android:contentDescription="Marcar como visto" />
 </LinearLayout>

@@ -281,6 +281,31 @@ interface UserRepository {
     fun cambiarSerieVista(serie: SerieModel, alTerminar: (Boolean) -> Unit)
 
     /**
+     * Los episodios que el usuario ya ha visto de una serie.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param alTerminar recibe los episodios marcados como pares (temporada, episodio). Llega
+     *   vacio tanto si no ha visto ninguno como si no hay sesion o falla la lectura.
+     */
+    fun episodiosVistos(serieId: Int, alTerminar: (Set<Pair<Int, Int>>) -> Unit)
+
+    /**
+     * Marca o desmarca un episodio, segun como este ahora.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param temporada el numero de temporada que da TMDB. La 0 son los especiales.
+     * @param episodio el numero de episodio dentro de esa temporada.
+     * @param alTerminar recibe true si el episodio queda marcado como visto y false si queda
+     *   sin ver. Si la escritura falla, se devuelve el estado que ya tenia.
+     */
+    fun cambiarEpisodioVisto(
+        serieId: Int,
+        temporada: Int,
+        episodio: Int,
+        alTerminar: (Boolean) -> Unit
+    )
+
+    /**
      * Las series guardadas en una lista del usuario.
      *
      * Es la misma lista que la de peliculas, pero mirando otro campo: una lista puede tener

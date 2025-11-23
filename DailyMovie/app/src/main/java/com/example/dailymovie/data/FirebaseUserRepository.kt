@@ -287,6 +287,57 @@ class FirebaseUserRepository(
     override fun cambiarSerieVista(serie: SerieModel, alTerminar: (Boolean) -> Unit) =
         alternarSerie(SERIES_VISTAS, serie, alTerminar)
 
+    /**
+     * Los episodios vistos se guardan como texto "serie-temporada-episodio" en un solo array.
+     *
+     * Se eligio asi y no una subcoleccion por serie porque el uso es siempre el mismo: abrir
+     * una serie y saber al momento que has visto. Con un array se lee el documento del usuario
+     * que ya esta en cache offline y no hace falta ninguna consulta mas; con una subcoleccion
+     * habria una lectura por serie abierta.
+     */
+    override fun episodiosVistos(serieId: Int, alTerminar: (Set<Pair<Int, Int>>) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(emptySet())
+        documento.get()
+            .addOnSuccessListener { instantanea ->
+                val marcas = (instantanea.get(EPISODIOS_VISTOS) as? List<*>).orEmpty()
+                alTerminar(
+                    marcas.mapNotNull { aEpisodioDeEstaSerie(it, serieId) }.toSet()
+                )
+            }
+            .addOnFailureListener { alTerminar(emptySet()) }
+    }
+
+    override fun cambiarEpisodioVisto(
+        serieId: Int,
+        temporada: Int,
+        episodio: Int,
+        alTerminar: (Boolean) -> Unit
+    ) {
+        val documento = documentoDelUsuario() ?: return alTerminar(false)
+        val marca = "$serieId-$temporada-$episodio"
+        documento.get()
+            .addOnSuccessListener { instantanea ->
+                val yaEstaba = (instantanea.get(EPISODIOS_VISTOS) as? List<*>)
+                    .orEmpty().any { it == marca }
+                val cambio = if (yaEstaba) FieldValue.arrayRemove(marca) else FieldValue.arrayUnion(marca)
+                documento.set(mapOf(EPISODIOS_VISTOS to cambio), SetOptions.merge())
+                    .addOnSuccessListener { alTerminar(!yaEstaba) }
+                    // Si la escritura falla se devuelve el estado de antes, para que la
+                    // casilla no se quede marcada enseñando algo que no se ha guardado.
+                    .addOnFailureListener { alTerminar(yaEstaba) }
+            }
+            .addOnFailureListener { alTerminar(false) }
+    }
+
+    /** Descompone "1396-5-14" y se queda con la temporada y el episodio si es de esta serie. */
+    private fun aEpisodioDeEstaSerie(marca: Any?, serieId: Int): Pair<Int, Int>? {
+        val trozos = (marca as? String)?.split("-") ?: return null
+        if (trozos.size != 3 || trozos[0].toIntOrNull() != serieId) return null
+        val temporada = trozos[1].toIntOrNull() ?: return null
+        val episodio = trozos[2].toIntOrNull() ?: return null
+        return temporada to episodio
+    }
+
     override fun seriesDeLista(nombre: String, alTerminar: (List<SerieModel>) -> Unit) {
         val documento = documentoDelUsuario() ?: return alTerminar(emptyList())
         documento.collection(LISTAS).document(nombre).get()
@@ -551,6 +602,7 @@ class FirebaseUserRepository(
         const val SERIES = "series"
         const val SERIES_FAVORITAS = "favoriteSeries"
         const val SERIES_VISTAS = "watchedSeries"
+        const val EPISODIOS_VISTOS = "watchedEpisodes"
         const val GUSTOS = "tastes"
         const val PELICULA_DEL_DIA = "dailymovie"
         const val CAMPO_FECHA = "date"

@@ -27,6 +27,15 @@ class SerieViewModel(
     private val _temporadaAbierta = MutableLiveData<SeasonResponse?>()
     val temporadaAbierta: LiveData<SeasonResponse?> get() = _temporadaAbierta
 
+    /**
+     * Los episodios que el usuario ya ha visto, como pares (temporada, episodio).
+     *
+     * Se cargan una sola vez al abrir la serie y se van cambiando en memoria: pedirlos otra
+     * vez a Firestore cada vez que se marca uno haria que el ojo tardara en cambiar.
+     */
+    private val _episodiosVistos = MutableLiveData<Set<Pair<Int, Int>>>(emptySet())
+    val episodiosVistos: LiveData<Set<Pair<Int, Int>>> get() = _episodiosVistos
+
     private val _reparto = MutableLiveData<CreditResponse>()
     val reparto: LiveData<CreditResponse> get() = _reparto
 
@@ -66,6 +75,7 @@ class SerieViewModel(
         series.videos(id) { if (it is Resultado.Exito) _videos.value = it.datos }
         series.plataformas(id) { if (it is Resultado.Exito) _plataformas.value = it.datos }
         series.clasificacionPorEdad(id) { _clasificacionPorEdad.value = it }
+        usuario.episodiosVistos(id) { _episodiosVistos.value = it }
         // Las reseñas no cuentan como error si fallan: la ficha se ve igual de bien sin ellas.
         series.resenas(id) { if (it is Resultado.Exito) _resenas.value = it.datos }
     }
@@ -78,6 +88,28 @@ class SerieViewModel(
             if (resultado is Resultado.Exito) _temporadaAbierta.value = resultado.datos
         }
     }
+
+    /**
+     * Marca o desmarca un episodio.
+     *
+     * @param temporada el numero de temporada de TMDB.
+     * @param episodio el numero dentro de esa temporada.
+     */
+    fun cambiarEpisodioVisto(temporada: Int, episodio: Int) {
+        if (serieId == -1) return
+        usuario.cambiarEpisodioVisto(serieId, temporada, episodio) { quedaVisto ->
+            val actuales = _episodiosVistos.value.orEmpty().toMutableSet()
+            if (quedaVisto) actuales.add(temporada to episodio) else actuales.remove(temporada to episodio)
+            _episodiosVistos.value = actuales
+        }
+    }
+
+    /** Sin sesion no hay donde guardar lo que se marca, asi que la pantalla lo esconde. */
+    fun haySesion() = usuario.haySesion()
+
+    /** Cuantos episodios de esa temporada ha visto ya. */
+    fun cuantosVistosDe(temporada: Int) =
+        _episodiosVistos.value.orEmpty().count { it.first == temporada }
 
     fun errorMostrado() {
         _error.value = null
