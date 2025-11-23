@@ -87,6 +87,7 @@ class SerieA : AppCompatActivity() {
         viewModel.temporadaAbierta.observe(this) { pintarTemporada(it) }
         viewModel.episodiosVistos.observe(this) {
             temporadaEnPantalla?.let { temporada -> pintarEpisodios(temporada) }
+            pintarProgresoDeLaSerie()
         }
 
         viewModel.reparto.observe(this) { creditos ->
@@ -146,6 +147,8 @@ class SerieA : AppCompatActivity() {
         binding.txtEstadoSerie.text = estado
 
         binding.imgPosterSerie.cargarCartel(serie.poster)
+        totalDeEpisodios = serie.numeroDeEpisodios
+        pintarProgresoDeLaSerie()
 
         prepararBotonesDeGuardado(serie)
 
@@ -199,6 +202,29 @@ class SerieA : AppCompatActivity() {
      * ha marcado como visto, sin volver a pedirla a TMDB.
      */
     private var temporadaEnPantalla: SeasonResponse? = null
+
+    /** Cuantos episodios tiene la serie entera, para poder decir "llevas 12 de 62". */
+    private var totalDeEpisodios = 0
+
+    /**
+     * Lo que llevas visto de la serie entera.
+     *
+     * Solo aparece cuando hay algo marcado: un "llevas 0 de 62" nada mas abrir la ficha
+     * suena a reproche, no a informacion.
+     */
+    private fun pintarProgresoDeLaSerie() {
+        val vistos = viewModel.episodiosVistos.value.orEmpty().size
+        if (vistos == 0 || totalDeEpisodios <= 0) {
+            binding.txtProgresoSerie.visibility = View.GONE
+            return
+        }
+        binding.txtProgresoSerie.visibility = View.VISIBLE
+        binding.txtProgresoSerie.text = if (vistos >= totalDeEpisodios) {
+            "La has visto entera"
+        } else {
+            "Llevas $vistos de $totalDeEpisodios episodios"
+        }
+    }
 
     private fun pintarTemporada(temporada: SeasonResponse?) {
         // Mientras se piden los episodios se enseña el indicador, que en series largas
