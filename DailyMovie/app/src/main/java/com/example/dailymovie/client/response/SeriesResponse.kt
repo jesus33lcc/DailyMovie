@@ -47,6 +47,19 @@ data class SerieDetailsResponse(
     @SerializedName("genres")
     val generos: List<GenreModel>,
 
+    /** La web oficial de la serie, si la tiene. Muchas llegan con la cadena vacia. */
+    @SerializedName("homepage")
+    val web: String? = null,
+
+    /**
+     * Los ids de la serie en otras webs, sobre todo IMDb.
+     *
+     * Solo llega si se pide con append_to_response; en la respuesta pelada de tv/{id} no
+     * viene.
+     */
+    @SerializedName("external_ids")
+    val idsExternos: IdsExternosResponse? = null,
+
     @SerializedName("seasons")
     val temporadas: List<TemporadaModel>
 )
