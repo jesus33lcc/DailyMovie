@@ -540,7 +540,9 @@ interface WebService {
     fun getSerieDetalles(
         @Path("tv_id") serieId: Int,
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
+        // Trae el id de IMDb en la misma peticion, en vez de hacer otro viaje solo para eso.
+        @Query("append_to_response") extras: String = "external_ids"
     ): Call<SerieDetailsResponse>
 
     /**

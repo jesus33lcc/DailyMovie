@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarCartel
@@ -149,6 +152,7 @@ class SerieA : AppCompatActivity() {
         binding.imgPosterSerie.cargarCartel(serie.poster)
         totalDeEpisodios = serie.numeroDeEpisodios
         pintarProgresoDeLaSerie()
+        prepararEnlaces(serie)
 
         prepararBotonesDeGuardado(serie)
 
@@ -202,6 +206,42 @@ class SerieA : AppCompatActivity() {
      * ha marcado como visto, sin volver a pedirla a TMDB.
      */
     private var temporadaEnPantalla: SeasonResponse? = null
+
+    /**
+     * El boton que lleva la serie fuera de la app.
+     *
+     * Lo mismo que en la ficha de pelicula: TMDB da el id de IMDb y la web oficial sin coste
+     * extra, y es donde la gente va a mirar la ficha "de verdad".
+     */
+    private fun prepararEnlaces(serie: SerieDetailsResponse) {
+        val enlaces = buildList {
+            serie.idsExternos?.imdb?.takeIf { it.isNotBlank() }
+                ?.let { add("Ver en IMDb" to "https://www.imdb.com/title/$it/") }
+            serie.web?.takeIf { it.isNotBlank() }?.let { add("Web oficial" to it) }
+            add("Ver en TMDB" to "https://www.themoviedb.org/tv/${serie.id}")
+        }
+
+        binding.btnEnlacesSerie.setOnClickListener { boton ->
+            PopupMenu(ContextThemeWrapper(this, R.style.TemaPopupDailyMovie), boton).apply {
+                enlaces.forEachIndexed { posicion, (titulo, _) -> menu.add(0, posicion, posicion, titulo) }
+                setOnMenuItemClickListener { opcion ->
+                    abrirEnElNavegador(enlaces[opcion.itemId].second)
+                    true
+                }
+                show()
+            }
+        }
+    }
+
+    /** Puede no haber navegador, asi que se avisa en vez de dejar que reviente. */
+    private fun abrirEnElNavegador(direccion: String) {
+        val intento = Intent(Intent.ACTION_VIEW, Uri.parse(direccion))
+        if (intento.resolveActivity(packageManager) != null) {
+            startActivity(intento)
+        } else {
+            Avisos.breve(binding.root, "No hay ningún navegador para abrirlo")
+        }
+    }
 
     /** Cuantos episodios tiene la serie entera, para poder decir "llevas 12 de 62". */
     private var totalDeEpisodios = 0
