@@ -9,6 +9,9 @@ import com.example.dailymovie.data.AltaDeLista
  *
  * Va aparte, igual que el de ErrorCarga, para que la capa de datos no tenga que saber nada
  * de los recursos de Android y se la pueda probar sola.
+ *
+ * @return el id del `string`, que la vista convierte en texto. Hay uno por cada motivo, para
+ *   que el usuario sepa exactamente que ha pasado en vez de leer un "no se ha podido".
  */
 @StringRes
 fun AltaDeLista.mensaje(): Int = when (this) {

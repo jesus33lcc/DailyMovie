@@ -34,6 +34,17 @@ object Imagenes {
         start()
     }
 
+    /**
+     * Mete una imagen de internet en un ImageView.
+     *
+     * Normalmente no se llama a esto directamente, sino a una de las extensiones de abajo,
+     * que ya saben que relleno le toca a cada cosa.
+     *
+     * @param vista donde va la imagen.
+     * @param url la direccion entera. Puede ser null: pasa cuando TMDB no tiene esa imagen, y
+     *   entonces se queda directamente el relleno.
+     * @param relleno el dibujo que se enseña si no hay imagen o si falla la descarga.
+     */
     fun cargar(vista: ImageView, url: String?, @DrawableRes relleno: Int) {
         Glide.with(vista.context)
             .load(url)
@@ -46,22 +57,46 @@ object Imagenes {
     }
 }
 
-/** El cartel de una pelicula o de una serie. */
+/**
+ * El cartel de una pelicula o de una serie.
+ *
+ * @param ruta el trozo que da TMDB ("/abc123.jpg"), sin la direccion delante. Null si esa
+ *   pelicula no tiene cartel, que pasa mas de lo que parece con lo poco conocido.
+ */
 fun ImageView.cargarCartel(ruta: String?) =
     Imagenes.cargar(this, ruta?.let { Constantes.IMAGE_URL + it }, R.drawable.relleno_pelicula)
 
-/** La foto de un actor o de un director. */
+/**
+ * La foto de un actor o de un director.
+ *
+ * @param ruta el trozo que da TMDB, o null si no tiene foto. El relleno es una silueta, que
+ *   queda mejor que la imagen tachada de las peliculas.
+ */
 fun ImageView.cargarFotoDePersona(ruta: String?) =
     Imagenes.cargar(this, ruta?.let { Constantes.IMAGE_URL + it }, R.drawable.relleno_persona)
 
-/** Un fotograma: imagenes de la ficha, capturas de episodio, logos de plataforma. */
+/**
+ * Un fotograma: imagenes de la ficha, capturas de episodio, logos de plataforma.
+ *
+ * @param ruta el trozo que da TMDB, o null si no hay imagen.
+ */
 fun ImageView.cargarFotograma(ruta: String?) =
     Imagenes.cargar(this, ruta?.let { Constantes.IMAGE_URL + it }, R.drawable.relleno_fotograma)
 
-/** Igual que el anterior pero con la direccion entera, para lo que no viene de TMDB. */
+/**
+ * Igual que el anterior pero con la direccion entera, para lo que no viene de TMDB.
+ *
+ * @param url la direccion completa. La usan las miniaturas de los trailers, que las sirve
+ *   YouTube y no TMDB.
+ */
 fun ImageView.cargarFotogramaDeUrl(url: String) =
     Imagenes.cargar(this, url, R.drawable.relleno_fotograma)
 
-/** La version grande de la galeria a pantalla completa. */
+/**
+ * La version grande de la galeria a pantalla completa.
+ *
+ * @param ruta el trozo que da TMDB. Se pide el original y no el w500 porque a pantalla
+ *   completa el w500 se ve pixelado.
+ */
 fun ImageView.cargarImagenGrande(ruta: String?) =
     Imagenes.cargar(this, ruta?.let { Constantes.IMAGE_ORIGINAL_URL + it }, R.drawable.relleno_fotograma)

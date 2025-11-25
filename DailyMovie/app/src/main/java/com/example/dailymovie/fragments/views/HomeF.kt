@@ -101,6 +101,12 @@ class HomeF : Fragment() {
             }
         })
 
+        homeViewModel.seriesEmpezadas.observe(viewLifecycleOwner) { empezadas ->
+            binding.seccionSigueViendo.visibility =
+                if (empezadas.isEmpty()) View.GONE else View.VISIBLE
+            pintarTira(binding.recyclerSigueViendo, empezadas.map { it.serie })
+        }
+
         homeViewModel.cargando.observe(viewLifecycleOwner, Observer { cargando ->
             // La rueda de "tirar para refrescar" solo cuando ya hay algo en pantalla: la
             // primera vez el que avisa de que se esta cargando es el hueco con brillo.
@@ -125,6 +131,11 @@ class HomeF : Fragment() {
     private fun pintarTira(lista: RecyclerView, hallazgos: List<Hallazgo>) {
         if (lista.itemDecorationCount == 0) {
             lista.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
+        }
+        // Las cuatro filas fijas lo tienen puesto arriba; "Sigue viendo" aparece y desaparece,
+        // asi que se le pone aqui la primera vez que le toca pintar algo.
+        if (lista.layoutManager == null) {
+            lista.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
         val adaptador = lista.adapter as? HallazgoAdapter
             ?: HallazgoAdapter { hallazgo, cartel -> abrirFicha(hallazgo, cartel) }.also { lista.adapter = it }

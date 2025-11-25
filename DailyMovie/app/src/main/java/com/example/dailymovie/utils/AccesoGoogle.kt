@@ -23,6 +23,13 @@ object AccesoGoogle {
 
     private const val CODIGO_DESARROLLADOR_MAL = 10
 
+    /**
+     * El cliente con el que se abre el dialogo de "elige una cuenta".
+     *
+     * @param context el de la pantalla desde la que se va a entrar.
+     * @return el cliente ya configurado para pedir el token de id y el correo, que es lo
+     *   unico que hace falta para despues entrar en Firebase.
+     */
     fun cliente(context: Context): GoogleSignInClient {
         // default_web_client_id lo genera el plugin de google-services leyendo el cliente
         // de tipo 3 de google-services.json, asi que no hay que copiar ningun id a mano.
@@ -36,6 +43,10 @@ object AccesoGoogle {
     /**
      * Saca el token del resultado del dialogo de Google.
      * Devuelve el token si todo fue bien, o null y el motivo si no.
+     *
+     * @param datos lo que trae de vuelta el dialogo. Puede ser null si se cerro sin elegir.
+     * @param alTerminar recibe (token, null) si salio bien y (null, motivo) si no. El motivo
+     *   viene ya escrito para el usuario, asi que la pantalla lo puede enseñar tal cual.
      */
     fun tokenDelResultado(datos: Intent?, alTerminar: (String?, String?) -> Unit) {
         try {
@@ -51,7 +62,11 @@ object AccesoGoogle {
         }
     }
 
-    /** Cierra tambien la sesion de Google, para que la proxima vez vuelva a preguntar. */
+    /**
+     * Cierra tambien la sesion de Google, para que la proxima vez vuelva a preguntar.
+     *
+     * @param activity la pantalla desde la que se cierra sesion.
+     */
     fun olvidarCuenta(activity: Activity) {
         cliente(activity).signOut()
     }

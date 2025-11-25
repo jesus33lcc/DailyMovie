@@ -181,7 +181,43 @@
 
             </LinearLayout>
 
+                        <!--
+                Sigue viendo.
+
+                Solo aparece si hay series a medias. Va justo debajo de la pelicula del dia y encima de
+                "En Cartelera" porque es lo primero que quiere ver quien ya esta enganchado a algo.
+            -->
             <LinearLayout
+                android:id="@+id/seccionSigueViendo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border_box_big"
+                android:clipToOutline="true"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sigue viendo"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="16dp"
+                    android:fontFamily="@font/courier_prime_bold"
+                    android:textAlignment="center"
+                    android:textColor="@color/black" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerSigueViendo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:scrollbars="horizontal" />
+            </LinearLayout>
+
+<LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"

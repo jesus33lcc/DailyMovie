@@ -290,6 +290,14 @@ interface UserRepository {
     fun episodiosVistos(serieId: Int, alTerminar: (Set<Pair<Int, Int>>) -> Unit)
 
     /**
+     * Las series que el usuario ha empezado, con cuantos episodios lleva de cada una.
+     *
+     * @param alTerminar recibe un mapa de id de serie a numero de episodios marcados. Llega
+     *   vacio si no ha empezado ninguna, si no hay sesion o si falla la lectura.
+     */
+    fun seriesEmpezadas(alTerminar: (Map<Int, Int>) -> Unit)
+
+    /**
      * Marca o desmarca un episodio, segun como este ahora.
      *
      * @param serieId el id de TMDB de la serie.

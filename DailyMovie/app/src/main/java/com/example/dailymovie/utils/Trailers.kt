@@ -18,7 +18,12 @@ import com.example.dailymovie.R
  */
 object Trailers {
 
-    /** Miniatura oficial del video. La sirve YouTube sin necesidad de clave. */
+    /**
+     * Miniatura oficial del video. La sirve YouTube sin necesidad de clave.
+     *
+     * @param videoId el `key` que da TMDB, que es el id del video en YouTube.
+     * @return la direccion entera de la imagen, lista para `cargarFotogramaDeUrl`.
+     */
     fun miniatura(videoId: String) = "https://img.youtube.com/vi/$videoId/hqdefault.jpg"
 
     /**
@@ -27,6 +32,9 @@ object Trailers {
      * Recibe la vista y no el contexto porque el aviso de que no se ha podido abrir sale
      * como Snackbar, que necesita una vista de la pantalla. Un Toast no valdria: desde
      * Android 12 no se pueden vestir y saldria con la caja gris del sistema.
+     *
+     * @param vista cualquiera de la pantalla, para poder avisar si no se abre nada.
+     * @param videoId el `key` de TMDB, o sea el id del video en YouTube.
      */
     fun abrir(vista: View, videoId: String) {
         val context = vista.context
