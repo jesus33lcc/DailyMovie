@@ -23,6 +23,25 @@ import com.example.dailymovie.R
  */
 object DialogoDailyMovie {
 
+    /**
+     * Monta el dialogo, lo enseña y lo devuelve.
+     *
+     * @param context el de la pantalla que lo abre.
+     * @param titulo la linea de arriba, la unica que no se puede quitar.
+     * @param mensaje la explicacion. Si no se pasa, ese hueco desaparece.
+     * @param contenido una vista propia que se mete debajo del mensaje, para los dialogos que
+     *   piden algo (el campo del nombre de una lista, la rejilla de casillas...).
+     * @param textoAceptar el texto del boton de la derecha.
+     * @param textoCancelar null para que no haya boton de cancelar, en los avisos que solo se
+     *   leen y se cierran.
+     * @param peligroso pinta el boton de aceptar en rojo. Para lo que no tiene vuelta atras:
+     *   borrar una lista, borrar la cuenta.
+     * @param alCancelar se llama al pulsar Cancelar. Ojo: tocar fuera tambien cierra el
+     *   dialogo, y en ese caso no se llama a nadie.
+     * @param alAceptar recibe el dialogo para poder decidir si se cierra o no. Si lo que se ha
+     *   escrito no vale, interesa dejarlo abierto y avisar ahi mismo.
+     * @return el dialogo ya en pantalla, por si hay que tocarlo despues.
+     */
     fun mostrar(
         context: Context,
         titulo: String,
@@ -72,7 +91,20 @@ object DialogoDailyMovie {
         return dialogo
     }
 
-    /** Atajo para las confirmaciones de toda la vida, que son casi todas. */
+    /**
+     * Atajo para las confirmaciones de toda la vida, que son casi todas.
+     *
+     * La diferencia con [mostrar] es que aqui el dialogo se cierra solo al aceptar, que es lo
+     * que se quiere cuando no hay nada que validar.
+     *
+     * @param context el de la pantalla que lo abre.
+     * @param titulo la pregunta, corta.
+     * @param mensaje lo que pasa si dice que si.
+     * @param textoAceptar el texto del boton, mejor el verbo ("Borrar") que un "Aceptar" seco.
+     * @param peligroso pinta el boton de aceptar en rojo.
+     * @param alCancelar se llama al pulsar Cancelar, no al tocar fuera.
+     * @param alConfirmar lo que se hace si dice que si, con el dialogo ya cerrado.
+     */
     fun confirmar(
         context: Context,
         titulo: String,

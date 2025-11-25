@@ -18,7 +18,12 @@ enum class ErrorCarga {
     RESPUESTA_INVALIDA
 }
 
-/** Texto que se le ensena al usuario para cada tipo de fallo. */
+/**
+ * Texto que se le ensena al usuario para cada tipo de fallo.
+ *
+ * @return el id del `string`, no el texto ya montado: hace falta un contexto para sacarlo y
+ *   quien lo tiene es la vista.
+ */
 @StringRes
 fun ErrorCarga.mensaje(): Int = when (this) {
     ErrorCarga.SIN_CONEXION -> R.string.error_sin_conexion

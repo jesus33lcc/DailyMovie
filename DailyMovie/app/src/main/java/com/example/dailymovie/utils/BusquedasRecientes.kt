@@ -19,6 +19,13 @@ object BusquedasRecientes {
     private const val SEPARADOR = "\n"
     private const val CUANTAS = 8
 
+    /**
+     * Apunta una busqueda, si merece la pena guardarla.
+     *
+     * @param context cualquiera vale, va a las preferencias del aparato.
+     * @param consulta lo que se escribio. Con menos de dos letras se ignora: no ayuda a
+     *   volver a nada y llenaria la lista de ruido.
+     */
     fun guardar(context: Context, consulta: String) {
         val limpia = consulta.trim()
         if (limpia.length < 2) return
@@ -33,17 +40,36 @@ object BusquedasRecientes {
             .apply()
     }
 
+    /**
+     * Lo que hay guardado ahora mismo.
+     *
+     * @param context cualquiera vale.
+     * @return las busquedas de la mas reciente a la mas antigua, ocho como mucho. Vacia si
+     *   nunca se ha buscado nada.
+     */
     fun todas(context: Context): List<String> =
         preferencias(context).getString(CLAVE, "")
             ?.split(SEPARADOR)
             ?.filter { it.isNotBlank() }
             .orEmpty()
 
+    /**
+     * Quita una sola busqueda de la lista.
+     *
+     * @param context cualquiera vale.
+     * @param consulta cual se quita. Da igual como este escrita en mayusculas: se compara
+     *   igual que al guardarla, que tampoco distingue.
+     */
     fun olvidar(context: Context, consulta: String) {
         val quedan = todas(context).filter { !it.equals(consulta, true) }
         preferencias(context).edit().putString(CLAVE, quedan.joinToString(SEPARADOR)).apply()
     }
 
+    /**
+     * Borra el historial entero, que es lo que hace el boton de la pantalla de explorar.
+     *
+     * @param context cualquiera vale.
+     */
     fun olvidarTodas(context: Context) {
         preferencias(context).edit().remove(CLAVE).apply()
     }

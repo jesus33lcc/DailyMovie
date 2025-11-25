@@ -8,6 +8,9 @@ import com.example.dailymovie.data.Recomendador
 import com.example.dailymovie.data.MovieRepository
 import com.example.dailymovie.data.Resultado
 import com.example.dailymovie.data.UserRepository
+import com.example.dailymovie.data.SerieRepository
+import com.example.dailymovie.models.Hallazgo
+import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.utils.ErrorCarga
@@ -16,6 +19,7 @@ import java.util.Calendar
 class HomeViewModel(
     private val peliculas: MovieRepository = Dependencias.peliculas,
     private val usuario: UserRepository = Dependencias.usuario,
+    private val series: SerieRepository = Dependencias.series,
     private val recomendador: Recomendador = Recomendador()
 ) : ViewModel() {
 
@@ -27,6 +31,15 @@ class HomeViewModel(
     val topRatedMovies: LiveData<List<MovieModel>> get() = _topRatedMovies
     private val _upcomingMovies = MutableLiveData<List<MovieModel>>()
     val upcomingMovies: LiveData<List<MovieModel>> get() = _upcomingMovies
+
+    /**
+     * Series que el usuario ha empezado y no ha terminado, con lo que lleva de cada una.
+     *
+     * Es la seccion "Sigue viendo": sin ella, marcar episodios no servia para nada fuera de
+     * la propia ficha de la serie, y volver a encontrar donde lo dejaste obligaba a buscarla.
+     */
+    private val _seriesEmpezadas = MutableLiveData<List<SerieEmpezada>>(emptyList())
+    val seriesEmpezadas: LiveData<List<SerieEmpezada>> get() = _seriesEmpezadas
 
     private val _movieOfTheDay = MutableLiveData<MovieOfTheDay?>()
     val movieOfTheDay: LiveData<MovieOfTheDay?> get() = _movieOfTheDay
@@ -53,6 +66,54 @@ class HomeViewModel(
         peliculas.mejorValoradas { reparte(it) { lista -> _topRatedMovies.value = lista } }
         peliculas.proximamente { reparte(it) { lista -> _upcomingMovies.value = lista } }
         cargarPeliculaDestacada()
+        cargarSeriesEmpezadas()
+    }
+
+    /**
+     * Busca las series a medias.
+     *
+     * Los detalles de cada una hay que pedirlos a TMDB porque en Firestore solo se guarda el
+     * id: el titulo y el cartel cambian con el idioma del aparato y guardarlos ahi los dejaria
+     * congelados en el idioma del dia que se marco el episodio.
+     *
+     * Se piden como mucho seis y no cuentan para el indicador de carga de la portada: son un
+     * extra, y si tardan no deben hacer esperar a lo demas.
+     */
+    private fun cargarSeriesEmpezadas() {
+        usuario.seriesEmpezadas { empezadas ->
+            if (empezadas.isEmpty()) {
+                _seriesEmpezadas.value = emptyList()
+                return@seriesEmpezadas
+            }
+            val aConsultar = empezadas.entries.sortedByDescending { it.value }.take(MAXIMO_EN_CURSO)
+            val encontradas = mutableListOf<SerieEmpezada>()
+            var pendientes = aConsultar.size
+
+            aConsultar.forEach { (serieId, vistos) ->
+                series.detalles(serieId) { resultado ->
+                    val detalles = (resultado as? Resultado.Exito)?.datos
+                    // Las terminadas no salen: la seccion es para retomar, no para presumir.
+                    if (detalles != null && vistos < detalles.numeroDeEpisodios) {
+                        encontradas += SerieEmpezada(
+                            serie = Hallazgo(
+                                id = detalles.id,
+                                titulo = detalles.titulo,
+                                subtitulo = detalles.estreno.orEmpty(),
+                                imagen = detalles.poster,
+                                nota = detalles.valoracion,
+                                tipo = TipoDeHallazgo.SERIE
+                            ),
+                            vistos = vistos,
+                            total = detalles.numeroDeEpisodios
+                        )
+                    }
+                    pendientes--
+                    if (pendientes == 0) {
+                        _seriesEmpezadas.value = encontradas.sortedByDescending { it.vistos }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -147,5 +208,24 @@ class HomeViewModel(
 
     private companion object {
         const val TOTAL_PETICIONES = 5
+
+        /** Mas de seis y la fila se convierte en otra lista infinita, que no es la idea. */
+        const val MAXIMO_EN_CURSO = 6
     }
+}
+
+/**
+ * Una serie que el usuario ha empezado y no ha terminado.
+ *
+ * @property serie la serie, ya en el formato que pinta la tarjeta comun.
+ * @property vistos cuantos episodios lleva marcados.
+ * @property total cuantos tiene la serie entera, para poder decir "12 de 62".
+ */
+data class SerieEmpezada(
+    val serie: Hallazgo,
+    val vistos: Int,
+    val total: Int
+) {
+    /** "12 de 62 episodios", lo que se enseña debajo del titulo de la seccion. */
+    fun comoVas() = "$vistos de $total episodios"
 }

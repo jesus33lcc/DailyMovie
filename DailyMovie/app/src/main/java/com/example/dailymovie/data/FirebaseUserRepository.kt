@@ -329,6 +329,20 @@ class FirebaseUserRepository(
             .addOnFailureListener { alTerminar(false) }
     }
 
+    override fun seriesEmpezadas(alTerminar: (Map<Int, Int>) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(emptyMap())
+        documento.get()
+            .addOnSuccessListener { instantanea ->
+                val marcas = (instantanea.get(EPISODIOS_VISTOS) as? List<*>).orEmpty()
+                alTerminar(
+                    marcas.mapNotNull { (it as? String)?.substringBefore("-")?.toIntOrNull() }
+                        .groupingBy { it }
+                        .eachCount()
+                )
+            }
+            .addOnFailureListener { alTerminar(emptyMap()) }
+    }
+
     /** Descompone "1396-5-14" y se queda con la temporada y el episodio si es de esta serie. */
     private fun aEpisodioDeEstaSerie(marca: Any?, serieId: Int): Pair<Int, Int>? {
         val trozos = (marca as? String)?.split("-") ?: return null

@@ -28,12 +28,21 @@ object Avisos {
      * eso significa que un Toast nunca se va a parecer al resto.
      *
      * El Snackbar si se puede vestir, sale en el mismo sitio y ademas no tapa nada.
+     *
+     * @param vista cualquiera de la pantalla: de ella cuelga el aviso y por ella se llega a
+     *   la barra de abajo para no taparla.
+     * @param texto lo que se lee. Cabe en tres lineas.
      */
     fun breve(vista: View, texto: String) {
         vestir(Snackbar.make(vista, texto, Snackbar.LENGTH_SHORT), vista).show()
     }
 
-    /** Igual pero para textos que hay que leer con calma. */
+    /**
+     * Igual pero para textos que hay que leer con calma.
+     *
+     * @param vista cualquiera de la pantalla.
+     * @param texto lo que se lee.
+     */
     fun largo(vista: View, texto: String) {
         vestir(Snackbar.make(vista, texto, Snackbar.LENGTH_LONG), vista).show()
     }
@@ -79,6 +88,13 @@ object Avisos {
      * Ojo con el orden: `alConfirmar` es donde va el borrado de verdad, y solo se llama si
      * el aviso se va solo. Quien llame a esto debe quitar la fila de la pantalla antes, para
      * que se vea desaparecer al instante.
+     *
+     * @param vista cualquiera de la pantalla donde sale el aviso.
+     * @param texto lo que acaba de pasar, para que se vea que fila era.
+     * @param textoAccion el boton de echarse atras.
+     * @param alDeshacer se llama al pulsar ese boton: aqui se devuelve la fila a su sitio.
+     * @param alConfirmar se llama cuando el aviso se va solo, y es donde va el borrado de
+     *   verdad. Si el usuario deshizo, no se llama.
      */
     fun conDeshacer(
         vista: View,

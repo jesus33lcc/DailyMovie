@@ -17,15 +17,31 @@ object Analitica {
     private const val FICHERO = "ajustes_dailymovie"
     private const val CLAVE = "analitica_activada"
 
+    /**
+     * Si el usuario ha dado permiso para recoger datos de uso.
+     *
+     * @param context cualquiera vale, solo se usa para leer las preferencias.
+     * @return false mientras no diga que si, que es como viene de fabrica.
+     */
     fun estaActivada(context: Context): Boolean =
         preferencias(context).getBoolean(CLAVE, false)
 
+    /**
+     * Guarda lo que ha elegido en Ajustes y lo aplica en el momento.
+     *
+     * @param context cualquiera vale: se usa para las preferencias y para Firebase.
+     * @param activada true si acepta que se recojan datos de uso.
+     */
     fun activar(context: Context, activada: Boolean) {
         preferencias(context).edit().putBoolean(CLAVE, activada).apply()
         aplicar(context, activada)
     }
 
-    /** Se llama al arrancar la app para respetar lo que el usuario eligio la ultima vez. */
+    /**
+     * Se llama al arrancar la app para respetar lo que el usuario eligio la ultima vez.
+     *
+     * @param context cualquiera vale.
+     */
     fun aplicarLoGuardado(context: Context) {
         aplicar(context, estaActivada(context))
     }
