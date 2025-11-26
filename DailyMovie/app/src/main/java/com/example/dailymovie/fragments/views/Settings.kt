@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.dailymovie.R
 import com.example.dailymovie.activities.views.LoginA
+import com.example.dailymovie.activities.views.EstadisticasA
 import com.example.dailymovie.activities.views.OnboardingA
 import com.example.dailymovie.databinding.FragmentSettingsBinding
 import com.example.dailymovie.fragments.viewmodels.SettingsViewModel
@@ -44,6 +45,10 @@ class Settings : Fragment() {
             startActivity(Intent(requireContext(), OnboardingA::class.java).apply {
                 putExtra(OnboardingA.EXTRA_DESDE_AJUSTES, true)
             })
+        }
+
+        binding.btnMisNumeros.setOnClickListener {
+            startActivity(Intent(requireContext(), EstadisticasA::class.java))
         }
 
         binding.btnRegion.setOnClickListener { mostrarRegion() }

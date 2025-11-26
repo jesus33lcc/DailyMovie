@@ -53,6 +53,11 @@
             style="@style/BotonDeAjustes"
             android:text="Editar mis gustos" />
 
+        <Button
+            android:id="@+id/btnMisNumeros"
+            style="@style/BotonDeAjustes"
+            android:text="Tus números" />
+
         <!-- Seccion: Contenido -->
         <TextView
             style="@style/TituloDeSeccionAjustes"

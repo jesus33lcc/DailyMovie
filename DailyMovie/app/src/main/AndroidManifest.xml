@@ -24,6 +24,9 @@
             android:name=".activities.views.GaleriaA"
             android:exported="false" />
         <activity
+            android:name=".activities.views.EstadisticasA"
+            android:exported="false" />
+        <activity
             android:name=".activities.views.SagaA"
             android:exported="false" />
         <activity

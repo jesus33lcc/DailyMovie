@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Un dato suelto: el numero gordo y debajo lo que significa -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="10dp"
+    android:padding="16dp"
+    android:background="@drawable/rounded_border_box"
+    android:clipToOutline="true">
+
+    <TextView
+        android:id="@+id/txtNumero"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:fontFamily="@font/courier_prime_bold"
+        android:textColor="@color/colorTextPrimary"
+        tools:text="47" />
+
+    <TextView
+        android:id="@+id/txtQueEs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:fontFamily="@font/courier_prime"
+        android:textColor="@color/colorAccent"
+        tools:text="películas vistas" />
+</LinearLayout>
