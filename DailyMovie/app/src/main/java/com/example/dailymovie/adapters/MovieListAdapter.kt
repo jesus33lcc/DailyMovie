@@ -17,11 +17,12 @@ import com.example.dailymovie.models.ListaModel
  *
  * Igual que el de peliculas, va con submitList y comparador para que crear o borrar una
  * lista se vea entrar y salir en vez de repintarse la pantalla entera.
- */
-/**
+ *
+ * @param itemClickListener al tocar la fila: abre esa lista.
  * @param onOpciones si es null, la fila no enseña los tres puntos. Es lo que distingue a
  *   Favoritos y Vistos, que vienen con la app y no se pueden borrar ni renombrar, de las
- *   listas que se ha hecho el usuario.
+ *   listas que se ha hecho el usuario. Recibe la lista y el propio boton, que hace falta para
+ *   colgar el menu de el.
  */
 class MovieListAdapter(
     private val itemClickListener: (ListaModel) -> Unit,
@@ -60,7 +61,12 @@ class MovieListAdapter(
         }
     }
 
-    /** La lista que esta en esa fila. */
+    /**
+     * La lista que esta en esa fila.
+     *
+     * @param position la fila, contando desde 0.
+     * @return lo que hay pintado ahi ahora mismo.
+     */
     fun listaEn(position: Int): ListaModel = getItem(position)
 
     private companion object {

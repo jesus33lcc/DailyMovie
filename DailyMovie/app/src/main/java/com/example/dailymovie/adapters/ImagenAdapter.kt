@@ -11,7 +11,12 @@ import com.example.dailymovie.utils.cargarFotograma
 import com.example.dailymovie.activities.views.GaleriaA
 import com.example.dailymovie.utils.Constantes
 
-/** La tira de imagenes de la ficha. Al tocar una se abre la galeria a pantalla completa. */
+/**
+ * La tira de imagenes de la ficha. Al tocar una se abre la galeria a pantalla completa.
+ *
+ * @param rutas las de TMDB, sin la direccion delante. Se le pasan enteras a la galeria junto
+ *   con la posicion tocada, para poder pasar de una a otra sin volver atras.
+ */
 class ImagenAdapter(private val rutas: List<String>) :
     RecyclerView.Adapter<ImagenAdapter.Holder>() {
 

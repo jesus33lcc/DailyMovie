@@ -13,6 +13,12 @@ import com.example.dailymovie.models.TemporadaModel
  *
  * Se enseñan como "T1", "T2"... y se marca la que esta abierta. Los especiales (temporada
  * 0) se dejan fuera desde la pantalla, no aqui.
+ *
+ * Cual esta elegida se guarda aqui dentro, y arranca en la primera de la lista: al abrir una
+ * serie siempre se ve algo, sin que la pantalla tenga que decir nada.
+ *
+ * @param temporadas las de la serie, en orden.
+ * @param alElegir se llama al tocar una, y es donde la pantalla pide sus episodios.
  */
 class TemporadaAdapter(
     private val temporadas: List<TemporadaModel>,

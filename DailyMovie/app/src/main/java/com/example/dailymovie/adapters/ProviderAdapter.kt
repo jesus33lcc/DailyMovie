@@ -11,6 +11,12 @@ import com.example.dailymovie.utils.cargarFotograma
 import com.example.dailymovie.models.ProviderDetailModel
 import com.example.dailymovie.utils.Constantes
 
+/**
+ * Los logos de donde se puede ver algo, en la ficha.
+ *
+ * @param providerList las plataformas del pais del aparato, que ya vienen filtradas desde la
+ *   pantalla: solo las de suscripcion, no las de alquiler ni compra.
+ */
 class ProviderAdapter(private val providerList: List<ProviderDetailModel>) : RecyclerView.Adapter<ProviderAdapter.ProviderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProviderViewHolder {

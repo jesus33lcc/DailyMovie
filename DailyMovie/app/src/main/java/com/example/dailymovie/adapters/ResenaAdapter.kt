@@ -15,6 +15,8 @@ import com.example.dailymovie.utils.Fechas
  * Cada una se enseña recortada y se abre al tocarla. Que estado tiene abierta cada una se
  * guarda aqui por id y no en el ViewHolder: los ViewHolder se reciclan, y si se guardara en
  * ellos al bajar y volver a subir aparecerian abiertas reseñas que nadie habia tocado.
+ *
+ * @param resenas las que trae TMDB, ya sin las que vienen sin texto.
  */
 class ResenaAdapter(
     private val resenas: List<ResenaResponse>

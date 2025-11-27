@@ -96,7 +96,15 @@ class HallazgoAdapter(
     }
 
     companion object {
-        /** El nombre que une el cartel de la tarjeta con el de la ficha que se abre. */
+        /**
+         * El nombre que une el cartel de la tarjeta con el de la ficha que se abre.
+         *
+         * Es publico porque la pantalla de destino tiene que ponerle exactamente el mismo a
+         * su imagen: si no coinciden, no hay animacion y el cartel aparece de la nada.
+         *
+         * @param hallazgo el de la tarjeta que se ha tocado.
+         * @return un nombre unico en la pantalla, con el tipo delante del id.
+         */
         fun nombreDeTransicion(hallazgo: Hallazgo) = "cartel_${hallazgo.tipo}_${hallazgo.id}"
 
         private val COMPARADOR = object : DiffUtil.ItemCallback<Hallazgo>() {

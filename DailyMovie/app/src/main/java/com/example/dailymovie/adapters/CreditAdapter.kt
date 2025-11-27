@@ -13,6 +13,12 @@ import com.example.dailymovie.activities.views.PersonaA
 import com.example.dailymovie.models.CastMemberModel
 import com.example.dailymovie.utils.Constantes
 
+/**
+ * El reparto de la ficha, en una tira horizontal: foto, nombre y personaje.
+ *
+ * @param castList la gente que sale en pantalla. Se pinta en el orden en que llega, que es el
+ *   de importancia del papel que ya manda TMDB.
+ */
 class CreditAdapter(private val castList: List<CastMemberModel>) : RecyclerView.Adapter<CreditAdapter.CreditViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CreditViewHolder {
