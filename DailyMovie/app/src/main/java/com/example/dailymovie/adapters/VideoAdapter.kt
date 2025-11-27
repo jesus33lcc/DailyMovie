@@ -21,6 +21,9 @@ import com.example.dailymovie.utils.Trailers
  *
  * El context sale del propio itemView: pasarlo por el constructor obligaba a que cada
  * pantalla se lo diera y era una forma facil de quedarse con una referencia de mas.
+ *
+ * @param videoList los videos de la pelicula o de la serie, con los trailers ya delante:
+ *   quien los pide es el repositorio y es el que los ordena.
  */
 class VideoAdapter(private val videoList: List<VideoModel>) :
     RecyclerView.Adapter<VideoAdapter.VideoViewHolder>() {

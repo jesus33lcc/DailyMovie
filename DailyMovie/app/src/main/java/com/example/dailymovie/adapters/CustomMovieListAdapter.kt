@@ -23,6 +23,12 @@ import com.example.dailymovie.utils.cargarCartel
  *
  * Cada tarjeta lleva sus tres puntos: el borrado deslizando no se descubria y ademas en una
  * cuadricula no se entiende, porque no esta claro que se esta arrastrando.
+ *
+ * @param onMovieClick al tocar la tarjeta: abre la ficha, que sera de pelicula o de serie
+ *   segun lo que sea.
+ * @param onOpciones al tocar los tres puntos. Se pasan tres cosas: lo que hay en esa tarjeta,
+ *   el propio boton (el menu tiene que salir pegado a el) y la posicion, que hace falta para
+ *   poder devolver la fila a su sitio si el usuario deshace el borrado.
  */
 class CustomMovieListAdapter(
     private val onMovieClick: (Guardado) -> Unit,
@@ -56,7 +62,12 @@ class CustomMovieListAdapter(
         }
     }
 
-    /** Lo que esta en esa posicion, para cuando hay que devolverlo a su sitio. */
+    /**
+     * Lo que esta en esa posicion, para cuando hay que devolverlo a su sitio.
+     *
+     * @param position la fila, contando desde 0.
+     * @return lo que hay pintado ahi ahora mismo.
+     */
     fun elementoEn(position: Int): Guardado = getItem(position)
 
     private companion object {

@@ -11,6 +11,11 @@ package com.example.dailymovie.models
  * Aqui se juntan los dos: un chip enseña un solo nombre y por dentro sabe a que pedir en cada
  * sitio. Si un genero solo existe en uno de los dos mundos, el otro id se queda a null y esa
  * mitad simplemente no se pide.
+ *
+ * @property nombre lo que se lee en el chip. Se coge el del genero de cine, que es el que
+ *   TMDB traduce; los que solo existen en series se quedan con su nombre en ingles.
+ * @property idPelicula el id con el que pedirlo en peliculas, o null si en cine no existe.
+ * @property idSerie el id con el que pedirlo en series, o null si en television no existe.
  */
 data class GeneroExplorable(
     val nombre: String,

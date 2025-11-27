@@ -30,6 +30,17 @@ data class Elegible(
     val esCara: Boolean = false
 )
 
+/**
+ * La rejilla de fichas del onboarding, donde se marca lo que a uno le gusta.
+ *
+ * El adapter no se guarda que hay marcado: lo pregunta y lo avisa. La cuenta la lleva el
+ * ViewModel del onboarding, que es quien al final tiene que guardarla, asi que aqui no hay
+ * una segunda copia que se pueda quedar desfasada.
+ *
+ * @param elementos lo que se puede marcar, ya sean generos, peliculas o personas.
+ * @param estaElegido responde si ese id esta marcado. Se llama al pintar cada ficha.
+ * @param alTocar avisa de que un id pasa a estar marcado (true) o desmarcado (false).
+ */
 class ElegibleAdapter(
     private val elementos: List<Elegible>,
     private val estaElegido: (Int) -> Boolean,

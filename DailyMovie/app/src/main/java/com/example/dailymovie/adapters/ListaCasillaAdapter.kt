@@ -16,6 +16,11 @@ import com.example.dailymovie.R
  *
  * El adapter no guarda nada por su cuenta: trabaja sobre el conjunto que le pasa el dialogo,
  * que es el que al final sabe que ha cambiado respecto a como estaba.
+ *
+ * @param nombres las listas del usuario, en el orden en que se enseñan.
+ * @param marcadas las listas donde ya esta esa pelicula. Se modifica aqui segun se van
+ *   tocando las casillas, y por eso quien lo pasa debe quedarse antes con una copia de como
+ *   estaba: sin ella no hay forma de saber que hay que meter y que hay que sacar.
  */
 class ListaCasillaAdapter(
     private val nombres: List<String>,

@@ -20,7 +20,9 @@ data class Hallazgo(
     val titulo: String,
     /** El año en peliculas y series; el oficio en las personas. */
     val subtitulo: String,
+    /** El cartel en peliculas, series y sagas; la foto en las personas. Null si no hay. */
     val imagen: String?,
+    /** De 0 a 10. Se queda en 0 en las personas y las sagas, que no tienen nota. */
     val nota: Double,
     val tipo: TipoDeHallazgo,
     /** Para ordenar por lo que mas encaja, que es como lo manda TMDB. */
@@ -34,6 +36,10 @@ data class Hallazgo(
         /**
          * Las tarjetas de la portada y de series son las mismas que las del buscador, asi que
          * en vez de tener tres adaptadores calcados se convierte a esto y se usa el mismo.
+         *
+         * @param pelicula la que se va a pintar.
+         * @return el hallazgo con el año de subtitulo y sin relevancia, porque aqui el orden
+         *   lo pone quien manda la lista.
          */
         fun de(pelicula: MovieModel) = Hallazgo(
             id = pelicula.id,
@@ -49,6 +55,8 @@ data class Hallazgo(
          *
          * Desde que se pide combined_credits en vez de movie_credits, en la ficha de una
          * persona salen las dos cosas, y el tipo decide que ficha se abre al tocarla.
+         *
+         * @param trabajo una entrada de su filmografia.
          */
         fun de(trabajo: com.example.dailymovie.client.response.PeliculaDePersona) = Hallazgo(
             id = trabajo.id,
@@ -59,7 +67,13 @@ data class Hallazgo(
             tipo = if (trabajo.esSerie) TipoDeHallazgo.SERIE else TipoDeHallazgo.PELICULA
         )
 
-        /** Una saga entera, para poder abrirla y ver sus peliculas en orden. */
+        /**
+         * Una saga entera, para poder abrirla y ver sus peliculas en orden.
+         *
+         * @param saga la coleccion que ha encontrado la busqueda.
+         * @return un hallazgo sin año ni nota, porque una saga no tiene ninguna de las dos
+         *   cosas, y con la relevancia al maximo para que salga la primera.
+         */
         fun de(saga: com.example.dailymovie.client.response.SagaResponse) = Hallazgo(
             id = saga.id,
             titulo = saga.nombre,
@@ -72,6 +86,10 @@ data class Hallazgo(
             relevancia = Double.MAX_VALUE
         )
 
+        /**
+         * @param serie la que se va a pintar. Si no tiene fecha de estreno el subtitulo se
+         *   queda vacio, que es mejor que enseñar un año inventado.
+         */
         fun de(serie: SerieModel) = Hallazgo(
             id = serie.id,
             titulo = serie.titulo,

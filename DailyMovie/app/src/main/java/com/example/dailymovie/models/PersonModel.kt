@@ -4,7 +4,18 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
-/** Ficha de una persona: vale igual para un actor que para un director. */
+/**
+ * Ficha de una persona: vale igual para un actor que para un director.
+ *
+ * @property biografia puede llegar vacia o a null aunque sea alguien conocido: TMDB solo la
+ *   tiene traducida en los nombres mas famosos y en el resto la deja en blanco.
+ * @property nacimiento la fecha como "1937-04-25", o null si no consta.
+ * @property fallecimiento null si sigue vivo. Es la unica forma de saberlo, no hay ninguna
+ *   marca aparte.
+ * @property lugarDeNacimiento ciudad, region y pais en un solo texto, tal cual lo escribe
+ *   TMDB.
+ * @property foto ruta de la foto, o null si no tiene.
+ */
 @Parcelize
 data class PersonModel(
     @SerializedName("id")
