@@ -35,7 +35,6 @@ class VideoAdapter(private val videoList: List<VideoModel>) :
 
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         val video = videoList[position]
-        val contexto = holder.itemView.context
 
         // YouTube ya no deja reproducir dentro de un WebView, asi que se enseña la miniatura
         // y al tocarla se abre el trailer en YouTube. Ver utils/Trailers.

@@ -72,7 +72,9 @@ class HallazgoAdapter(
             // Lo que aun no ha salido se dice en la propia tarjeta: con el año a secas no se
             // distingue de lo que ya se puede ver, y ademas todavia no tiene nota.
             val porVenir = Fechas.estaPorVenir(hallazgo.subtitulo)
-            holder.subtitulo.text = if (porVenir) {
+            holder.subtitulo.text = if (hallazgo.subtituloLibre != null) {
+                hallazgo.subtituloLibre
+            } else if (porVenir) {
                 contexto.getString(R.string.proximamente_corto)
             } else {
                 Fechas.soloElAno(hallazgo.subtitulo)

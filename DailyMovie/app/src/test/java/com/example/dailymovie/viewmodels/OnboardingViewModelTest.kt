@@ -189,6 +189,19 @@ class OnboardingViewModelTest {
         override fun anadirAlHistorial(pelicula: MovieModel, alTerminar: (Boolean) -> Unit) = Unit
         override fun borrarHistorial(alTerminar: (Boolean) -> Unit) = Unit
         override fun peliculaDelDia(alTerminar: (MovieOfTheDay?) -> Unit) = Unit
+
+        // Los episodios vistos no pintan nada aqui; estan porque la interfaz los pide.
+        override fun episodiosVistos(serieId: Int, alTerminar: (Set<Pair<Int, Int>>) -> Unit) =
+            alTerminar(emptySet())
+
+        override fun cambiarEpisodioVisto(
+            serieId: Int,
+            temporada: Int,
+            episodio: Int,
+            alTerminar: (Boolean) -> Unit
+        ) = alTerminar(false)
+
+        override fun seriesEmpezadas(alTerminar: (Map<Int, Int>) -> Unit) = alTerminar(emptyMap())
     }
 
     // ---- Ayudas ----------------------------------------------------------------------

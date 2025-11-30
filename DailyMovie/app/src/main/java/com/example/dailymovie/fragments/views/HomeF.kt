@@ -104,7 +104,11 @@ class HomeF : Fragment() {
         homeViewModel.seriesEmpezadas.observe(viewLifecycleOwner) { empezadas ->
             binding.seccionSigueViendo.visibility =
                 if (empezadas.isEmpty()) View.GONE else View.VISIBLE
-            pintarTira(binding.recyclerSigueViendo, empezadas.map { it.serie })
+            // En esta fila el año de estreno no dice nada: lo que interesa es por donde vas.
+            pintarTira(
+                binding.recyclerSigueViendo,
+                empezadas.map { it.serie.copy(subtituloLibre = it.comoVas()) }
+            )
         }
 
         homeViewModel.cargando.observe(viewLifecycleOwner, Observer { cargando ->

@@ -26,7 +26,15 @@ data class Hallazgo(
     val nota: Double,
     val tipo: TipoDeHallazgo,
     /** Para ordenar por lo que mas encaja, que es como lo manda TMDB. */
-    val relevancia: Double = 0.0
+    val relevancia: Double = 0.0,
+    /**
+     * Un texto que sustituye al subtitulo calculado, cuando la pantalla quiere decir otra cosa.
+     *
+     * La tarjeta normal saca el año del subtitulo, asi que no vale con machacar [subtitulo]:
+     * "12 de 62 episodios" se quedaria en "12 d". Lo usa "Sigue viendo" para enseñar por donde
+     * vas en vez del año de estreno, que ahi no aporta nada.
+     */
+    val subtituloLibre: String? = null
 ) : Parcelable {
 
     /** El año, para poder ordenar por fecha sin arrastrar la fecha entera. */
