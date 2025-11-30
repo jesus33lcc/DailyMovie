@@ -54,18 +54,6 @@ object BusquedasRecientes {
             .orEmpty()
 
     /**
-     * Quita una sola busqueda de la lista.
-     *
-     * @param context cualquiera vale.
-     * @param consulta cual se quita. Da igual como este escrita en mayusculas: se compara
-     *   igual que al guardarla, que tampoco distingue.
-     */
-    fun olvidar(context: Context, consulta: String) {
-        val quedan = todas(context).filter { !it.equals(consulta, true) }
-        preferencias(context).edit().putString(CLAVE, quedan.joinToString(SEPARADOR)).apply()
-    }
-
-    /**
      * Borra el historial entero, que es lo que hace el boton de la pantalla de explorar.
      *
      * @param context cualquiera vale.

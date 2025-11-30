@@ -16,7 +16,7 @@ object Constantes {
     val API_KEY: String = BuildConfig.TMDB_API_KEY
 
     /** La raiz de la API v3; de aqui cuelgan todos los endpoints de `WebService`. */
-    const val BASE_URL = "https://api.themoviedb.org/3/";
+    const val BASE_URL = "https://api.themoviedb.org/3/"
 
     /**
      * Imagenes al tamaño de siempre: carteles, fotos de gente y fotogramas.

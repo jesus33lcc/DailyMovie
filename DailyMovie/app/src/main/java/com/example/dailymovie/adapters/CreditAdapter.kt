@@ -11,7 +11,6 @@ import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarFotoDePersona
 import com.example.dailymovie.activities.views.PersonaA
 import com.example.dailymovie.models.CastMemberModel
-import com.example.dailymovie.utils.Constantes
 
 /**
  * El reparto de la ficha, en una tira horizontal: foto, nombre y personaje.

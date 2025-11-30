@@ -328,18 +328,17 @@ class ExplorarViewModel(
     }
 
     /**
-     * Enseña lo mas popular de un genero como si fuera una busqueda.
+     * Enseña lo mas popular de un genero, con peliculas y series juntas.
      *
      * Reaprovecha discover, el mismo endpoint que alimenta la recomendacion de la portada.
      * Los resultados se meten en la misma rejilla, asi que tocar un genero se comporta igual
      * que escribir algo: mismos filtros y mismas tarjetas.
-     */
-    /**
-     * Enseña lo mas popular de un genero, con peliculas y series juntas.
      *
      * Se piden las dos cosas y se espera a las dos antes de pintar. Al principio esto solo
      * traia peliculas, porque discover/movie es lo unico que se estaba usando y las series
      * no aparecian por ningun lado.
+     *
+     * @param genero el genero elegido, que ya trae dentro el id de cine y el de television.
      */
     fun explorarGenero(genero: GeneroExplorable) {
         trabajoDeBusqueda?.cancel()

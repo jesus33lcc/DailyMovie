@@ -147,6 +147,15 @@ class ExplorarViewModelTest {
             pagina: Int,
             alTerminar: (Resultado<List<SerieModel>>) -> Unit
         ) = Unit
+
+        // Ni la clasificacion ni las reseñas se usan aqui; la interfaz las pide igualmente.
+        override fun clasificacionPorEdad(serieId: Int, alTerminar: (String?) -> Unit) =
+            alTerminar(null)
+
+        override fun resenas(
+            serieId: Int,
+            alTerminar: (Resultado<List<ResenaResponse>>) -> Unit
+        ) = alTerminar(Resultado.Exito(emptyList()))
     }
 
     /** Usuario de mentira: el buscador solo le pide el historial, que aqui no se prueba. */
@@ -189,6 +198,19 @@ class ExplorarViewModelTest {
         override fun guardarGustos(gustos: Gustos, alTerminar: (Boolean) -> Unit) = Unit
         override fun gustos(alTerminar: (Gustos?) -> Unit) = Unit
         override fun peliculaDelDia(alTerminar: (MovieOfTheDay?) -> Unit) = Unit
+
+        // Los episodios vistos no pintan nada aqui; estan porque la interfaz los pide.
+        override fun episodiosVistos(serieId: Int, alTerminar: (Set<Pair<Int, Int>>) -> Unit) =
+            alTerminar(emptySet())
+
+        override fun cambiarEpisodioVisto(
+            serieId: Int,
+            temporada: Int,
+            episodio: Int,
+            alTerminar: (Boolean) -> Unit
+        ) = alTerminar(false)
+
+        override fun seriesEmpezadas(alTerminar: (Map<Int, Int>) -> Unit) = alTerminar(emptyMap())
     }
 
     // ---- Ayudas ----------------------------------------------------------------------

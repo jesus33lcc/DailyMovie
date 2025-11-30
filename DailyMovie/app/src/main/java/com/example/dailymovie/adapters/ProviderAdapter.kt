@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarFotograma
 import com.example.dailymovie.models.ProviderDetailModel
-import com.example.dailymovie.utils.Constantes
 
 /**
  * Los logos de donde se puede ver algo, en la ficha.
