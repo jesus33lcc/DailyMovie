@@ -454,6 +454,14 @@ class ExplorarF : Fragment() {
     // ---------------- Ir a la ficha ----------------
 
     private fun abrir(hallazgo: Hallazgo, cartel: View? = null) {
+        // Abrir un resultado tambien cuenta como buscar a proposito: hasta ahora solo se
+        // guardaba al pulsar la lupa del teclado, y casi nadie la pulsa. Se escribe, se mira
+        // lo que sale y se toca, asi que "lo ultimo que buscaste" salia casi siempre vacio.
+        val consulta = binding.searchInput.text.toString().trim()
+        if (consulta.length >= MINIMO_PARA_GUARDAR) {
+            BusquedasRecientes.guardar(requireContext(), consulta)
+        }
+
         val destino = when (hallazgo.tipo) {
             TipoDeHallazgo.PELICULA ->
                 Intent(context, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
@@ -472,6 +480,11 @@ class ExplorarF : Fragment() {
             requireActivity()
                 .abrirConCartel(destino, cartel, HallazgoAdapter.nombreDeTransicion(hallazgo))
         }
+    }
+
+    private companion object {
+        /** Con menos de tres letras la busqueda no se lanza, asi que tampoco se guarda. */
+        const val MINIMO_PARA_GUARDAR = 3
     }
 
     private fun esconderTeclado() {
