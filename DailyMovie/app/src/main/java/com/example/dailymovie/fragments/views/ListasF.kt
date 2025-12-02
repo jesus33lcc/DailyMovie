@@ -188,7 +188,7 @@ class ListasF : Fragment() {
         DialogoDailyMovie.confirmar(
             context = requireContext(),
             titulo = "Eliminar lista",
-            mensaje = "Se borra \"${lista.nombre}\" y las películas que tengas guardadas ahí. " +
+            mensaje = "Se borra «${lista.nombre}» y las películas que tengas guardadas ahí. " +
                 "Esto no se puede deshacer.",
             textoAceptar = "Eliminar",
             peligroso = true
