@@ -115,7 +115,7 @@ class OnboardingA : AppCompatActivity() {
         when (paso) {
             PASO_GENEROS -> {
                 if (!viewModel.hayAlgunGenero()) {
-                    Avisos.breve(binding.root, "Elige al menos un género, o toca \"Ahora no\"")
+                    Avisos.breve(binding.root, "Elige al menos un género, o toca «Ahora no»")
                     return
                 }
                 paso = PASO_PELICULAS
