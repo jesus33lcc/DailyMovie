@@ -202,6 +202,14 @@ class ListasF : Fragment() {
         }
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        // Al volver de una ficha puede haber cambiado lo guardado, y los numeros de cada
+        // lista se habrian quedado viejos.
+        viewModel.recargar()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

@@ -22,6 +22,17 @@ class ListasViewModel(
     val customLists: LiveData<List<ListaModel>> get() = _customLists
 
     init {
+        recargar()
+    }
+
+    /**
+     * Vuelve a pedirlo todo.
+     *
+     * Hace falta al volver a la pestaña: si el usuario se ha ido a una ficha y ha guardado
+     * algo, los numeros de aqui se han quedado viejos. El ViewModel sobrevive al cambio de
+     * pestaña, asi que el init no basta.
+     */
+    fun recargar() {
         cargarListasFijas()
         cargarListasDelUsuario()
     }
@@ -52,21 +63,32 @@ class ListasViewModel(
     }
 
     /**
-     * Pone el numero de peliculas a cada lista del usuario.
+     * Pone a cada lista del usuario cuantas cosas tiene guardadas.
      *
-     * Cada lista es un documento aparte en Firestore, asi que hay que pedirlas una a una.
-     * Se publica cuando han contestado todas para no repintar la pantalla N veces.
+     * Se suman peliculas y series: en Firestore van en dos campos distintos del mismo
+     * documento, pero para el usuario una lista es una lista y da igual lo que haya metido
+     * dentro. Antes solo se contaban las peliculas, asi que guardar una serie no movia el
+     * numero y parecia que no se habia guardado.
+     *
+     * Cada lista es un documento aparte, asi que hay que pedirlas una a una; se publica
+     * cuando han contestado todas para no repintar la pantalla N veces.
      */
     private fun contarListasDelUsuario(nombres: List<String>) {
         if (nombres.isEmpty()) return
         val cuentas = mutableMapOf<String, Int>()
+
+        fun publicarSiEstanTodas() {
+            if (cuentas.size < nombres.size) return
+            _customLists.value = nombres.map {
+                ListaModel(it, R.drawable.ic_baseline_list_24, cuentas[it])
+            }
+        }
+
         nombres.forEach { nombre ->
             usuario.peliculasDeLista(nombre) { peliculas ->
-                cuentas[nombre] = peliculas.size
-                if (cuentas.size == nombres.size) {
-                    _customLists.value = nombres.map {
-                        ListaModel(it, R.drawable.ic_baseline_list_24, cuentas[it])
-                    }
+                usuario.seriesDeLista(nombre) { series ->
+                    cuentas[nombre] = peliculas.size + series.size
+                    publicarSiEstanTodas()
                 }
             }
         }
