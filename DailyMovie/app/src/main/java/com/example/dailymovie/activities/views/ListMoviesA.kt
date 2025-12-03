@@ -73,14 +73,24 @@ class ListMoviesA : AppCompatActivity() {
         movieViewModel.cargarListaCompleta(listName) { actualizadas ->
             movieList = actualizadas.toMutableList()
             movieListAdapter.submitList(actualizadas) { decidirSiHayAlgo() }
-            pintarCuantasHay(actualizadas.size)
+            pintarCuantasHay(actualizadas)
         }
     }
 
-    /** El "12 películas" de debajo del titulo, que no se enseña si la lista esta vacia. */
-    private fun pintarCuantasHay(cuantas: Int) {
+    /**
+     * El "12 películas" de debajo del titulo, que no se enseña si la lista esta vacia.
+     *
+     * Si dentro hay alguna serie se dice "títulos": una lista con dos series no tiene "2
+     * películas", y llamarlas peliculas a todas suena a que la app no se entera.
+     */
+    private fun pintarCuantasHay(guardados: List<Guardado>) {
+        val cuantas = guardados.size
         binding.listCuantas.visibility = if (cuantas == 0) View.GONE else View.VISIBLE
-        binding.listCuantas.text = if (cuantas == 1) "1 película" else "$cuantas películas"
+        binding.listCuantas.text = when {
+            guardados.any { it.esSerie } -> if (cuantas == 1) "1 título" else "$cuantas títulos"
+            cuantas == 1 -> "1 película"
+            else -> "$cuantas películas"
+        }
     }
 
     /**
