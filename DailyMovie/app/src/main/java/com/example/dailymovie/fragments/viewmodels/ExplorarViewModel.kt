@@ -16,6 +16,7 @@ import com.example.dailymovie.models.GenreModel
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.TipoDeHallazgo
+import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.utils.ErrorCarga
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -245,13 +246,26 @@ class ExplorarViewModel(
     }
 
     /** Los filtros se aplican sobre lo ya descargado: cambiar de chip no vuelve a la red. */
+    /** Si de ese resultado se puede enseñar una nota: la gente no tiene, y lo por estrenar tampoco. */
+    private fun tieneNotaQueEnseñar(hallazgo: Hallazgo) =
+        hallazgo.nota > 0 &&
+            hallazgo.tipo != TipoDeHallazgo.PERSONA &&
+            hallazgo.tipo != TipoDeHallazgo.SAGA &&
+            !Fechas.estaPorVenir(hallazgo.subtitulo)
+
     private fun aplicarFiltro() {
         val porTipo = filtro.tipo?.let { t -> todosLosResultados.filter { it.tipo == t } }
             ?: todosLosResultados
 
         _resultados.value = when (filtro.orden) {
             OrdenDeBusqueda.RELEVANCIA -> porTipo
-            OrdenDeBusqueda.NOTA -> porTipo.sortedByDescending { it.nota }
+            // Lo que no tiene nota va al final: las sagas y la gente no la tienen, y de lo
+            // que aun no ha salido no se enseña. Sin esto, ordenar por nota dejaba arriba
+            // justo lo que no la enseñaba, y parecia que el orden no habia hecho nada.
+            OrdenDeBusqueda.NOTA -> porTipo.sortedWith(
+                compareBy<Hallazgo> { tieneNotaQueEnseñar(it).not() }
+                    .thenByDescending { it.nota }
+            )
             OrdenDeBusqueda.ANO -> porTipo.sortedByDescending { it.ano }
         }
     }
