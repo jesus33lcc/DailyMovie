@@ -25,6 +25,8 @@ acabar descubriendo otra película suya que no conocías.
 **Series**
 - Sección propia con las series en emisión, populares y mejor valoradas
 - Cada serie con sus temporadas y todos sus episodios, con imagen, fecha y duración
+- Marca los episodios que ya has visto y la app lleva la cuenta: "llevas 12 de 62"
+- En la portada, una fila de **"Sigue viendo"** con lo que tienes a medias
 
 **Fichas completas**
 - Sinopsis, géneros, duración, presupuesto, recaudación y clasificación por edad
@@ -39,6 +41,10 @@ acabar descubriendo otra película suya que no conocías.
 - Favoritos y vistos
 - Listas propias con el nombre que quieras, y cada una dice cuántas películas tiene
 - Historial de lo que has buscado
+
+**Tus números**
+- Cuántas películas has visto, cuántas series llevas, de qué década es lo que más ves y qué es lo
+  más antiguo que has guardado
 
 **Tu cuenta**
 - Registro con correo o entrando con Google
