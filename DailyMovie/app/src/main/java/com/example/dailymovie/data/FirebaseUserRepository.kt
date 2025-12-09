@@ -9,6 +9,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.PersistentCacheSettings
 import com.google.firebase.firestore.SetOptions
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -37,8 +38,12 @@ class FirebaseUserRepository(
 
     init {
         // Persistencia offline: lo que ya se ha visto sigue estando sin cobertura.
+        //
+        // Se usa setLocalCacheSettings y no el setPersistenceEnabled de toda la vida porque
+        // ese quedo obsoleto; hacen lo mismo, pero el nuevo ademas deja elegir el tamaño de
+        // la cache si algun dia hace falta.
         db.firestoreSettings = FirebaseFirestoreSettings.Builder()
-            .setPersistenceEnabled(true)
+            .setLocalCacheSettings(PersistentCacheSettings.newBuilder().build())
             .build()
     }
 

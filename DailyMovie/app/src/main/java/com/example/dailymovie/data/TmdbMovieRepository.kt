@@ -45,25 +45,27 @@ class TmdbMovieRepository(
     ) {
         servicio.buscarTodo(consulta, apiKey, page = pagina).enqueueSimple(
             onExito = { respuesta ->
-                val pagina = Pagina(
+                val resultados = Pagina(
                     hallazgos = aHallazgos(respuesta.resultados),
                     pagina = respuesta.pagina,
                     hayMas = respuesta.pagina < respuesta.totalDePaginas
                 )
                 // Las sagas van en otro endpoint y no estan paginadas, asi que solo se piden
                 // la primera vez. Si fallan no pasa nada: se devuelve lo que haya llegado.
-                if (pagina.pagina > 1) {
-                    alTerminar(Resultado.Exito(pagina))
+                if (resultados.pagina > 1) {
+                    alTerminar(Resultado.Exito(resultados))
                     return@enqueueSimple
                 }
                 servicio.buscarSagas(consulta, apiKey).enqueueSimple(
                     onExito = { sagas ->
                         val encontradas = sagas.resultados.take(3).map { Hallazgo.de(it) }
                         alTerminar(
-                            Resultado.Exito(pagina.copy(hallazgos = encontradas + pagina.hallazgos))
+                            Resultado.Exito(
+                                resultados.copy(hallazgos = encontradas + resultados.hallazgos)
+                            )
                         )
                     },
-                    onError = { alTerminar(Resultado.Exito(pagina)) }
+                    onError = { alTerminar(Resultado.Exito(resultados)) }
                 )
             },
             onError = { alTerminar(Resultado.Fallo(it)) }

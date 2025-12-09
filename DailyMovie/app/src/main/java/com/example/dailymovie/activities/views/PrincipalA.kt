@@ -19,13 +19,8 @@ class PrincipalA : AppCompatActivity() {
         setContentView(binding.root)
         val navView:BottomNavigationView=binding.navView
         val navController =findNavController(R.id.nav_host_fragment_activity_principal)
-        val appBarConfiguration= AppBarConfiguration(
-            setOf(
-                R.id.menu_home, R.id.menu_explorar, R.id.menu_series,
-                R.id.menu_listas, R.id.menu_ajustes
-            )
-        )
-        //setupActionBarWithNavController(navController, appBarConfiguration)
+        // Aqui habia un AppBarConfiguration para setupActionBarWithNavController, pero el tema
+        // es NoActionBar: no habia barra que configurar y quedaba sin usar.
         navView.setupWithNavController(navController)
     }
     private fun replaceFragment(fragment: Fragment){
