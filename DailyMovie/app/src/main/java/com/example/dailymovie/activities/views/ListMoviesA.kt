@@ -14,6 +14,7 @@ import com.example.dailymovie.databinding.ActivityListMoviesBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.data.ListaFija
 import com.example.dailymovie.models.Guardado
+import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.utils.Avisos
 import com.example.dailymovie.utils.Constantes
@@ -37,7 +38,9 @@ class ListMoviesA : AppCompatActivity() {
 
         // Lo que llega en el Intent son solo peliculas; las series entran en onResume, que es
         // quien pide la lista completa.
-        movieList = intent.getParcelableArrayListExtra<com.example.dailymovie.models.MovieModel>(EXTRA_LISTA)
+        // La version con Class pide API 33 y el minSdk ya es 33, asi que se puede usar sin
+        // condicionales y sin el aviso de obsoleto.
+        movieList = intent.getParcelableArrayListExtra(EXTRA_LISTA, MovieModel::class.java)
             ?.map { Guardado.de(it) }?.toMutableList() ?: mutableListOf()
 
         movieListAdapter = CustomMovieListAdapter(
