@@ -441,6 +441,21 @@ interface WebService {
      * @return todo en bruto y sin filtrar, incluidos promocionales y apariciones de un minuto.
      *   Quien decide que merece la pena enseñar es el repositorio.
      */
+    /**
+     * Las fotos que TMDB tiene de una persona.
+     *
+     * Son retratos verticales, no fotogramas: la galeria las enseña igual, lo unico que
+     * cambia es la forma.
+     *
+     * @param personaId el id de TMDB de la persona.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     */
+    @GET("person/{person_id}/images")
+    fun getImagenesDePersona(
+        @Path("person_id") personaId: Int,
+        @Query("api_key") apiKey: String
+    ): Call<ImagenesDePersonaResponse>
+
     @GET("person/{person_id}/combined_credits")
     fun getFilmografia(
         @Path("person_id") personaId: Int,

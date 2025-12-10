@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarFotoDePersona
 import com.example.dailymovie.activities.viewmodels.PersonaViewModel
+import com.example.dailymovie.adapters.ImagenAdapter
 import com.example.dailymovie.adapters.HallazgoAdapter
 import com.example.dailymovie.utils.abrirConCartel
 import com.example.dailymovie.models.Hallazgo
@@ -54,6 +55,7 @@ class PersonaA : AppCompatActivity() {
         binding.recyclerDirigiendo.addItemDecoration(SpacingItemDecoration.deLista(this))
 
         viewModel.ficha.observe(this) { pintarFicha(it) }
+        viewModel.fotos.observe(this) { pintarFotos(it) }
         viewModel.filmografia.observe(this) { pintarFilmografia(it) }
         viewModel.error.observe(this) { error ->
             error?.let {
@@ -127,6 +129,23 @@ class PersonaA : AppCompatActivity() {
         binding.seccionDirigiendo.visibility =
             if (filmografia.dirigiendo.isEmpty()) View.GONE else View.VISIBLE
         pintarFilmografia(binding.recyclerDirigiendo, filmografia.dirigiendo)
+    }
+
+    /**
+     * Las fotos de la persona, con la misma tira y la misma galeria que la ficha de pelicula.
+     *
+     * Se enseñan como mucho quince: TMDB tiene de algunos actores mas de cien y una tira
+     * infinita de retratos no aporta nada.
+     */
+    private fun pintarFotos(rutas: List<String>) {
+        binding.seccionFotos.visibility = if (rutas.isEmpty()) View.GONE else View.VISIBLE
+        if (rutas.isEmpty()) return
+        binding.recyclerFotos.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        if (binding.recyclerFotos.itemDecorationCount == 0) {
+            binding.recyclerFotos.addItemDecoration(SpacingItemDecoration.deLista(this))
+        }
+        binding.recyclerFotos.adapter = ImagenAdapter(rutas.take(15), sonRetratos = true)
     }
 
     /** La filmografia con la misma tarjeta que el resto del catalogo. */
