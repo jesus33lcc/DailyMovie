@@ -37,6 +37,16 @@ interface PersonRepository {
      *   caras es justo lo que no se puede enseñar.
      */
     fun populares(alTerminar: (Resultado<List<PersonaPopular>>) -> Unit)
+
+    /**
+     * Las fotos que TMDB tiene de una persona.
+     *
+     * @param personaId el id de TMDB.
+     * @param alTerminar recibe las rutas de las fotos, sin la direccion delante. Llega vacio
+     *   si no hay ninguna o si falla: una galeria de mas o de menos no es un error que haya
+     *   que enseñarle a nadie.
+     */
+    fun fotos(personaId: Int, alTerminar: (List<String>) -> Unit)
 }
 
 /**
@@ -100,6 +110,13 @@ class TmdbPersonRepository(
         (trabajo.episodios ?: 0) >= EPISODIOS_PARA_SER_FIJO
     } else {
         (trabajo.puestoEnElReparto ?: 0) <= PUESTOS_PRINCIPALES
+    }
+
+    override fun fotos(personaId: Int, alTerminar: (List<String>) -> Unit) {
+        servicio.getImagenesDePersona(personaId, apiKey).enqueueSimple(
+            onExito = { respuesta -> alTerminar(respuesta.fotos.map { it.ruta }) },
+            onError = { alTerminar(emptyList()) }
+        )
     }
 
     override fun populares(alTerminar: (Resultado<List<PersonaPopular>>) -> Unit) {

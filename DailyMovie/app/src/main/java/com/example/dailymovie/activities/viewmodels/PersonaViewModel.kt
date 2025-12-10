@@ -20,6 +20,10 @@ class PersonaViewModel(
     private val _filmografia = MutableLiveData<Filmografia>()
     val filmografia: LiveData<Filmografia> get() = _filmografia
 
+    /** Las fotos de la persona. Llega vacio si TMDB no tiene ninguna. */
+    private val _fotos = MutableLiveData<List<String>>(emptyList())
+    val fotos: LiveData<List<String>> get() = _fotos
+
     private val _error = MutableLiveData<ErrorCarga?>()
     val error: LiveData<ErrorCarga?> get() = _error
 
@@ -33,6 +37,8 @@ class PersonaViewModel(
         personas.filmografia(personaId) { resultado ->
             if (resultado is Resultado.Exito) _filmografia.value = resultado.datos
         }
+        // Las fotos no cuentan como error si fallan: la ficha se ve igual sin ellas.
+        personas.fotos(personaId) { _fotos.value = it }
     }
 
     fun errorMostrado() {
