@@ -34,4 +34,8 @@
     <string name="lista_vacia_favoritos">Todavía no tienes favoritos.\n\nToca el corazón en cualquier ficha y aparecerá aquí.</string>
     <string name="lista_vacia_vistos">Aún no has marcado nada como visto.\n\nUsa el ojo en la ficha de lo que ya hayas visto.</string>
     <string name="lista_vacia_propia">Esta lista está vacía.\n\nBusca algo y guárdalo aquí desde su ficha.</string>
+    <!-- La misma tira se usa para fotogramas de una pelicula y para retratos de una
+         persona, asi que el texto de accesibilidad no puede decir "de la pelicula" -->
+    <string name="imagen_de_la_tira">Imagen, toca para verla grande</string>
+    <string name="imagen_a_pantalla_completa">Imagen a pantalla completa</string>
 </resources>

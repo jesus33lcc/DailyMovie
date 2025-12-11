@@ -13,6 +13,6 @@
         android:scaleType="centerCrop"
         android:background="@drawable/rounded_border"
         android:clipToOutline="true"
-        android:contentDescription="Imagen de la película"
+        android:contentDescription="@string/imagen_de_la_tira"
         tools:src="@drawable/relleno_fotograma" />
 </FrameLayout>
