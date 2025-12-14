@@ -31,7 +31,8 @@ acabar descubriendo otra película suya que no conocías.
 **Fichas completas**
 - Sinopsis, géneros, duración, presupuesto, recaudación y clasificación por edad
 - Dónde verla: las plataformas de streaming de tu país
-- Reparto y director, y tocando a cualquiera se abre su ficha con su biografía y su filmografía
+- Reparto y director, y tocando a cualquiera se abre su ficha con su biografía, sus fotos y su
+  filmografía completa (cine y series)
 - Galería de imágenes de la película, que se ven a pantalla completa
 - Tráilers, películas similares y recomendadas
 - A qué saga pertenece, para ver el resto de una sentada
