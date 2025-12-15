@@ -51,6 +51,15 @@ class SerieViewModel(
     private val _resenas = MutableLiveData<List<ResenaResponse>>()
     val resenas: LiveData<List<ResenaResponse>> get() = _resenas
 
+    private val _similares = MutableLiveData<List<SerieModel>>(emptyList())
+    val similares: LiveData<List<SerieModel>> get() = _similares
+
+    private val _recomendadas = MutableLiveData<List<SerieModel>>(emptyList())
+    val recomendadas: LiveData<List<SerieModel>> get() = _recomendadas
+
+    private val _imagenes = MutableLiveData<List<String>>(emptyList())
+    val imagenes: LiveData<List<String>> get() = _imagenes
+
     private val _error = MutableLiveData<ErrorCarga?>()
     val error: LiveData<ErrorCarga?> get() = _error
 
@@ -76,6 +85,10 @@ class SerieViewModel(
         series.plataformas(id) { if (it is Resultado.Exito) _plataformas.value = it.datos }
         series.clasificacionPorEdad(id) { _clasificacionPorEdad.value = it }
         usuario.episodiosVistos(id) { _episodiosVistos.value = it }
+        // Ninguna de estas tres cuenta como error: son secciones que se esconden si no hay nada.
+        series.similares(id) { if (it is Resultado.Exito) _similares.value = it.datos }
+        series.recomendadas(id) { if (it is Resultado.Exito) _recomendadas.value = it.datos }
+        series.imagenes(id) { _imagenes.value = it }
         // Las reseñas no cuentan como error si fallan: la ficha se ve igual de bien sin ellas.
         series.resenas(id) { if (it is Resultado.Exito) _resenas.value = it.datos }
     }

@@ -13,6 +13,9 @@ import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarCartel
 import com.example.dailymovie.activities.viewmodels.SerieViewModel
 import androidx.recyclerview.widget.RecyclerView
+import com.example.dailymovie.adapters.HallazgoAdapter
+import com.example.dailymovie.adapters.ImagenAdapter
+import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.adapters.CreditAdapter
 import com.example.dailymovie.adapters.ListaCasillaAdapter
 import com.example.dailymovie.adapters.EpisodioAdapter
@@ -28,6 +31,7 @@ import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.DialogoDailyMovie
+import com.example.dailymovie.utils.abrirConCartel
 import com.example.dailymovie.utils.rebotar
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.utils.LocaleUtil
@@ -126,6 +130,30 @@ class SerieA : AppCompatActivity() {
             binding.recyclerResenasSerie.layoutManager = LinearLayoutManager(this)
             // Como mucho cinco, igual que en peliculas: con mas, la ficha se convierte en un foro.
             binding.recyclerResenasSerie.adapter = ResenaAdapter(resenas.take(5))
+        }
+
+        viewModel.imagenes.observe(this) { rutas ->
+            binding.seccionImagenesSerie.visibility =
+                if (rutas.isEmpty()) View.GONE else View.VISIBLE
+            if (rutas.isEmpty()) return@observe
+            binding.recyclerImagenesSerie.layoutManager =
+                LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+            if (binding.recyclerImagenesSerie.itemDecorationCount == 0) {
+                binding.recyclerImagenesSerie.addItemDecoration(SpacingItemDecoration.deLista(this))
+            }
+            binding.recyclerImagenesSerie.adapter = ImagenAdapter(rutas.take(15))
+        }
+
+        viewModel.similares.observe(this) { series ->
+            pintarTiraDeSeries(
+                binding.seccionSimilaresSerie, binding.recyclerSimilaresSerie, series
+            )
+        }
+
+        viewModel.recomendadas.observe(this) { series ->
+            pintarTiraDeSeries(
+                binding.seccionRecomendadasSerie, binding.recyclerRecomendadasSerie, series
+            )
         }
 
         viewModel.error.observe(this) { error ->
@@ -241,6 +269,35 @@ class SerieA : AppCompatActivity() {
         } else {
             Avisos.breve(binding.root, "No hay ningún navegador para abrirlo")
         }
+    }
+
+    /**
+     * Una tira de series con la tarjeta comun, y la seccion escondida si no hay nada.
+     *
+     * Al tocar una se abre su ficha, que es esta misma pantalla con otro id: se cierra la
+     * actual para que el boton de atras no vaya dejando un rastro de fichas encadenadas.
+     */
+    private fun pintarTiraDeSeries(
+        seccion: View,
+        lista: androidx.recyclerview.widget.RecyclerView,
+        series: List<SerieModel>
+    ) {
+        seccion.visibility = if (series.isEmpty()) View.GONE else View.VISIBLE
+        if (series.isEmpty()) return
+        lista.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        if (lista.itemDecorationCount == 0) {
+            lista.addItemDecoration(SpacingItemDecoration.deLista(this))
+        }
+        val adaptador = lista.adapter as? HallazgoAdapter
+            ?: HallazgoAdapter { hallazgo, cartel ->
+                abrirConCartel(
+                    Intent(this, SerieA::class.java).putExtra(EXTRA_SERIE_ID, hallazgo.id),
+                    cartel,
+                    HallazgoAdapter.nombreDeTransicion(hallazgo)
+                )
+                finish()
+            }.also { lista.adapter = it }
+        adaptador.submitList(series.map { Hallazgo.de(it) })
     }
 
     /** Cuantos episodios tiene la serie entera, para poder decir "llevas 12 de 62". */

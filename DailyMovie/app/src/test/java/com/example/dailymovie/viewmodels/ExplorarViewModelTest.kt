@@ -156,6 +156,18 @@ class ExplorarViewModelTest {
             serieId: Int,
             alTerminar: (Resultado<List<ResenaResponse>>) -> Unit
         ) = alTerminar(Resultado.Exito(emptyList()))
+
+        override fun similares(
+            serieId: Int,
+            alTerminar: (Resultado<List<SerieModel>>) -> Unit
+        ) = alTerminar(Resultado.Exito(emptyList()))
+
+        override fun recomendadas(
+            serieId: Int,
+            alTerminar: (Resultado<List<SerieModel>>) -> Unit
+        ) = alTerminar(Resultado.Exito(emptyList()))
+
+        override fun imagenes(serieId: Int, alTerminar: (List<String>) -> Unit) = alTerminar(emptyList())
     }
 
     /** Usuario de mentira: el buscador solo le pide el historial, que aqui no se prueba. */

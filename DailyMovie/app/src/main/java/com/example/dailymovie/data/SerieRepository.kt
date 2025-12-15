@@ -4,6 +4,7 @@ import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.WebService
 import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.CreditResponse
+import com.example.dailymovie.client.response.ImagenesResponse
 import com.example.dailymovie.client.response.ProviderResponse
 import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.client.response.SeasonResponse
@@ -111,6 +112,31 @@ interface SerieRepository {
     fun clasificacionPorEdad(serieId: Int, alTerminar: (String?) -> Unit)
 
     /**
+     * Series parecidas a una.
+     *
+     * @param serieId el id de TMDB de la serie de partida.
+     * @param alTerminar recibe las parecidas, o un fallo si no se pudo pedir.
+     */
+    fun similares(serieId: Int, alTerminar: (Resultado<List<SerieModel>>) -> Unit)
+
+    /**
+     * Las que TMDB recomienda a quien ve esa serie.
+     *
+     * @param serieId el id de TMDB de la serie de partida.
+     * @param alTerminar recibe las recomendadas, o un fallo si no se pudo pedir.
+     */
+    fun recomendadas(serieId: Int, alTerminar: (Resultado<List<SerieModel>>) -> Unit)
+
+    /**
+     * Los fotogramas que TMDB tiene de una serie.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param alTerminar recibe las rutas, sin la direccion delante. Llega vacio si no hay
+     *   ninguna o si falla: una galeria de mas o de menos no es un error que enseñar.
+     */
+    fun imagenes(serieId: Int, alTerminar: (List<String>) -> Unit)
+
+    /**
      * Las reseñas que ha escrito la gente sobre la serie.
      *
      * @param serieId el id de TMDB de la serie.
@@ -193,6 +219,29 @@ class TmdbSerieRepository(
                 alTerminar(Resultado.Exito(trailersPrimero))
             },
             onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    override fun similares(serieId: Int, alTerminar: (Resultado<List<SerieModel>>) -> Unit) {
+        servicio.getSeriesSimilares(serieId, apiKey).enqueueSimple(
+            onExito = { alTerminar(Resultado.Exito(it.results)) },
+            onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    override fun recomendadas(serieId: Int, alTerminar: (Resultado<List<SerieModel>>) -> Unit) {
+        servicio.getSeriesRecomendadas(serieId, apiKey).enqueueSimple(
+            onExito = { alTerminar(Resultado.Exito(it.results)) },
+            onError = { alTerminar(Resultado.Fallo(it)) }
+        )
+    }
+
+    override fun imagenes(serieId: Int, alTerminar: (List<String>) -> Unit) {
+        servicio.getImagenesDeSerie(serieId, apiKey).enqueueSimple(
+            // Los fondos y no los carteles: son fotogramas de la serie, que es lo que
+            // apetece mirar, y ademas cuadran con la tira apaisada.
+            onExito = { respuesta -> alTerminar(respuesta.fondos.map { it.ruta }) },
+            onError = { alTerminar(emptyList()) }
         )
     }
 

@@ -570,6 +570,50 @@ interface WebService {
      * @param language idioma de los textos; por defecto el del aparato.
      */
     /**
+     * Series parecidas a una, segun TMDB.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     */
+    @GET("tv/{tv_id}/similar")
+    fun getSeriesSimilares(
+        @Path("tv_id") serieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<SeriesResponse>
+
+    /**
+     * Las que TMDB recomienda a quien ha visto esa.
+     *
+     * No es lo mismo que las similares: las similares se parecen en genero y tono, y estas
+     * salen de lo que ve la gente que ve esa serie.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     */
+    @GET("tv/{tv_id}/recommendations")
+    fun getSeriesRecomendadas(
+        @Path("tv_id") serieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = LocaleUtil.getLanguageAndCountry()
+    ): Call<SeriesResponse>
+
+    /**
+     * Las imagenes que TMDB tiene de una serie.
+     *
+     * @param serieId el id de TMDB de la serie.
+     * @param apiKey la clave de TMDB, que pone el repositorio.
+     * @param idiomasDeImagen las imagenes no llevan idioma por defecto, asi que hay que
+     *   pedirlas asi o vienen vacias.
+     */
+    @GET("tv/{tv_id}/images")
+    fun getImagenesDeSerie(
+        @Path("tv_id") serieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("include_image_language") idiomasDeImagen: String = "es,en,null"
+    ): Call<ImagenesResponse>
+
+    /**
      * La clasificacion por edad de una serie, pais por pais.
      *
      * En peliculas viene dentro de los detalles con append_to_response; en series TMDB lo

@@ -372,7 +372,91 @@
                 android:orientation="horizontal" />
         </LinearLayout>
 
-        <!-- Lo que ha escrito la gente. Va al final, como en la ficha de pelicula: es lo que
+                <!-- Fotogramas de la serie -->
+        <LinearLayout
+        android:id="@+id/seccionImagenesSerie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_border_box_big"
+        android:clipToOutline="true"
+        android:visibility="gone">
+
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Imágenes"
+        android:textSize="22sp"
+        android:fontFamily="@font/courier_prime_bold"
+        android:textColor="@color/black" />
+
+        <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerImagenesSerie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal" />
+        </LinearLayout>
+
+        <!-- Series parecidas -->
+        <LinearLayout
+        android:id="@+id/seccionSimilaresSerie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_border_box_big"
+        android:clipToOutline="true"
+        android:visibility="gone">
+
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Similares"
+        android:textSize="22sp"
+        android:fontFamily="@font/courier_prime_bold"
+        android:textColor="@color/black" />
+
+        <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerSimilaresSerie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal" />
+        </LinearLayout>
+
+        <!-- Lo que ve la gente que ve esta -->
+        <LinearLayout
+        android:id="@+id/seccionRecomendadasSerie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_border_box_big"
+        android:clipToOutline="true"
+        android:visibility="gone">
+
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Recomendadas"
+        android:textSize="22sp"
+        android:fontFamily="@font/courier_prime_bold"
+        android:textColor="@color/black" />
+
+        <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerRecomendadasSerie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal" />
+        </LinearLayout>
+
+<!-- Lo que ha escrito la gente. Va al final, como en la ficha de pelicula: es lo que
         menos se lee y lo que mas ocupa -->
         <LinearLayout
         android:id="@+id/seccionResenasSerie"

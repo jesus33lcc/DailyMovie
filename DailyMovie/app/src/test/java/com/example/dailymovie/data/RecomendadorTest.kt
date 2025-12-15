@@ -184,6 +184,9 @@ class RecomendadorTest {
 
         override fun filmografia(personaId: Int, alTerminar: (Resultado<Filmografia>) -> Unit) = Unit
         override fun populares(alTerminar: (Resultado<List<PersonaPopular>>) -> Unit) = Unit
+
+        // Las fotos no se usan aqui; la interfaz las pide igualmente.
+        override fun fotos(personaId: Int, alTerminar: (List<String>) -> Unit) = alTerminar(emptyList())
     }
 
     // ---- Ayudas ----------------------------------------------------------------------
