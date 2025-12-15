@@ -131,6 +131,9 @@ class OnboardingViewModelTest {
 
         override fun ficha(personaId: Int, alTerminar: (Resultado<PersonModel>) -> Unit) = Unit
         override fun filmografia(personaId: Int, alTerminar: (Resultado<Filmografia>) -> Unit) = Unit
+
+        // Las fotos no se usan aqui; la interfaz las pide igualmente.
+        override fun fotos(personaId: Int, alTerminar: (List<String>) -> Unit) = alTerminar(emptyList())
     }
 
     /**
