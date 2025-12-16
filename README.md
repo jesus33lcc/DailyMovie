@@ -21,6 +21,7 @@ La idea es sencilla: abres la app y lo primero que ves es una película elegida 
 **Series**
 - Sección propia con las series en emisión, populares y mejor valoradas
 - Cada serie con sus temporadas y todos sus episodios, con imagen, fecha y duración
+- Ficha completa igual que la de las películas: dónde verla, reparto, tráilers, imágenes, clasificación por edad, reseñas, series parecidas y enlaces a IMDb
 - Marca los episodios que ya has visto y la app lleva la cuenta: "llevas 12 de 62"
 - En la portada, una fila de **"Sigue viendo"** con lo que tienes a medias
 
