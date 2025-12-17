@@ -64,6 +64,11 @@
             android:text="Contenido" />
 
         <Button
+            android:id="@+id/btnIdioma"
+            style="@style/BotonDeAjustes"
+            android:text="Idioma de las películas" />
+
+        <Button
             android:id="@+id/btnRegion"
             style="@style/BotonDeAjustes"
             android:text="Región" />

@@ -18,6 +18,10 @@ import com.example.dailymovie.databinding.FragmentSettingsBinding
 import com.example.dailymovie.fragments.viewmodels.SettingsViewModel
 import com.example.dailymovie.utils.Analitica
 import com.example.dailymovie.utils.LocaleUtil
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import com.example.dailymovie.utils.Idioma
+import com.example.dailymovie.utils.IdiomaDelContenido
 import com.example.dailymovie.utils.Avisos
 import com.example.dailymovie.utils.DialogoDailyMovie
 
@@ -51,6 +55,7 @@ class Settings : Fragment() {
             startActivity(Intent(requireContext(), EstadisticasA::class.java))
         }
 
+        binding.btnIdioma.setOnClickListener { mostrarIdiomas() }
         binding.btnRegion.setOnClickListener { mostrarRegion() }
         binding.btnClearHistory.setOnClickListener { confirmarBorrarHistorial() }
         binding.btnChangePassword.setOnClickListener { mostrarCambiarContrasena() }
@@ -68,6 +73,48 @@ class Settings : Fragment() {
 
         viewModel.sesionCerrada.observe(viewLifecycleOwner) { cerrada ->
             if (cerrada == true) irALogin()
+        }
+    }
+
+    /**
+     * Elegir en que idioma llegan las peliculas.
+     *
+     * Se avisa de que los textos de la app no cambian: TMDB devuelve titulos y sinopsis en el
+     * idioma que se le pida, pero los botones y los avisos estan escritos en español. Sin
+     * decirlo, elegir "English" y ver la app medio en español parece un fallo.
+     *
+     * Al cambiarlo se rehace la pantalla: lo que ya estaba cargado se pidio en el idioma de
+     * antes y no se entera de nada.
+     */
+    private fun mostrarIdiomas() {
+        val contenido = layoutInflater.inflate(R.layout.dialogo_opciones, null)
+        val grupo = contenido.findViewById<RadioGroup>(R.id.dialogoOpciones)
+        val puesto = IdiomaDelContenido.elPuesto(requireContext())
+        var elegido = puesto
+
+        Idioma.entries.forEach { idioma ->
+            val opcion = layoutInflater.inflate(R.layout.item_opcion_radio, grupo, false) as RadioButton
+            opcion.id = View.generateViewId()
+            opcion.text = idioma.nombre
+            opcion.isChecked = idioma == puesto
+            opcion.setOnClickListener { elegido = idioma }
+            grupo.addView(opcion)
+        }
+
+        DialogoDailyMovie.mostrar(
+            context = requireContext(),
+            titulo = "Idioma de las películas",
+            mensaje = "En este idioma se piden los títulos, las sinopsis y los géneros. " +
+                "Los textos de la app se quedan en español.",
+            contenido = contenido,
+            textoAceptar = "Aplicar"
+        ) { dialogo ->
+            dialogo.dismiss()
+            if (elegido == puesto) return@mostrar
+            IdiomaDelContenido.cambiar(requireContext(), elegido)
+            // Lo que ya esta en pantalla se pidio en el idioma de antes, asi que se rehace la
+            // pantalla entera: la portada, las listas y las fichas se vuelven a pedir solas.
+            requireActivity().recreate()
         }
     }
 

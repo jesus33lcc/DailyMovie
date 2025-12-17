@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Una opcion de las que solo se puede elegir una, dentro de un dialogo.
+
+    Es un RadioButton suelto y no un RadioGroup montado en XML porque las opciones se generan
+    en codigo (los idiomas salen de un enum), y asi el mismo layout vale para cualquier
+    dialogo de elegir uno entre varios.
+-->
+<RadioButton xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/opcionRadio"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="14dp"
+    android:paddingStart="8dp"
+    android:textSize="17sp"
+    android:fontFamily="@font/courier_prime"
+    android:textColor="@color/white"
+    android:buttonTint="@color/colorPrimary"
+    tools:text="Español" />
