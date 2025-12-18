@@ -131,6 +131,24 @@ Lo que hay en `main` es la continuación: arreglar lo que estaba mal, rehacer la
 
 ## Licencia
 
-Ver [LICENSE](LICENSE).
+**GNU General Public License v3.0** — el texto entero está en [LICENSE](LICENSE).
+
+En cristiano: puedes mirar el código, aprender de él, cambiarlo y usarlo. Lo único que se pide es que, si publicas tu propia versión, publiques también su código con esta misma licencia. Lo que no se puede es coger esto, cerrarlo y venderlo como si fuera otra cosa.
+
+```
+DailyMovie — una app de cine para Android
+Copyright (C) 2024-2026 jesus33lcc
+
+Este programa es software libre: puedes redistribuirlo y/o modificarlo bajo los
+términos de la GNU General Public License publicada por la Free Software
+Foundation, en su versión 3 o (si lo prefieres) cualquier versión posterior.
+
+Se distribuye con la esperanza de que sea útil, pero SIN NINGUNA GARANTÍA; ni
+siquiera la garantía implícita de COMERCIABILIDAD o IDONEIDAD PARA UN FIN
+DETERMINADO. Mira la GNU General Public License para más detalles.
+
+Deberías haber recibido una copia de la GNU General Public License junto con
+este programa. Si no, escribe a <https://www.gnu.org/licenses/>.
+```
 
 Los datos de películas y series vienen de [TMDB](https://www.themoviedb.org/), pero este proyecto no está avalado ni certificado por ellos.

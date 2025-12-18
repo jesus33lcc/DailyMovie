@@ -133,7 +133,8 @@
             android:textAlignment="center"
             android:fontFamily="@font/courier_prime"
             android:textColor="@color/colorPrimaryDark"
-            tools:text="DailyMovie 1.0" />
+            android:lineSpacingExtra="3dp"
+            tools:text="DailyMovie 1.0\nSoftware libre bajo licencia GPL-3.0\nDatos de películas: TMDB" />
     </LinearLayout>
 
 </ScrollView>

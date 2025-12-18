@@ -43,7 +43,10 @@ class Settings : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.txtCorreoUsuario.text = viewModel.correoDelUsuario() ?: "Cuenta de Google"
-        binding.txtVersion.text = "DailyMovie ${com.example.dailymovie.BuildConfig.VERSION_NAME}"
+        // La GPL pide que el aviso se vea desde la propia app, no solo en el repositorio.
+        binding.txtVersion.text = "DailyMovie ${com.example.dailymovie.BuildConfig.VERSION_NAME}\n" +
+            "Software libre bajo licencia GPL-3.0\n" +
+            "Datos de películas: TMDB"
 
         binding.btnEditarGustos.setOnClickListener {
             startActivity(Intent(requireContext(), OnboardingA::class.java).apply {
