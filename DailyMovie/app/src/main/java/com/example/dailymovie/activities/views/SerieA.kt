@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
+import android.widget.ImageButton
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
 import android.net.Uri
 import androidx.appcompat.view.ContextThemeWrapper
@@ -154,6 +156,30 @@ class SerieA : AppCompatActivity() {
             pintarTiraDeSeries(
                 binding.seccionRecomendadasSerie, binding.recyclerRecomendadasSerie, series
             )
+        }
+
+        // Los dos botones se pintan solos cada vez que cambia su estado, que ahora vive en el
+        // ViewModel y no en Firestore.
+        var primeraPintadaFavorita = true
+        viewModel.favorita.puesto.observe(this) { puesto ->
+            pintarBotonDeGuardado(
+                binding.btnFavoritaSerie, puesto,
+                R.drawable.ic_baseline_favorite_24,
+                R.drawable.ic_baseline_favorite_border_24,
+                primeraPintadaFavorita
+            )
+            primeraPintadaFavorita = false
+        }
+
+        var primeraPintadaVista = true
+        viewModel.vista.puesto.observe(this) { puesto ->
+            pintarBotonDeGuardado(
+                binding.btnVistaSerie, puesto,
+                R.drawable.ic_baseline_visibility_24,
+                R.drawable.ic_baseline_visibility_off_24,
+                primeraPintadaVista
+            )
+            primeraPintadaVista = false
         }
 
         viewModel.error.observe(this) { error ->
@@ -384,43 +410,35 @@ class SerieA : AppCompatActivity() {
             poster = serie.poster
         )
         serieGuardable = guardable
+        viewModel.prepararBotonesDeGuardado(guardable)
 
-        pintarIconoFavorita(guardable.id)
-        pintarIconoVista(guardable.id)
-
-        binding.btnFavoritaSerie.setOnClickListener {
-            viewModel.cambiarFavorita(guardable) { pintarIconoFavorita(guardable.id, conRebote = true) }
-        }
-        binding.btnVistaSerie.setOnClickListener {
-            viewModel.cambiarVista(guardable) { pintarIconoVista(guardable.id, conRebote = true) }
-        }
+        binding.btnFavoritaSerie.setOnClickListener { viewModel.cambiarFavorita() }
+        binding.btnVistaSerie.setOnClickListener { viewModel.cambiarVista() }
         binding.btnAnadirListaSerie.setOnClickListener { elegirListas(guardable) }
         binding.btnCompartirSerie.setOnClickListener { compartir(guardable) }
     }
 
     /**
-     * @param conRebote si el icono cambia porque el usuario acaba de pulsar. Al abrir la
-     *   ficha tambien se pinta, y ahi un boton dando saltos solo distrae.
+     * Pinta un boton de guardar y le da el saltito cuando cambia.
+     *
+     * El rebote se salta la primera vez: al abrir la ficha tambien se pinta, y ahi un boton
+     * dando saltos solo distrae.
+     *
+     * @param boton el corazon o el ojo.
+     * @param puesto si toca pintarlo marcado.
+     * @param marcado el dibujo de marcado.
+     * @param sinMarcar el dibujo de sin marcar.
+     * @param esLaPrimera si es la pintada de al abrir la ficha.
      */
-    private fun pintarIconoFavorita(serieId: Int, conRebote: Boolean = false) {
-        viewModel.esFavorita(serieId) { esFavorita ->
-            binding.btnFavoritaSerie.setImageResource(
-                if (esFavorita) R.drawable.ic_baseline_favorite_24
-                else R.drawable.ic_baseline_favorite_border_24
-            )
-            if (conRebote) binding.btnFavoritaSerie.rebotar()
-        }
-    }
-
-    /** @param conRebote lo mismo que en [pintarIconoFavorita]. */
-    private fun pintarIconoVista(serieId: Int, conRebote: Boolean = false) {
-        viewModel.estaVista(serieId) { estaVista ->
-            binding.btnVistaSerie.setImageResource(
-                if (estaVista) R.drawable.ic_baseline_visibility_24
-                else R.drawable.ic_baseline_visibility_off_24
-            )
-            if (conRebote) binding.btnVistaSerie.rebotar()
-        }
+    private fun pintarBotonDeGuardado(
+        boton: ImageButton,
+        puesto: Boolean,
+        @DrawableRes marcado: Int,
+        @DrawableRes sinMarcar: Int,
+        esLaPrimera: Boolean
+    ) {
+        boton.setImageResource(if (puesto) marcado else sinMarcar)
+        if (!esLaPrimera) boton.rebotar()
     }
 
     /** El mismo dialogo de casillas que en peliculas, pero con las listas de la serie. */

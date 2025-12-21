@@ -60,6 +60,26 @@ class SerieViewModel(
     private val _imagenes = MutableLiveData<List<String>>(emptyList())
     val imagenes: LiveData<List<String>> get() = _imagenes
 
+    /**
+     * La serie que hay abierta, en la version corta que se guarda en Firestore.
+     *
+     * La necesitan los dos marcadores para saber que guardar; hasta que no se rellena en
+     * [prepararBotonesDeGuardado] los botones no hacen nada.
+     */
+    private var serieAbierta: SerieModel? = null
+
+    /** El corazon. Ver [Marcado] para por que esto no es un simple booleano. */
+    val favorita = Marcado { comoQuedar, alTerminar ->
+        serieAbierta?.let { usuario.ponerSerieFavorita(it, comoQuedar, alTerminar) }
+            ?: alTerminar(false)
+    }
+
+    /** El ojo, igual que [favorita]. */
+    val vista = Marcado { comoQuedar, alTerminar ->
+        serieAbierta?.let { usuario.ponerSerieVista(it, comoQuedar, alTerminar) }
+            ?: alTerminar(false)
+    }
+
     private val _error = MutableLiveData<ErrorCarga?>()
     val error: LiveData<ErrorCarga?> get() = _error
 
@@ -133,17 +153,25 @@ class SerieViewModel(
     // Los mismos gestos que en la ficha de pelicula: marcarla como favorita, como vista o
     // meterla en una lista. Las series se guardan en sus propios campos, ver UserRepository.
 
-    fun esFavorita(serieId: Int, alTerminar: (Boolean) -> Unit) =
-        usuario.esSerieFavorita(serieId, alTerminar)
+    /**
+     * Prepara los dos botones de guardar de la ficha.
+     *
+     * Igual que en la ficha de pelicula: se pregunta una vez como esta y desde ahi manda la
+     * memoria, no Firestore.
+     *
+     * @param serie la serie abierta en su version corta, que es lo que se guarda.
+     */
+    fun prepararBotonesDeGuardado(serie: SerieModel) {
+        serieAbierta = serie
+        usuario.esSerieFavorita(serie.id) { favorita.empezarEn(it) }
+        usuario.estaSerieVista(serie.id) { vista.empezarEn(it) }
+    }
 
-    fun estaVista(serieId: Int, alTerminar: (Boolean) -> Unit) =
-        usuario.estaSerieVista(serieId, alTerminar)
+    /** Le da la vuelta a "favorita". */
+    fun cambiarFavorita() = favorita.cambiar { _error.value = ErrorCarga.SIN_CONEXION }
 
-    fun cambiarFavorita(serie: SerieModel, alTerminar: (Boolean) -> Unit) =
-        usuario.cambiarSerieFavorita(serie, alTerminar)
-
-    fun cambiarVista(serie: SerieModel, alTerminar: (Boolean) -> Unit) =
-        usuario.cambiarSerieVista(serie, alTerminar)
+    /** Le da la vuelta a "vista". */
+    fun cambiarVista() = vista.cambiar { _error.value = ErrorCarga.SIN_CONEXION }
 
     fun listasDelUsuario(alTerminar: (List<String>) -> Unit) =
         usuario.listasDelUsuario(alTerminar)

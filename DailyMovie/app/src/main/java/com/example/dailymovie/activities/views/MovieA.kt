@@ -7,6 +7,7 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -100,6 +101,30 @@ class MovieA : AppCompatActivity() {
                 }
             })
 
+            // Los dos botones de guardar se pintan solos cada vez que cambia su estado, que
+            // ahora vive en el ViewModel y no en Firestore.
+            var primeraPintadaFavorita = true
+            movieViewModel.favorita.puesto.observe(this) { puesto ->
+                pintarBotonDeGuardado(
+                    binding.btnFavorite, puesto,
+                    R.drawable.ic_baseline_favorite_24,
+                    R.drawable.ic_baseline_favorite_border_24,
+                    primeraPintadaFavorita
+                )
+                primeraPintadaFavorita = false
+            }
+
+            var primeraPintadaVista = true
+            movieViewModel.vista.puesto.observe(this) { puesto ->
+                pintarBotonDeGuardado(
+                    binding.btnWatched, puesto,
+                    R.drawable.ic_baseline_visibility_24,
+                    R.drawable.ic_baseline_visibility_off_24,
+                    primeraPintadaVista
+                )
+                primeraPintadaVista = false
+            }
+
             movieViewModel.error.observe(this, Observer { error ->
                 error?.let {
                     showToast(getString(it.mensaje()))
@@ -111,6 +136,12 @@ class MovieA : AppCompatActivity() {
         }
     }
 
+    /**
+     * Los cuatro botones de debajo del cartel.
+     *
+     * El corazon y el ojo ya no preguntan nada al pulsarse: el ViewModel lleva el estado en
+     * memoria y esta pantalla solo pinta lo que le dice. Ver [com.example.dailymovie.activities.viewmodels.Marcado].
+     */
     private fun setupButtons(movie: MovieDetailsModel) {
         val movieModel = MovieModel(
             id = movie.id,
@@ -120,31 +151,12 @@ class MovieA : AppCompatActivity() {
             posterPath = movie.posterPath
         )
 
-        val btnFavorite: ImageButton = findViewById(R.id.btnFavorite)
-        val btnWatched: ImageButton = findViewById(R.id.btnWatched)
-        val btnAddList: ImageButton = findViewById(R.id.btnAddList)
-        val btnShare: ImageButton = findViewById(R.id.btnShare)
+        movieViewModel.prepararBotonesDeGuardado(movieModel)
 
-        updateFavoriteButtonIcon(movie.id, btnFavorite)
-        updateWatchedButtonIcon(movie.id, btnWatched)
-
-        btnFavorite.setOnClickListener {
-            movieViewModel.toggleFavorite(movieModel) {
-                updateFavoriteButtonIcon(movie.id, btnFavorite, conRebote = true)
-            }
-        }
-
-        btnWatched.setOnClickListener {
-            movieViewModel.toggleWatched(movieModel) {
-                updateWatchedButtonIcon(movie.id, btnWatched, conRebote = true)
-            }
-        }
-        btnAddList.setOnClickListener {
-            showListSelectionDialog(movieModel)
-        }
-        btnShare.setOnClickListener {
-            shareMovie(movieModel)
-        }
+        binding.btnFavorite.setOnClickListener { movieViewModel.cambiarFavorita() }
+        binding.btnWatched.setOnClickListener { movieViewModel.cambiarVista() }
+        binding.btnAddList.setOnClickListener { showListSelectionDialog(movieModel) }
+        binding.btnShare.setOnClickListener { shareMovie(movieModel) }
     }
 
     /** Abre otra pelicula desde las tiras de similares y recomendadas. */
@@ -210,36 +222,27 @@ class MovieA : AppCompatActivity() {
     }
 
     /**
-     * @param conRebote si el icono cambia porque el usuario acaba de pulsar. Al entrar en la
-     *   ficha tambien se pinta, y ahi un boton dando saltos solo distrae.
+     * Pinta un boton de guardar y le da el saltito cuando cambia.
+     *
+     * El rebote se salta la primera vez: al abrir la ficha tambien se pinta, y ahi un boton
+     * dando saltos solo distrae. De la segunda en adelante siempre es porque el usuario ha
+     * pulsado.
+     *
+     * @param boton el corazon o el ojo.
+     * @param puesto si toca pintarlo marcado.
+     * @param marcado el dibujo de marcado.
+     * @param sinMarcar el dibujo de sin marcar.
+     * @param esLaPrimera si es la pintada de al abrir la ficha.
      */
-    private fun updateFavoriteButtonIcon(
-        movieId: Int,
-        button: ImageButton,
-        conRebote: Boolean = false
+    private fun pintarBotonDeGuardado(
+        boton: ImageButton,
+        puesto: Boolean,
+        @DrawableRes marcado: Int,
+        @DrawableRes sinMarcar: Int,
+        esLaPrimera: Boolean
     ) {
-        movieViewModel.esFavorita(movieId) { isFavorite ->
-            runOnUiThread {
-                val icon = if (isFavorite) R.drawable.ic_baseline_favorite_24 else R.drawable.ic_baseline_favorite_border_24
-                button.setImageResource(icon)
-                if (conRebote) button.rebotar()
-            }
-        }
-    }
-
-    /** @param conRebote lo mismo que en [updateFavoriteButtonIcon]. */
-    private fun updateWatchedButtonIcon(
-        movieId: Int,
-        button: ImageButton,
-        conRebote: Boolean = false
-    ) {
-        movieViewModel.estaVista(movieId) { isWatched ->
-            runOnUiThread {
-                val icon = if (isWatched) R.drawable.ic_baseline_visibility_24 else R.drawable.ic_baseline_visibility_off_24
-                button.setImageResource(icon)
-                if (conRebote) button.rebotar()
-            }
-        }
+        boton.setImageResource(if (puesto) marcado else sinMarcar)
+        if (!esLaPrimera) boton.rebotar()
     }
 
     /**
