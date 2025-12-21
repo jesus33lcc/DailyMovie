@@ -150,22 +150,29 @@ interface UserRepository {
     fun estaVista(peliculaId: Int, alTerminar: (Boolean) -> Unit)
 
     /**
-     * Mete la pelicula en favoritos, o la saca si ya estaba.
+     * Deja la pelicula en favoritos o la saca, segun lo que se pida.
+     *
+     * **No es un interruptor, es una orden.** Antes habia un `cambiarFavorita` que miraba como
+     * estaba y ponia lo contrario, y eso se rompia al pulsar rapido: dos toques seguidos leian
+     * los dos "no esta" antes de que ninguno hubiera escrito, y los dos la metian. Diciendo
+     * como tiene que quedar, da igual el orden en que lleguen las llamadas y cuantas sean.
      *
      * @param pelicula la pelicula entera, no solo el id: en Firestore se guarda el objeto
      *   completo para poder pintar la lista sin volver a preguntarle a TMDB.
-     * @param alTerminar recibe si se pudo guardar el cambio, no en que estado ha quedado. Para
-     *   saber eso hay que volver a preguntar con [esFavorita].
+     * @param favorita true para que quede guardada, false para que no.
+     * @param alTerminar recibe si se pudo guardar. Si llega false, quien llamo tiene que
+     *   deshacer lo que hubiera pintado.
      */
-    fun cambiarFavorita(pelicula: MovieModel, alTerminar: (Boolean) -> Unit)
+    fun ponerFavorita(pelicula: MovieModel, favorita: Boolean, alTerminar: (Boolean) -> Unit)
 
     /**
-     * Marca la pelicula como vista, o le quita la marca si ya la tenia.
+     * Deja la pelicula marcada como vista o le quita la marca, segun lo que se pida.
      *
-     * @param pelicula la pelicula entera, por lo mismo que en [cambiarFavorita].
-     * @param alTerminar recibe si se pudo guardar el cambio.
+     * @param pelicula la pelicula entera, por lo mismo que en [ponerFavorita].
+     * @param vista true para que quede marcada, false para que no.
+     * @param alTerminar recibe si se pudo guardar.
      */
-    fun cambiarVista(pelicula: MovieModel, alTerminar: (Boolean) -> Unit)
+    fun ponerVista(pelicula: MovieModel, vista: Boolean, alTerminar: (Boolean) -> Unit)
 
     /**
      * Los nombres de las listas que se ha creado el usuario.
@@ -265,20 +272,24 @@ interface UserRepository {
     fun estaSerieVista(serieId: Int, alTerminar: (Boolean) -> Unit)
 
     /**
-     * Mete la serie en favoritas, o la saca si ya estaba.
+     * Deja la serie en favoritas o la saca, segun lo que se pida.
+     *
+     * Es una orden y no un interruptor, por lo mismo que [ponerFavorita].
      *
      * @param serie la serie entera, que es lo que se guarda.
-     * @param alTerminar recibe si se pudo guardar el cambio, no en que estado ha quedado.
+     * @param favorita true para que quede guardada, false para que no.
+     * @param alTerminar recibe si se pudo guardar.
      */
-    fun cambiarSerieFavorita(serie: SerieModel, alTerminar: (Boolean) -> Unit)
+    fun ponerSerieFavorita(serie: SerieModel, favorita: Boolean, alTerminar: (Boolean) -> Unit)
 
     /**
-     * Marca la serie como vista, o le quita la marca.
+     * Deja la serie marcada como vista o le quita la marca, segun lo que se pida.
      *
      * @param serie la serie entera.
-     * @param alTerminar recibe si se pudo guardar el cambio.
+     * @param vista true para que quede marcada, false para que no.
+     * @param alTerminar recibe si se pudo guardar.
      */
-    fun cambiarSerieVista(serie: SerieModel, alTerminar: (Boolean) -> Unit)
+    fun ponerSerieVista(serie: SerieModel, vista: Boolean, alTerminar: (Boolean) -> Unit)
 
     /**
      * Los episodios que el usuario ya ha visto de una serie.

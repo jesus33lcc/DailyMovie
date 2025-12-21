@@ -177,11 +177,11 @@ class FirebaseUserRepository(
     override fun estaVista(peliculaId: Int, alTerminar: (Boolean) -> Unit) =
         contiene(VISTAS, peliculaId, alTerminar)
 
-    override fun cambiarFavorita(pelicula: MovieModel, alTerminar: (Boolean) -> Unit) =
-        alternar(FAVORITAS, pelicula, alTerminar)
+    override fun ponerFavorita(pelicula: MovieModel, favorita: Boolean, alTerminar: (Boolean) -> Unit) =
+        poner(FAVORITAS, pelicula, favorita, alTerminar)
 
-    override fun cambiarVista(pelicula: MovieModel, alTerminar: (Boolean) -> Unit) =
-        alternar(VISTAS, pelicula, alTerminar)
+    override fun ponerVista(pelicula: MovieModel, vista: Boolean, alTerminar: (Boolean) -> Unit) =
+        poner(VISTAS, pelicula, vista, alTerminar)
 
     override fun listasDelUsuario(alTerminar: (List<String>) -> Unit) {
         val documento = documentoDelUsuario() ?: return alTerminar(emptyList())
@@ -286,11 +286,11 @@ class FirebaseUserRepository(
     override fun estaSerieVista(serieId: Int, alTerminar: (Boolean) -> Unit) =
         leerSeries(SERIES_VISTAS) { series -> alTerminar(series.any { it.id == serieId }) }
 
-    override fun cambiarSerieFavorita(serie: SerieModel, alTerminar: (Boolean) -> Unit) =
-        alternarSerie(SERIES_FAVORITAS, serie, alTerminar)
+    override fun ponerSerieFavorita(serie: SerieModel, favorita: Boolean, alTerminar: (Boolean) -> Unit) =
+        ponerSerie(SERIES_FAVORITAS, serie, favorita, alTerminar)
 
-    override fun cambiarSerieVista(serie: SerieModel, alTerminar: (Boolean) -> Unit) =
-        alternarSerie(SERIES_VISTAS, serie, alTerminar)
+    override fun ponerSerieVista(serie: SerieModel, vista: Boolean, alTerminar: (Boolean) -> Unit) =
+        ponerSerie(SERIES_VISTAS, serie, vista, alTerminar)
 
     /**
      * Los episodios vistos se guardan como texto "serie-temporada-episodio" en un solo array.
@@ -512,12 +512,40 @@ class FirebaseUserRepository(
         leerLista(campo) { peliculas -> alTerminar(peliculas.any { it.id == peliculaId }) }
     }
 
-    /** Mete o saca la pelicula segun si ya estaba, y avisa de si la operacion salio bien. */
-    private fun alternar(campo: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit) {
+    /**
+     * Deja la pelicula dentro o fuera de un campo, segun se pida.
+     *
+     * Los dos caminos son distintos a proposito:
+     *
+     * - **Meterla** es una sola escritura con `arrayUnion`, que ya es idempotente: si la
+     *   pelicula estaba, no hace nada. No hace falta leer antes.
+     * - **Sacarla** obliga a leer, porque `arrayRemove` solo quita el elemento si es **igual
+     *   campo a campo** al guardado, y la nota de TMDB cambia con el tiempo: la pelicula que
+     *   se guardo con un 7,8 hace meses no coincide con la que llega hoy con un 7,9, y el
+     *   arrayRemove se quedaba sin hacer nada. Se lee, se quita por id y se reescribe la
+     *   lista entera.
+     *
+     * La lectura de sacar ya no es una carrera: quien llama manda **como tiene que quedar**,
+     * no "lo contrario de lo que hay", asi que dos ordenes seguidas acaban en el mismo sitio.
+     */
+    private fun poner(
+        campo: String,
+        pelicula: MovieModel,
+        dentro: Boolean,
+        alTerminar: (Boolean) -> Unit
+    ) {
         val documento = documentoDelUsuario() ?: return alTerminar(false)
-        contiene(campo, pelicula.id) { yaEstaba ->
-            val cambio = if (yaEstaba) FieldValue.arrayRemove(pelicula) else FieldValue.arrayUnion(pelicula)
-            documento.set(mapOf(campo to cambio), SetOptions.merge())
+        if (dentro) {
+            documento.set(mapOf(campo to FieldValue.arrayUnion(pelicula)), SetOptions.merge())
+                .addOnSuccessListener { alTerminar(true) }
+                .addOnFailureListener { alTerminar(false) }
+            return
+        }
+        leerLista(campo) { peliculas ->
+            documento.set(
+                mapOf(campo to peliculas.filterNot { it.id == pelicula.id }),
+                SetOptions.merge()
+            )
                 .addOnSuccessListener { alTerminar(true) }
                 .addOnFailureListener { alTerminar(false) }
         }
@@ -552,12 +580,25 @@ class FirebaseUserRepository(
     }
 
     /** Mete o saca la serie segun si ya estaba, igual que con las peliculas. */
-    private fun alternarSerie(campo: String, serie: SerieModel, alTerminar: (Boolean) -> Unit) {
+    /** Lo mismo que [poner] pero con series. Mismos dos caminos y por las mismas razones. */
+    private fun ponerSerie(
+        campo: String,
+        serie: SerieModel,
+        dentro: Boolean,
+        alTerminar: (Boolean) -> Unit
+    ) {
         val documento = documentoDelUsuario() ?: return alTerminar(false)
+        if (dentro) {
+            documento.set(mapOf(campo to FieldValue.arrayUnion(serie)), SetOptions.merge())
+                .addOnSuccessListener { alTerminar(true) }
+                .addOnFailureListener { alTerminar(false) }
+            return
+        }
         leerSeries(campo) { series ->
-            val yaEstaba = series.any { it.id == serie.id }
-            val cambio = if (yaEstaba) FieldValue.arrayRemove(serie) else FieldValue.arrayUnion(serie)
-            documento.set(mapOf(campo to cambio), SetOptions.merge())
+            documento.set(
+                mapOf(campo to series.filterNot { it.id == serie.id }),
+                SetOptions.merge()
+            )
                 .addOnSuccessListener { alTerminar(true) }
                 .addOnFailureListener { alTerminar(false) }
         }

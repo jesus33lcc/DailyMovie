@@ -47,6 +47,27 @@ class MovieViewModel(
     private val _error = MutableLiveData<ErrorCarga?>()
     val error: LiveData<ErrorCarga?> get() = _error
 
+    /**
+     * La pelicula que hay abierta.
+     *
+     * La necesitan los dos marcadores de aqui abajo para saber que guardar. Se rellena en
+     * [prepararBotonesDeGuardado] y hasta entonces los botones no hacen nada, que es lo
+     * correcto: sin ficha cargada no hay nada que marcar.
+     */
+    private var peliculaAbierta: MovieModel? = null
+
+    /** El corazon. Ver [Marcado] para por que esto no es un simple booleano. */
+    val favorita = Marcado { comoQuedar, alTerminar ->
+        peliculaAbierta?.let { usuario.ponerFavorita(it, comoQuedar, alTerminar) }
+            ?: alTerminar(false)
+    }
+
+    /** El ojo, igual que [favorita]. */
+    val vista = Marcado { comoQuedar, alTerminar ->
+        peliculaAbierta?.let { usuario.ponerVista(it, comoQuedar, alTerminar) }
+            ?: alTerminar(false)
+    }
+
     fun cargarPelicula(peliculaId: Int) {
         // Los datos principales avisan si fallan; las secciones de abajo son un extra y
         // simplemente se ocultan, para no llenar la pantalla de mensajes.
@@ -71,17 +92,25 @@ class MovieViewModel(
         if (resultado is Resultado.Exito) bloque(resultado.datos)
     }
 
-    fun toggleFavorite(pelicula: MovieModel, alTerminar: (Boolean) -> Unit) =
-        usuario.cambiarFavorita(pelicula, alTerminar)
+    /**
+     * Prepara los dos botones de guardar de la ficha.
+     *
+     * Se llama una vez al abrir: pregunta a Firestore como esta la pelicula y a partir de ahi
+     * manda la memoria. Los toques ya no vuelven a preguntar nada.
+     *
+     * @param pelicula la pelicula abierta, que es lo que se guarda en Firestore.
+     */
+    fun prepararBotonesDeGuardado(pelicula: MovieModel) {
+        peliculaAbierta = pelicula
+        usuario.esFavorita(pelicula.id) { favorita.empezarEn(it) }
+        usuario.estaVista(pelicula.id) { vista.empezarEn(it) }
+    }
 
-    fun toggleWatched(pelicula: MovieModel, alTerminar: (Boolean) -> Unit) =
-        usuario.cambiarVista(pelicula, alTerminar)
+    /** Le da la vuelta a "favorita". El icono cambia ya; guardar es cosa de [Marcado]. */
+    fun cambiarFavorita() = favorita.cambiar { _error.value = ErrorCarga.SIN_CONEXION }
 
-    fun esFavorita(peliculaId: Int, alTerminar: (Boolean) -> Unit) =
-        usuario.esFavorita(peliculaId, alTerminar)
-
-    fun estaVista(peliculaId: Int, alTerminar: (Boolean) -> Unit) =
-        usuario.estaVista(peliculaId, alTerminar)
+    /** Le da la vuelta a "vista". */
+    fun cambiarVista() = vista.cambiar { _error.value = ErrorCarga.SIN_CONEXION }
 
     fun getCustomLists(alTerminar: (List<String>) -> Unit) = usuario.listasDelUsuario(alTerminar)
 
@@ -95,8 +124,9 @@ class MovieViewModel(
     /** Quitar de una lista fija es cambiar el estado; de una del usuario, sacarla. */
     fun removeMovieFromList(nombre: String, pelicula: MovieModel, alTerminar: (Boolean) -> Unit) {
         when (ListaFija.desdeTitulo(nombre)) {
-            ListaFija.FAVORITOS -> usuario.cambiarFavorita(pelicula, alTerminar)
-            ListaFija.VISTOS -> usuario.cambiarVista(pelicula, alTerminar)
+            // Desde una lista solo se puede sacar, nunca meter, asi que va false fijo.
+            ListaFija.FAVORITOS -> usuario.ponerFavorita(pelicula, false, alTerminar)
+            ListaFija.VISTOS -> usuario.ponerVista(pelicula, false, alTerminar)
             null -> usuario.quitarDeLista(nombre, pelicula, alTerminar)
         }
     }
@@ -168,8 +198,8 @@ class MovieViewModel(
 
         val serie = elemento.aSerie()
         when (ListaFija.desdeTitulo(nombre)) {
-            ListaFija.FAVORITOS -> usuario.cambiarSerieFavorita(serie, alTerminar)
-            ListaFija.VISTOS -> usuario.cambiarSerieVista(serie, alTerminar)
+            ListaFija.FAVORITOS -> usuario.ponerSerieFavorita(serie, false, alTerminar)
+            ListaFija.VISTOS -> usuario.ponerSerieVista(serie, false, alTerminar)
             null -> usuario.quitarSerieDeLista(nombre, serie, alTerminar)
         }
     }

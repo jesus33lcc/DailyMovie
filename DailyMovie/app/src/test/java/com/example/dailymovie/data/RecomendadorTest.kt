@@ -122,8 +122,8 @@ class RecomendadorTest {
         override fun borrarCuenta(contrasena: String?, alTerminar: (Boolean, String) -> Unit) = Unit
         override fun esFavorita(peliculaId: Int, alTerminar: (Boolean) -> Unit) = Unit
         override fun estaVista(peliculaId: Int, alTerminar: (Boolean) -> Unit) = Unit
-        override fun cambiarFavorita(pelicula: MovieModel, alTerminar: (Boolean) -> Unit) = Unit
-        override fun cambiarVista(pelicula: MovieModel, alTerminar: (Boolean) -> Unit) = Unit
+        override fun ponerFavorita(pelicula: MovieModel, favorita: Boolean, alTerminar: (Boolean) -> Unit) = Unit
+        override fun ponerVista(pelicula: MovieModel, vista: Boolean, alTerminar: (Boolean) -> Unit) = Unit
         override fun listasDelUsuario(alTerminar: (List<String>) -> Unit) = Unit
         override fun crearLista(nombre: String, alTerminar: (AltaDeLista) -> Unit) = Unit
         override fun borrarLista(nombre: String, alTerminar: (Boolean) -> Unit) = Unit
@@ -135,8 +135,8 @@ class RecomendadorTest {
         override fun seriesVistas(alTerminar: (List<SerieModel>) -> Unit) = Unit
         override fun esSerieFavorita(serieId: Int, alTerminar: (Boolean) -> Unit) = Unit
         override fun estaSerieVista(serieId: Int, alTerminar: (Boolean) -> Unit) = Unit
-        override fun cambiarSerieFavorita(serie: SerieModel, alTerminar: (Boolean) -> Unit) = Unit
-        override fun cambiarSerieVista(serie: SerieModel, alTerminar: (Boolean) -> Unit) = Unit
+        override fun ponerSerieFavorita(serie: SerieModel, favorita: Boolean, alTerminar: (Boolean) -> Unit) = Unit
+        override fun ponerSerieVista(serie: SerieModel, vista: Boolean, alTerminar: (Boolean) -> Unit) = Unit
         override fun seriesDeLista(nombre: String, alTerminar: (List<SerieModel>) -> Unit) = Unit
         override fun anadirSerieALista(nombre: String, serie: SerieModel, alTerminar: (Boolean) -> Unit) = Unit
         override fun quitarSerieDeLista(nombre: String, serie: SerieModel, alTerminar: (Boolean) -> Unit) = Unit
