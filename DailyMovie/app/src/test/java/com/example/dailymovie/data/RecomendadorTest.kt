@@ -151,10 +151,11 @@ class RecomendadorTest {
         override fun episodiosVistos(serieId: Int, alTerminar: (Set<Pair<Int, Int>>) -> Unit) =
             alTerminar(emptySet())
 
-        override fun cambiarEpisodioVisto(
+        override fun ponerEpisodioVisto(
             serieId: Int,
             temporada: Int,
             episodio: Int,
+            visto: Boolean,
             alTerminar: (Boolean) -> Unit
         ) = alTerminar(false)
 
