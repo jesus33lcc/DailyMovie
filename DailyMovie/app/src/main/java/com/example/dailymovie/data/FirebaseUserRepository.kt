@@ -4,8 +4,10 @@ import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.models.SerieModel
 import com.google.firebase.auth.EmailAuthProvider
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -312,26 +314,24 @@ class FirebaseUserRepository(
             .addOnFailureListener { alTerminar(emptySet()) }
     }
 
-    override fun cambiarEpisodioVisto(
+    /**
+     * Aqui no hace falta leer antes de escribir, al reves que en [poner].
+     *
+     * La marca es un texto plano ("1396-1-1"), asi que `arrayRemove` la encuentra siempre: el
+     * problema de los favoritos era que comparaba objetos enteros y la nota de TMDB cambiaba.
+     * Con esto, meter y sacar son las dos una sola escritura idempotente.
+     */
+    override fun ponerEpisodioVisto(
         serieId: Int,
         temporada: Int,
         episodio: Int,
+        visto: Boolean,
         alTerminar: (Boolean) -> Unit
     ) {
         val documento = documentoDelUsuario() ?: return alTerminar(false)
         val marca = "$serieId-$temporada-$episodio"
-        documento.get()
-            .addOnSuccessListener { instantanea ->
-                val yaEstaba = (instantanea.get(EPISODIOS_VISTOS) as? List<*>)
-                    .orEmpty().any { it == marca }
-                val cambio = if (yaEstaba) FieldValue.arrayRemove(marca) else FieldValue.arrayUnion(marca)
-                documento.set(mapOf(EPISODIOS_VISTOS to cambio), SetOptions.merge())
-                    .addOnSuccessListener { alTerminar(!yaEstaba) }
-                    // Si la escritura falla se devuelve el estado de antes, para que la
-                    // casilla no se quede marcada enseñando algo que no se ha guardado.
-                    .addOnFailureListener { alTerminar(yaEstaba) }
-            }
-            .addOnFailureListener { alTerminar(false) }
+        val cambio = if (visto) FieldValue.arrayUnion(marca) else FieldValue.arrayRemove(marca)
+        escribirSinEsperar(documento, mapOf(EPISODIOS_VISTOS to cambio), alTerminar)
     }
 
     override fun seriesEmpezadas(alTerminar: (Map<Int, Int>) -> Unit) {
@@ -501,11 +501,69 @@ class FirebaseUserRepository(
 
     // ---------------- Auxiliares ----------------
 
+    /**
+     * Escribe en Firestore sin esperar al servidor.
+     *
+     * Firestore aplica la escritura en el movil al momento y la sincroniza cuando puede, pero
+     * **el Task no se completa hasta que el servidor la confirma**. Esperando a eso, sin
+     * cobertura el callback no llega nunca: ni exito ni error. El corazon se quedaba pensando
+     * para siempre y dejaba de responder a los toques siguientes.
+     *
+     * Asi que se da por buena la copia local, que es la que el usuario ya esta viendo. El
+     * unico caso en que el servidor puede rechazarla es que las reglas no dejen escribir, y
+     * eso seria un fallo de configuracion, no algo del dia a dia; se recoge en el log para
+     * poder verlo, pero no se le vuelve a decir nada a quien llamo, que ya se fue hace rato.
+     *
+     * @param referencia el documento donde se escribe.
+     * @param datos lo que se escribe, siempre con merge para no pisar el resto del documento.
+     * @param alTerminar se llama **una sola vez** y siempre con true.
+     */
+    private fun escribirSinEsperar(
+        referencia: DocumentReference,
+        datos: Map<String, Any>,
+        alTerminar: (Boolean) -> Unit
+    ) {
+        referencia.set(datos, SetOptions.merge())
+            .addOnFailureListener { Log.w(TAG, "Firestore rechazo la escritura", it) }
+        alTerminar(true)
+    }
+
+    /**
+     * Lee una lista de peliculas de un campo del usuario.
+     *
+     * **Ojo: devuelve lista vacia tanto si no hay nada como si la lectura falla.** Sirve para
+     * pintar (una lista vacia se ve igual de bien que un error), pero **no** para decidir que
+     * se reescribe: para eso esta [leerListaOFallar].
+     */
     private fun leerLista(campo: String, alTerminar: (List<MovieModel>) -> Unit) {
         val documento = documentoDelUsuario() ?: return alTerminar(emptyList())
         documento.get()
             .addOnSuccessListener { alTerminar(aPeliculas(it.get(campo))) }
             .addOnFailureListener { alTerminar(emptyList()) }
+    }
+
+    /**
+     * Lo mismo que [leerLista] pero diciendo si de verdad se pudo leer.
+     *
+     * Hace falta para quitar cosas de una lista: ahi se reescribe el array entero, y confundir
+     * "no hay nada" con "no se ha podido leer" significa guardar una lista vacia encima de los
+     * favoritos del usuario. Es decir, borrarselos.
+     *
+     * @param alTerminar recibe null si la lectura fallo, y la lista si salio bien.
+     */
+    private fun leerListaOFallar(campo: String, alTerminar: (List<MovieModel>?) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(null)
+        documento.get()
+            .addOnSuccessListener { alTerminar(aPeliculas(it.get(campo))) }
+            .addOnFailureListener { alTerminar(null) }
+    }
+
+    /** Lo mismo que [leerListaOFallar] pero con series. */
+    private fun leerSeriesOFallar(campo: String, alTerminar: (List<SerieModel>?) -> Unit) {
+        val documento = documentoDelUsuario() ?: return alTerminar(null)
+        documento.get()
+            .addOnSuccessListener { alTerminar(aSeries(it.get(campo))) }
+            .addOnFailureListener { alTerminar(null) }
     }
 
     private fun contiene(campo: String, peliculaId: Int, alTerminar: (Boolean) -> Unit) {
@@ -536,18 +594,18 @@ class FirebaseUserRepository(
     ) {
         val documento = documentoDelUsuario() ?: return alTerminar(false)
         if (dentro) {
-            documento.set(mapOf(campo to FieldValue.arrayUnion(pelicula)), SetOptions.merge())
-                .addOnSuccessListener { alTerminar(true) }
-                .addOnFailureListener { alTerminar(false) }
+            escribirSinEsperar(documento, mapOf(campo to FieldValue.arrayUnion(pelicula)), alTerminar)
             return
         }
-        leerLista(campo) { peliculas ->
-            documento.set(
+        leerListaOFallar(campo) { peliculas ->
+            // Si no se ha podido leer no se escribe NADA. Guardar aqui la lista vacia que
+            // devolvia el lector de antes borraba los favoritos enteros del usuario.
+            if (peliculas == null) return@leerListaOFallar alTerminar(false)
+            escribirSinEsperar(
+                documento,
                 mapOf(campo to peliculas.filterNot { it.id == pelicula.id }),
-                SetOptions.merge()
+                alTerminar
             )
-                .addOnSuccessListener { alTerminar(true) }
-                .addOnFailureListener { alTerminar(false) }
         }
     }
 
@@ -589,18 +647,16 @@ class FirebaseUserRepository(
     ) {
         val documento = documentoDelUsuario() ?: return alTerminar(false)
         if (dentro) {
-            documento.set(mapOf(campo to FieldValue.arrayUnion(serie)), SetOptions.merge())
-                .addOnSuccessListener { alTerminar(true) }
-                .addOnFailureListener { alTerminar(false) }
+            escribirSinEsperar(documento, mapOf(campo to FieldValue.arrayUnion(serie)), alTerminar)
             return
         }
-        leerSeries(campo) { series ->
-            documento.set(
+        leerSeriesOFallar(campo) { series ->
+            if (series == null) return@leerSeriesOFallar alTerminar(false)
+            escribirSinEsperar(
+                documento,
                 mapOf(campo to series.filterNot { it.id == serie.id }),
-                SetOptions.merge()
+                alTerminar
             )
-                .addOnSuccessListener { alTerminar(true) }
-                .addOnFailureListener { alTerminar(false) }
         }
     }
 
@@ -653,6 +709,7 @@ class FirebaseUserRepository(
     }
 
     private companion object {
+        const val TAG = "DailyMovie/Firestore"
         const val USUARIOS = "users"
         const val LISTAS = "lists"
         const val PELICULAS = "movies"

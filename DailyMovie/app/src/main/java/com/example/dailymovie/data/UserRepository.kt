@@ -309,18 +309,23 @@ interface UserRepository {
     fun seriesEmpezadas(alTerminar: (Map<Int, Int>) -> Unit)
 
     /**
-     * Marca o desmarca un episodio, segun como este ahora.
+     * Deja un episodio marcado como visto o sin marcar, segun lo que se pida.
+     *
+     * Es una orden y no un interruptor, por lo mismo que [ponerFavorita]: al pulsar rapido dos
+     * veces en la misma casilla, dos interruptores leian el mismo estado y el episodio acababa
+     * al reves de lo que el usuario habia pedido.
      *
      * @param serieId el id de TMDB de la serie.
      * @param temporada el numero de temporada que da TMDB. La 0 son los especiales.
      * @param episodio el numero de episodio dentro de esa temporada.
-     * @param alTerminar recibe true si el episodio queda marcado como visto y false si queda
-     *   sin ver. Si la escritura falla, se devuelve el estado que ya tenia.
+     * @param visto true para que quede marcado, false para que no.
+     * @param alTerminar recibe si se pudo guardar.
      */
-    fun cambiarEpisodioVisto(
+    fun ponerEpisodioVisto(
         serieId: Int,
         temporada: Int,
         episodio: Int,
+        visto: Boolean,
         alTerminar: (Boolean) -> Unit
     )
 

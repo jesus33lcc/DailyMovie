@@ -130,10 +130,20 @@ class SerieViewModel(
      */
     fun cambiarEpisodioVisto(temporada: Int, episodio: Int) {
         if (serieId == -1) return
-        usuario.cambiarEpisodioVisto(serieId, temporada, episodio) { quedaVisto ->
-            val actuales = _episodiosVistos.value.orEmpty().toMutableSet()
-            if (quedaVisto) actuales.add(temporada to episodio) else actuales.remove(temporada to episodio)
-            _episodiosVistos.value = actuales
+        val cual = temporada to episodio
+        val actuales = _episodiosVistos.value.orEmpty()
+        val quedaVisto = cual !in actuales
+
+        // El ojo cambia al momento y despues se guarda, igual que el corazon de la ficha. Al
+        // ser una orden idempotente, aporrear la casilla acaba siempre donde el usuario quiso.
+        _episodiosVistos.value = if (quedaVisto) actuales + cual else actuales - cual
+
+        usuario.ponerEpisodioVisto(serieId, temporada, episodio, quedaVisto) { bien ->
+            if (bien) return@ponerEpisodioVisto
+            // No se ha podido guardar: se deshace para no enseñar algo que no esta guardado.
+            val ahora = _episodiosVistos.value.orEmpty()
+            _episodiosVistos.value = if (quedaVisto) ahora - cual else ahora + cual
+            _error.value = ErrorCarga.SIN_CONEXION
         }
     }
 
