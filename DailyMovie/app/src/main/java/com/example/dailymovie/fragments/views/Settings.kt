@@ -23,6 +23,7 @@ import android.widget.RadioGroup
 import com.example.dailymovie.utils.Idioma
 import com.example.dailymovie.utils.IdiomaDelContenido
 import com.example.dailymovie.utils.Avisos
+import com.example.dailymovie.utils.siLaVistaSigueAhi
 import com.example.dailymovie.utils.DialogoDailyMovie
 
 class Settings : Fragment() {
@@ -69,7 +70,7 @@ class Settings : Fragment() {
 
         viewModel.mensaje.observe(viewLifecycleOwner) { texto ->
             texto?.let {
-                Avisos.breve(binding.root, it)
+                avisar(it)
                 viewModel.mensajeMostrado()
             }
         }
@@ -151,7 +152,9 @@ class Settings : Fragment() {
             peligroso = true
         ) {
             viewModel.borrarHistorial { bien ->
-                Avisos.breve(binding.root, if (bien) "Historial borrado" else "No se ha podido borrar")
+                _binding.siLaVistaSigueAhi { vista ->
+                    Avisos.breve(vista.root, if (bien) "Historial borrado" else "No se ha podido borrar")
+                }
             }
         }
     }
@@ -226,8 +229,7 @@ class Settings : Fragment() {
             textoAceptar = if (activada) "Desactivar" else "Activar"
         ) {
             Analitica.activar(requireContext(), !activada)
-            val texto = if (activada) "Datos de uso desactivados" else "Datos de uso activados"
-            Avisos.breve(binding.root, texto)
+            avisar(if (activada) "Datos de uso desactivados" else "Datos de uso activados")
         }
     }
 
@@ -292,8 +294,14 @@ class Settings : Fragment() {
         startActivity(intent)
     }
 
+    /**
+     * Un aviso, si la pantalla sigue ahi para enseñarlo.
+     *
+     * Lo llaman callbacks de Firebase que pueden tardar (cambiar contraseña, borrar cuenta),
+     * y para entonces el usuario puede haberse ido de la pestaña.
+     */
     private fun avisar(texto: String) {
-        Avisos.breve(binding.root, texto)
+        _binding.siLaVistaSigueAhi { vista -> Avisos.breve(vista.root, texto) }
     }
 
     override fun onDestroyView() {

@@ -457,6 +457,9 @@ class SerieA : AppCompatActivity() {
             }
 
             viewModel.listasConLaSerie(serie.id) { yaEstaba ->
+                // Dos saltos a Firestore antes de abrir la ventana: si el usuario se ha ido
+                // mientras tanto, el contexto ya no vale y abrirla revienta.
+                if (isFinishing || isDestroyed) return@listasConLaSerie
                 val marcadas = yaEstaba.toMutableSet()
                 val contenido = layoutInflater.inflate(R.layout.dialogo_listas, null)
                 val lista = contenido.findViewById<RecyclerView>(R.id.dialogoListas)

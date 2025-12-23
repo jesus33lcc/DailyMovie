@@ -25,6 +25,7 @@ import com.example.dailymovie.activities.views.SagaA
 import com.example.dailymovie.activities.views.SerieA
 import com.example.dailymovie.adapters.HallazgoAdapter
 import com.example.dailymovie.utils.abrirConCartel
+import com.example.dailymovie.utils.siLaVistaSigueAhi
 import com.example.dailymovie.databinding.FragmentExplorarBinding
 import com.example.dailymovie.fragments.viewmodels.ExplorarViewModel
 import com.example.dailymovie.fragments.viewmodels.OrdenDeBusqueda
@@ -173,6 +174,9 @@ class ExplorarF : Fragment() {
             binding.chipTodo to null,
             binding.chipPeliculas to TipoDeHallazgo.PELICULA,
             binding.chipSeries to TipoDeHallazgo.SERIE,
+            // El de sagas se pintaba con su contador pero no tenia listener, asi que salia un
+            // chip que no hacia nada al tocarlo.
+            binding.chipSagas to TipoDeHallazgo.SAGA,
             binding.chipPersonas to TipoDeHallazgo.PERSONA
         ).forEach { (chip, tipo) ->
             chip.setOnClickListener {
@@ -323,10 +327,11 @@ class ExplorarF : Fragment() {
             // El subir se hace en el callback, cuando la lista nueva ya esta pintada: antes
             // de eso el RecyclerView todavia tiene las posiciones viejas.
             resultadosAdapter.submitList(hallazgos) {
-                if (volverArriba) {
-                    volverArriba = false
-                    binding.rvListaBusqueda.scrollToPosition(0)
-                }
+                // El diff corre en otro hilo y este callback llega despues: para entonces la
+                // vista puede haber desaparecido.
+                if (!volverArriba) return@submitList
+                volverArriba = false
+                _binding.siLaVistaSigueAhi { vista -> vista.rvListaBusqueda.scrollToPosition(0) }
             }
             pintarChips()
             decidirQueSeVe()
