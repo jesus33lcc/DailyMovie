@@ -26,6 +26,7 @@ import com.example.dailymovie.fragments.viewmodels.ListasViewModel
 import com.example.dailymovie.utils.DialogoDailyMovie
 import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.utils.Avisos
+import com.example.dailymovie.utils.siLaVistaSigueAhi
 
 class ListasF : Fragment() {
 
@@ -94,7 +95,9 @@ class ListasF : Fragment() {
      */
     private fun abrirLista(lista: ListaModel) {
         viewModel.cargarLista(lista.nombre) { peliculas ->
-            navigateToMovieList(peliculas, lista.nombre)
+            // Si el usuario se ha ido mientras Firestore contestaba, no se le abre una
+            // pantalla encima de donde este ahora.
+            _binding.siLaVistaSigueAhi { navigateToMovieList(peliculas, lista.nombre) }
         }
     }
 
@@ -156,7 +159,10 @@ class ListasF : Fragment() {
                 }
                 else -> viewModel.createNewList(nombre) { resultado ->
                     dialogo.dismiss()
-                    Avisos.breve(binding.root, getString(resultado.mensaje(), nombre))
+                    // Firestore puede contestar cuando el usuario ya se ha ido de la pestaña.
+                    _binding.siLaVistaSigueAhi { vista ->
+                        Avisos.breve(vista.root, getString(resultado.mensaje(), nombre))
+                    }
                 }
             }
         }
@@ -197,7 +203,7 @@ class ListasF : Fragment() {
                 // No hay que sacar la fila a mano: al borrarla el ViewModel recarga las
                 // listas y el comparador ve que falta esa.
                 val texto = if (borrada) "Lista eliminada" else "No se ha podido eliminar"
-                Avisos.breve(binding.root, texto)
+                _binding.siLaVistaSigueAhi { vista -> Avisos.breve(vista.root, texto) }
             }
         }
     }

@@ -51,89 +51,92 @@ class MovieA : AppCompatActivity() {
         setContentView(binding.root)
 
         val movieId = intent.getIntExtra(EXTRA_MOVIE_ID, -1)
+        // Sin un id no hay nada que enseñar. Antes se avisaba y se dejaba una pantalla vacia
+        // y muerta; las fichas de serie y de persona ya cerraban en este caso.
+        if (movieId == -1) {
+            showToast("No hemos podido abrir esa película")
+            finish()
+            return
+        }
 
         // El mismo nombre que lleva el cartel de la tarjeta desde la que se ha llegado: es
         // lo que hace que la imagen crezca hasta aqui en vez de aparecer de golpe.
         binding.imgPosterMovie.transitionName = "cartel_${TipoDeHallazgo.PELICULA}_$movieId"
 
-        if (movieId != -1) {
-            movieViewModel.cargarPelicula(movieId)
+        movieViewModel.cargarPelicula(movieId)
 
-            movieViewModel.movieDetails.observe(this, Observer { movieDetailsResponse ->
-                movieDetailsResponse?.let {
-                    val movieDetails = convertToMovieDetailsModel(it)
-                    displayMovieDetails(movieDetails)
-                    setupButtons(movieDetails)
-                    mostrarExtras(it)
-                }
-            })
-
-            movieViewModel.movieProviders.observe(this, Observer { providerResponse ->
-                providerResponse?.let {
-                    displayProviders(it)
-                }
-            })
-
-            movieViewModel.movieCredits.observe(this, Observer { creditResponse ->
-                creditResponse?.let {
-                    displayCredits(it)
-                    mostrarDirector(it)
-                }
-            })
-
-            movieViewModel.movieVideos.observe(this, Observer { videoList ->
-                videoList?.let {
-                    displayVideos(it)
-                }
-            })
-
-            movieViewModel.similarMovies.observe(this, Observer { similarMovies ->
-                similarMovies?.let {
-                    displaySimilarMovies(it)
-                }
-            })
-
-            movieViewModel.resenas.observe(this) { mostrarResenas(it) }
-
-            movieViewModel.recommendedMovies.observe(this, Observer { recommendedMovies ->
-                recommendedMovies?.let {
-                    displayRecommendedMovies(it)
-                }
-            })
-
-            // Los dos botones de guardar se pintan solos cada vez que cambia su estado, que
-            // ahora vive en el ViewModel y no en Firestore.
-            var primeraPintadaFavorita = true
-            movieViewModel.favorita.puesto.observe(this) { puesto ->
-                pintarBotonDeGuardado(
-                    binding.btnFavorite, puesto,
-                    R.drawable.ic_baseline_favorite_24,
-                    R.drawable.ic_baseline_favorite_border_24,
-                    primeraPintadaFavorita
-                )
-                primeraPintadaFavorita = false
+        movieViewModel.movieDetails.observe(this, Observer { movieDetailsResponse ->
+            movieDetailsResponse?.let {
+                val movieDetails = convertToMovieDetailsModel(it)
+                displayMovieDetails(movieDetails)
+                setupButtons(movieDetails)
+                mostrarExtras(it)
             }
+        })
 
-            var primeraPintadaVista = true
-            movieViewModel.vista.puesto.observe(this) { puesto ->
-                pintarBotonDeGuardado(
-                    binding.btnWatched, puesto,
-                    R.drawable.ic_baseline_visibility_24,
-                    R.drawable.ic_baseline_visibility_off_24,
-                    primeraPintadaVista
-                )
-                primeraPintadaVista = false
+        movieViewModel.movieProviders.observe(this, Observer { providerResponse ->
+            providerResponse?.let {
+                displayProviders(it)
             }
+        })
 
-            movieViewModel.error.observe(this, Observer { error ->
-                error?.let {
-                    showToast(getString(it.mensaje()))
-                    movieViewModel.errorMostrado()
-                }
-            })
-        } else {
-            showToast("Error: El Id de la pelicula no es valido.")
+        movieViewModel.movieCredits.observe(this, Observer { creditResponse ->
+            creditResponse?.let {
+                displayCredits(it)
+                mostrarDirector(it)
+            }
+        })
+
+        movieViewModel.movieVideos.observe(this, Observer { videoList ->
+            videoList?.let {
+                displayVideos(it)
+            }
+        })
+
+        movieViewModel.similarMovies.observe(this, Observer { similarMovies ->
+            similarMovies?.let {
+                displaySimilarMovies(it)
+            }
+        })
+
+        movieViewModel.resenas.observe(this) { mostrarResenas(it) }
+
+        movieViewModel.recommendedMovies.observe(this, Observer { recommendedMovies ->
+            recommendedMovies?.let {
+                displayRecommendedMovies(it)
+            }
+        })
+
+        // Los dos botones de guardar se pintan solos cada vez que cambia su estado, que
+        // ahora vive en el ViewModel y no en Firestore.
+        var primeraPintadaFavorita = true
+        movieViewModel.favorita.puesto.observe(this) { puesto ->
+            pintarBotonDeGuardado(
+                binding.btnFavorite, puesto,
+                R.drawable.ic_baseline_favorite_24,
+                R.drawable.ic_baseline_favorite_border_24,
+                primeraPintadaFavorita
+            )
+            primeraPintadaFavorita = false
         }
+
+        var primeraPintadaVista = true
+        movieViewModel.vista.puesto.observe(this) { puesto ->
+            pintarBotonDeGuardado(
+                binding.btnWatched, puesto,
+                R.drawable.ic_baseline_visibility_24,
+                R.drawable.ic_baseline_visibility_off_24,
+                primeraPintadaVista
+            )
+            primeraPintadaVista = false
+        }
+
+        movieViewModel.error.observe(this, Observer { error ->
+            error?.let {
+                showToast(getString(it.mensaje()))
+                movieViewModel.errorMostrado()
+            }
+        })
     }
 
     /**
@@ -270,6 +273,9 @@ class MovieA : AppCompatActivity() {
             }
 
             movieViewModel.listasConLaPelicula(movie.id) { yaEstaba ->
+                // Dos saltos a Firestore antes de abrir la ventana: si el usuario se ha ido
+                // mientras tanto, el contexto ya no vale y abrirla revienta.
+                if (isFinishing || isDestroyed) return@listasConLaPelicula
                 val marcadas = yaEstaba.toMutableSet()
                 val contenido = layoutInflater.inflate(R.layout.dialogo_listas, null)
                 val lista = contenido.findViewById<RecyclerView>(R.id.dialogoListas)
