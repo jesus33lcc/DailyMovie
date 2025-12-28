@@ -92,11 +92,32 @@ class ExplorarViewModel(
      * Ahora cada tecla cancela la busqueda anterior y se espera un momento a que pares de
      * escribir: sale una sola peticion, y siempre la de lo ultimo que hay en el campo.
      */
+    /**
+     * De que busqueda es cada respuesta.
+     *
+     * Cancelar el Job solo sirve mientras la corrutina esta en el `delay`: en cuanto sale la
+     * peticion a TMDB, el callback de Retrofit ya no depende de el y llega igual. Si escribes
+     * "inters" y luego "interstellar", las dos respuestas estan en el aire y la del texto
+     * viejo puede llegar la ultima y pisar a la buena.
+     *
+     * Cada busqueda se lleva su numero y al contestar se compara: si ya no es la de ahora, la
+     * respuesta se tira. Lo mismo vale para los filtros, los generos y la paginacion, que
+     * comparten el mismo contador porque cualquiera de ellos invalida a los demas.
+     */
+    private var generacionDeBusqueda = 0
+
+    /** Empieza una busqueda nueva y devuelve su numero, invalidando todo lo que estuviera en el aire. */
+    private fun nuevaGeneracion(): Int {
+        pidiendoMas = false
+        return ++generacionDeBusqueda
+    }
+
     fun buscar(consulta: String) {
         val limpia = consulta.trim()
         consultaActual = limpia
 
         trabajoDeBusqueda?.cancel()
+        val mia = nuevaGeneracion()
 
         if (limpia.length < MINIMO_PARA_BUSCAR) {
             todosLosResultados = emptyList()
@@ -113,6 +134,9 @@ class ExplorarViewModel(
             delay(ESPERA_ANTES_DE_BUSCAR)
             _cargando.value = true
             peliculas.buscarTodo(limpia, pagina = 1) { resultado ->
+                // Si mientras contestaba TMDB el usuario escribio otra cosa, esta respuesta
+                // ya no vale para nada.
+                if (mia != generacionDeBusqueda) return@buscarTodo
                 _cargando.value = false
                 when (resultado) {
                     is Resultado.Exito -> {
@@ -147,8 +171,13 @@ class ExplorarViewModel(
         if (pidiendoMas || !hayMasPaginas) return
         pidiendoMas = true
         val siguiente = paginaActual + 1
+        // La pagina 2 se pide de una busqueda concreta. Si el usuario escribe otra cosa
+        // mientras baja, esta respuesta llegaria y se pegaria a los resultados nuevos,
+        // dejando la rejilla con una mezcla de las dos busquedas.
+        val mia = generacionDeBusqueda
 
-        val alRecibir: (List<Hallazgo>, Boolean) -> Unit = { nuevos, quedanMas ->
+        val alRecibir: (List<Hallazgo>, Boolean) -> Unit = alRecibir@{ nuevos, quedanMas ->
+            if (mia != generacionDeBusqueda) return@alRecibir
             pidiendoMas = false
             paginaActual = siguiente
             hayMasPaginas = quedanMas
@@ -170,6 +199,7 @@ class ExplorarViewModel(
                 filtros = filtrosAvanzados,
                 pagina = siguiente
             ) { resultado ->
+                if (mia != generacionDeBusqueda) return@descubrir
                 if (resultado is Resultado.Exito) {
                     alRecibir(resultado.datos.map { Hallazgo.de(it) }, resultado.datos.size >= POR_PAGINA)
                 } else {
@@ -178,6 +208,7 @@ class ExplorarViewModel(
             }
             genero != null -> cargarGeneroEnPagina(genero, siguiente, alRecibir)
             else -> peliculas.buscarTodo(consultaActual, siguiente) { resultado ->
+                if (mia != generacionDeBusqueda) return@buscarTodo
                 if (resultado is Resultado.Exito) {
                     alRecibir(resultado.datos.hallazgos, resultado.datos.hayMas)
                 } else {
@@ -197,6 +228,7 @@ class ExplorarViewModel(
     fun cambiarFiltrosAvanzados(nuevos: FiltrosAvanzados) {
         filtrosAvanzados = nuevos
         paginaActual = 1
+        val mia = nuevaGeneracion()
 
         if (nuevos.estanVacios()) {
             // Sin filtros se vuelve a lo de antes: lo escrito, o el genero que hubiera.
@@ -218,6 +250,7 @@ class ExplorarViewModel(
             filtros = nuevos,
             pagina = 1
         ) { resultado ->
+            if (mia != generacionDeBusqueda) return@descubrir
             _cargando.value = false
             if (resultado is Resultado.Exito) {
                 todosLosResultados = resultado.datos.map { Hallazgo.de(it) }
@@ -360,8 +393,10 @@ class ExplorarViewModel(
         generoEnCurso = genero
         paginaActual = 1
         _cargando.value = true
+        val mia = nuevaGeneracion()
 
         cargarGeneroEnPagina(genero, 1) { hallazgos, quedanMas ->
+            if (mia != generacionDeBusqueda) return@cargarGeneroEnPagina
             _cargando.value = false
             todosLosResultados = hallazgos
             hayMasPaginas = quedanMas
