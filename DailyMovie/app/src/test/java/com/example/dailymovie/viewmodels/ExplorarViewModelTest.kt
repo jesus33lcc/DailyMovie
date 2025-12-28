@@ -84,6 +84,37 @@ class ExplorarViewModelTest {
      * Lo que no este en el mapa se contesta como una pagina vacia y sin continuacion, que es
      * como se comporta TMDB cuando te pasas del final.
      */
+    /**
+     * Un repositorio que no contesta hasta que el test lo dice.
+     *
+     * Sirve para reproducir la carrera de verdad: dos busquedas en el aire y la vieja
+     * contestando la ultima. Con el doble normal, que contesta en el acto, esa situacion no
+     * se puede montar.
+     */
+    private class PeliculasQueTardan : MovieRepository by PeliculasFalsas() {
+        private val pendientes = mutableListOf<Pair<String, (Resultado<Pagina>) -> Unit>>()
+
+        override fun buscarTodo(consulta: String, pagina: Int, alTerminar: (Resultado<Pagina>) -> Unit) {
+            pendientes += consulta to alTerminar
+        }
+
+        /** Contesta a la busqueda de ese texto con las peliculas de esos ids. */
+        fun contestar(consulta: String, vararg ids: Int) {
+            val cual = pendientes.indexOfFirst { it.first == consulta }
+            if (cual < 0) return
+            val (_, alTerminar) = pendientes.removeAt(cual)
+            alTerminar(
+                Resultado.Exito(
+                    Pagina(
+                        ids.map { Hallazgo(it, "Peli $it", "2020-01-01", null, 7.0, TipoDeHallazgo.PELICULA) },
+                        1,
+                        false
+                    )
+                )
+            )
+        }
+    }
+
     private class PeliculasFalsas(
         private val porPagina: Map<Int, Resultado<Pagina>> = emptyMap()
     ) : MovieRepository {
@@ -227,6 +258,24 @@ class ExplorarViewModelTest {
     }
 
     // ---- Ayudas ----------------------------------------------------------------------
+
+    @Test
+    fun `una respuesta que llega tarde no pisa la busqueda nueva`() {
+        val peliculas = PeliculasQueTardan()
+        val vm = viewModel(peliculas)
+
+        vm.buscar("inters")
+        adelantarLaEspera()
+        vm.buscar("interstellar")
+        adelantarLaEspera()
+
+        // Contesta primero la buena y despues la vieja, que es lo que pasaba de verdad con
+        // dos peticiones en el aire.
+        peliculas.contestar("interstellar", 1, 2)
+        peliculas.contestar("inters", 90, 91)
+
+        assertEquals(listOf(1, 2), idsEnPantalla(vm))
+    }
 
     private fun peli(id: Int, nota: Double = 7.0, ano: String = "2020-01-01") =
         Hallazgo(id, "Peli $id", ano, "/poster$id.jpg", nota, TipoDeHallazgo.PELICULA)
