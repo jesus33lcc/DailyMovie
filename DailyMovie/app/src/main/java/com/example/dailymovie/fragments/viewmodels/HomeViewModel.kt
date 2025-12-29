@@ -56,17 +56,38 @@ class HomeViewModel(
 
     private var peticionesPendientes = 0
 
+    /**
+     * De que carga es cada respuesta.
+     *
+     * La portada se recarga al tirar hacia abajo, y antes eso reseteaba el contador a 5 con
+     * hasta cinco respuestas de la carga anterior todavia en el aire: las cinco primeras que
+     * llegaran apagaban la rueda con media portada sin pedir. Con el numero de carga, las
+     * respuestas viejas ni se cuentan ni se pintan.
+     */
+    private var generacionDeCarga = 0
+
     /** Pide de golpe todo lo que se ve en la portada y avisa mientras dure. */
     fun cargarPortada() {
-        peticionesPendientes = TOTAL_PETICIONES
+        val mia = ++generacionDeCarga
+        // Se cuenta al lanzar cada peticion en vez de con una constante escrita a mano: antes
+        // habia un TOTAL_PETICIONES = 5 que habia que acordarse de subir al añadir una fila,
+        // y si no, la rueda se quedaba girando para siempre.
+        peticionesPendientes = 0
         _cargando.value = true
 
-        peliculas.enCartelera { reparte(it) { lista -> _nowPlayingMovies.value = lista } }
-        peliculas.populares { reparte(it) { lista -> _popularMovies.value = lista } }
-        peliculas.mejorValoradas { reparte(it) { lista -> _topRatedMovies.value = lista } }
-        peliculas.proximamente { reparte(it) { lista -> _upcomingMovies.value = lista } }
-        cargarPeliculaDestacada()
+        pedir(mia) { peliculas.enCartelera { r -> reparte(mia, r) { l -> _nowPlayingMovies.value = l } } }
+        pedir(mia) { peliculas.populares { r -> reparte(mia, r) { l -> _popularMovies.value = l } } }
+        pedir(mia) { peliculas.mejorValoradas { r -> reparte(mia, r) { l -> _topRatedMovies.value = l } } }
+        pedir(mia) { peliculas.proximamente { r -> reparte(mia, r) { l -> _upcomingMovies.value = l } } }
+        pedir(mia) { cargarPeliculaDestacada(mia) }
         cargarSeriesEmpezadas()
+    }
+
+    /** Apunta una peticion mas y la lanza. */
+    private fun pedir(generacion: Int, peticion: () -> Unit) {
+        if (generacion != generacionDeCarga) return
+        peticionesPendientes++
+        peticion()
     }
 
     /**
@@ -126,14 +147,15 @@ class HomeViewModel(
      * La idea es que la portada nunca se quede vacia, y que cuanto mas sepa la app de ti,
      * mas tuya sea la pelicula que te enseña.
      */
-    private fun cargarPeliculaDestacada() {
+    private fun cargarPeliculaDestacada(generacion: Int) {
         usuario.peliculaDelDia { curada ->
+            if (generacion != generacionDeCarga) return@peliculaDelDia
             if (curada != null) {
                 _motivoRecomendacion.value = null
                 _movieOfTheDay.value = curada
-                peticionTerminada()
+                peticionTerminada(generacion)
             } else {
-                recomendarSegunGustos()
+                recomendarSegunGustos(generacion)
             }
         }
     }
@@ -145,15 +167,16 @@ class HomeViewModel(
      * La semilla es el dia del año: la portada cambia de un dia para otro, pero no cada vez
      * que se abre la app. Si cambiara a cada rato no seria "la pelicula del dia" de nadie.
      */
-    private fun recomendarSegunGustos() {
+    private fun recomendarSegunGustos(generacion: Int) {
         val diaDelAno = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
         recomendador.paraHoy(diaDelAno) { propuesta ->
+            if (generacion != generacionDeCarga) return@paraHoy
             if (propuesta == null) {
                 _motivoRecomendacion.value = null
                 _movieOfTheDay.value = null
-                peticionTerminada()
+                peticionTerminada(generacion)
             } else {
-                publicarRecomendada(propuesta.pelicula, propuesta.motivo)
+                publicarRecomendada(generacion, propuesta.pelicula, propuesta.motivo)
             }
         }
     }
@@ -165,10 +188,12 @@ class HomeViewModel(
      * recomendada no, asi que se rellena con lo que da TMDB para que la portada se vea
      * igual de completa venga de donde venga.
      */
-    private fun publicarRecomendada(pelicula: MovieModel, motivo: String) {
+    private fun publicarRecomendada(generacion: Int, pelicula: MovieModel, motivo: String) {
         peliculas.detalles(pelicula.id) { detalles ->
+            if (generacion != generacionDeCarga) return@detalles
             val sinopsis = (detalles as? Resultado.Exito)?.datos?.overview.orEmpty()
             peliculas.videos(pelicula.id) { videos ->
+                if (generacion != generacionDeCarga) return@videos
                 val trailer = (videos as? Resultado.Exito)?.datos?.firstOrNull()?.key.orEmpty()
                 _motivoRecomendacion.value = motivo
                 _movieOfTheDay.value = MovieOfTheDay(
@@ -180,21 +205,23 @@ class HomeViewModel(
                     motivo = motivo,
                     videoId = trailer
                 )
-                peticionTerminada()
+                peticionTerminada(generacion)
             }
         }
     }
 
-    private fun <T : Any> reparte(resultado: Resultado<T>, alIrBien: (T) -> Unit) {
+    private fun <T : Any> reparte(generacion: Int, resultado: Resultado<T>, alIrBien: (T) -> Unit) {
+        if (generacion != generacionDeCarga) return
         when (resultado) {
             is Resultado.Exito -> alIrBien(resultado.datos)
             is Resultado.Fallo -> _error.value = resultado.motivo
         }
-        peticionTerminada()
+        peticionTerminada(generacion)
     }
 
     /** Apaga el indicador cuando han contestado todas, hayan ido bien o mal. */
-    private fun peticionTerminada() {
+    private fun peticionTerminada(generacion: Int) {
+        if (generacion != generacionDeCarga) return
         peticionesPendientes--
         if (peticionesPendientes <= 0) {
             peticionesPendientes = 0
@@ -207,8 +234,6 @@ class HomeViewModel(
     }
 
     private companion object {
-        const val TOTAL_PETICIONES = 5
-
         /** Mas de seis y la fila se convierte en otra lista infinita, que no es la idea. */
         const val MAXIMO_EN_CURSO = 6
     }
