@@ -131,7 +131,6 @@ class ExplorarViewModelTest {
 
         // El buscador no usa el resto: si llamara a alguna, el callback no se llamaria y el
         // test lo cantaria al no ver resultados.
-        override fun buscar(consulta: String, alTerminar: (Resultado<List<MovieModel>>) -> Unit) = Unit
         override fun peliculasDeLaSaga(sagaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit) = Unit
         override fun tendencias(alTerminar: (Resultado<List<Hallazgo>>) -> Unit) = Unit
         override fun enCartelera(alTerminar: (Resultado<List<MovieModel>>) -> Unit) = Unit
@@ -163,7 +162,6 @@ class ExplorarViewModelTest {
 
     /** Series de mentira: el buscador solo las toca al explorar generos, que aqui no se prueba. */
     private class SeriesFalsas : SerieRepository {
-        override fun buscar(consulta: String, alTerminar: (Resultado<List<SerieModel>>) -> Unit) = Unit
         override fun populares(alTerminar: (Resultado<List<SerieModel>>) -> Unit) = Unit
         override fun mejorValoradas(alTerminar: (Resultado<List<SerieModel>>) -> Unit) = Unit
         override fun enEmision(alTerminar: (Resultado<List<SerieModel>>) -> Unit) = Unit

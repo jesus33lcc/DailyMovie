@@ -44,10 +44,6 @@ class HomeViewModel(
     private val _movieOfTheDay = MutableLiveData<MovieOfTheDay?>()
     val movieOfTheDay: LiveData<MovieOfTheDay?> get() = _movieOfTheDay
 
-    /** Por que se enseña esa pelicula, para poder explicarselo al usuario en la portada. */
-    private val _motivoRecomendacion = MutableLiveData<String?>()
-    val motivoRecomendacion: LiveData<String?> get() = _motivoRecomendacion
-
     private val _error = MutableLiveData<ErrorCarga?>()
     val error: LiveData<ErrorCarga?> get() = _error
 
@@ -151,7 +147,6 @@ class HomeViewModel(
         usuario.peliculaDelDia { curada ->
             if (generacion != generacionDeCarga) return@peliculaDelDia
             if (curada != null) {
-                _motivoRecomendacion.value = null
                 _movieOfTheDay.value = curada
                 peticionTerminada(generacion)
             } else {
@@ -172,7 +167,6 @@ class HomeViewModel(
         recomendador.paraHoy(diaDelAno) { propuesta ->
             if (generacion != generacionDeCarga) return@paraHoy
             if (propuesta == null) {
-                _motivoRecomendacion.value = null
                 _movieOfTheDay.value = null
                 peticionTerminada(generacion)
             } else {
@@ -195,7 +189,6 @@ class HomeViewModel(
             peliculas.videos(pelicula.id) { videos ->
                 if (generacion != generacionDeCarga) return@videos
                 val trailer = (videos as? Resultado.Exito)?.datos?.firstOrNull()?.key.orEmpty()
-                _motivoRecomendacion.value = motivo
                 _movieOfTheDay.value = MovieOfTheDay(
                     id = pelicula.id,
                     title = pelicula.title,

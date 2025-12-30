@@ -26,15 +26,6 @@ import retrofit2.Call
 interface SerieRepository {
 
     /**
-     * Busca series por titulo.
-     *
-     * @param consulta lo que ha escrito el usuario.
-     * @param alTerminar recibe las series que encajan, o un fallo si no hubo red o TMDB
-     *   contesto con error. Que no haya coincidencias no es un fallo: llega una lista vacia.
-     */
-    fun buscar(consulta: String, alTerminar: (Resultado<List<SerieModel>>) -> Unit)
-
-    /**
      * Las series mas vistas del momento.
      *
      * @param alTerminar recibe las series, o un fallo si no se pudo pedir.
@@ -177,9 +168,6 @@ class TmdbSerieRepository(
     private val servicio: WebService = RetrofitClient.webService,
     private val apiKey: String = Constantes.API_KEY
 ) : SerieRepository {
-
-    override fun buscar(consulta: String, alTerminar: (Resultado<List<SerieModel>>) -> Unit) =
-        listaDeSeries(servicio.buscarSeries(consulta, apiKey), alTerminar)
 
     override fun populares(alTerminar: (Resultado<List<SerieModel>>) -> Unit) =
         listaDeSeries(servicio.getSeriesPopulares(apiKey), alTerminar)

@@ -2,7 +2,6 @@ package com.example.dailymovie.activities.views
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -22,11 +21,5 @@ class PrincipalA : AppCompatActivity() {
         // Aqui habia un AppBarConfiguration para setupActionBarWithNavController, pero el tema
         // es NoActionBar: no habia barra que configurar y quedaba sin usar.
         navView.setupWithNavController(navController)
-    }
-    private fun replaceFragment(fragment: Fragment){
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.nav_host_fragment_activity_principal, fragment)
-        fragmentTransaction.commit()
     }
 }

@@ -78,7 +78,6 @@ class RecomendadorTest {
 
         // El resto del repositorio no pinta nada en la recomendacion: si el Recomendador
         // llamara a alguna de estas, el callback no se llamaria y el test lo cantaria.
-        override fun buscar(consulta: String, alTerminar: (Resultado<List<MovieModel>>) -> Unit) = Unit
         override fun buscarTodo(consulta: String, pagina: Int, alTerminar: (Resultado<Pagina>) -> Unit) = Unit
         override fun peliculasDeLaSaga(sagaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit) = Unit
         override fun tendencias(alTerminar: (Resultado<List<Hallazgo>>) -> Unit) = Unit

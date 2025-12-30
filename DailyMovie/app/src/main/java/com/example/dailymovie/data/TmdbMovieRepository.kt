@@ -35,9 +35,6 @@ class TmdbMovieRepository(
     private val apiKey: String = Constantes.API_KEY
 ) : MovieRepository {
 
-    override fun buscar(consulta: String, alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
-        listaDePeliculas(servicio.searchMovies(consulta, apiKey), alTerminar)
-
     override fun buscarTodo(
         consulta: String,
         pagina: Int,

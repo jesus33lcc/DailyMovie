@@ -150,10 +150,6 @@ class SerieViewModel(
     /** Sin sesion no hay donde guardar lo que se marca, asi que la pantalla lo esconde. */
     fun haySesion() = usuario.haySesion()
 
-    /** Cuantos episodios de esa temporada ha visto ya. */
-    fun cuantosVistosDe(temporada: Int) =
-        _episodiosVistos.value.orEmpty().count { it.first == temporada }
-
     fun errorMostrado() {
         _error.value = null
     }

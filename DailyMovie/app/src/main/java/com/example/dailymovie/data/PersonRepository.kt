@@ -58,10 +58,7 @@ interface PersonRepository {
 data class Filmografia(
     val actuando: List<PeliculaDePersona>,
     val dirigiendo: List<PeliculaDePersona>
-) {
-    /** Si no hay nada que enseñar, para poder poner el aviso en vez de dos huecos. */
-    fun estaVacia() = actuando.isEmpty() && dirigiendo.isEmpty()
-}
+)
 
 private const val PUESTOS_PRINCIPALES = 5
 private const val EPISODIOS_PARA_SER_FIJO = 4

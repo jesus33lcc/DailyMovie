@@ -25,15 +25,6 @@ import com.example.dailymovie.utils.ErrorCarga
 interface MovieRepository {
 
     /**
-     * Busca peliculas por titulo.
-     *
-     * @param consulta lo que ha escrito el usuario.
-     * @param alTerminar recibe las peliculas que encajan, o un fallo si no hubo red o TMDB
-     *   contesto con un error. Que no haya coincidencias no es un fallo: llega una lista vacia.
-     */
-    fun buscar(consulta: String, alTerminar: (Resultado<List<MovieModel>>) -> Unit)
-
-    /**
      * Busca peliculas, series y gente de una vez.
      *
      * @param consulta lo que ha escrito el usuario.

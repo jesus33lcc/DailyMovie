@@ -28,27 +28,6 @@ import retrofit2.http.Query
 interface WebService {
 
     /**
-     * Busca peliculas por titulo.
-     *
-     * Es la busqueda antigua, la que solo ve cine. La pantalla de buscar usa [buscarTodo]; esta
-     * se queda para los sitios donde solo interesan peliculas.
-     *
-     * @param title lo que ha escrito el usuario.
-     * @param apiKey la clave de TMDB, que pone el repositorio.
-     * @param include_adult si entra tambien el cine para adultos.
-     * @param language idioma de los titulos y sinopsis; por defecto el del aparato.
-     * @param page que tanda de 20 se pide.
-     */
-    @GET("search/movie")
-    fun searchMovies(
-        @Query("query") title: String,
-        @Query("api_key") apiKey: String,
-        @Query("include_adult") include_adult: Boolean = true,
-        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
-        @Query("page") page: Int = 1
-    ): Call<MoviesResponse>
-
-    /**
      * La ficha completa de una pelicula.
      *
      * @param movieId el id de TMDB de la pelicula.
@@ -482,22 +461,6 @@ interface WebService {
     ): Call<ResenasResponse>
 
     // ---- Series ----
-
-    /**
-     * Busca series por titulo.
-     *
-     * @param titulo lo que ha escrito el usuario.
-     * @param apiKey la clave de TMDB, que pone el repositorio.
-     * @param language idioma de los textos; por defecto el del aparato.
-     * @param page que tanda de 20 se pide.
-     */
-    @GET("search/tv")
-    fun buscarSeries(
-        @Query("query") titulo: String,
-        @Query("api_key") apiKey: String,
-        @Query("language") language: String = LocaleUtil.getLanguageAndCountry(),
-        @Query("page") page: Int = 1
-    ): Call<SeriesResponse>
 
     /**
      * Las series mas vistas del momento.
