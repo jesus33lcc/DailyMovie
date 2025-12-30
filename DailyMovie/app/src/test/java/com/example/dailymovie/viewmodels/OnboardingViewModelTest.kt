@@ -94,7 +94,6 @@ class OnboardingViewModelTest {
 
         // El onboarding no usa el resto: si llamara a alguna, el callback no se llamaria y el
         // test lo cantaria al no ver nada publicado.
-        override fun buscar(consulta: String, alTerminar: (Resultado<List<MovieModel>>) -> Unit) = Unit
         override fun buscarTodo(consulta: String, pagina: Int, alTerminar: (Resultado<Pagina>) -> Unit) = Unit
         override fun peliculasDeLaSaga(sagaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit) = Unit
         override fun tendencias(alTerminar: (Resultado<List<Hallazgo>>) -> Unit) = Unit
