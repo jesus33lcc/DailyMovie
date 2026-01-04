@@ -463,10 +463,6 @@ class ExplorarViewModel(
         usuario.historial { _history.value = it }
     }
 
-    fun addToHistory(pelicula: MovieModel) {
-        usuario.anadirAlHistorial(pelicula) { }
-    }
-
     fun errorMostrado() {
         _error.value = null
     }

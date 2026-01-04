@@ -401,16 +401,20 @@ class FirebaseUserRepository(
 
     override fun historial(alTerminar: (List<MovieModel>) -> Unit) = leerLista(HISTORIAL, alTerminar)
 
+    /**
+     * Mete la pelicula al final del historial, quitandola antes si ya estaba.
+     *
+     * Las dos escrituras van seguidas sin esperar a la primera: Firestore aplica en orden lo
+     * que se le manda al mismo documento, asi que el resultado es el mismo y ademas funciona
+     * sin cobertura. Esperando al `addOnCompleteListener` de la primera, sin red la segunda
+     * no llegaba a lanzarse nunca y el historial no se guardaba.
+     */
     override fun anadirAlHistorial(pelicula: MovieModel, alTerminar: (Boolean) -> Unit) {
         val documento = documentoDelUsuario() ?: return alTerminar(false)
-        // arrayRemove antes de arrayUnion para que lo visto de nuevo suba al final y el
-        // historial quede en orden de visita, sin duplicados.
+        // El arrayRemove antes del arrayUnion es para que lo visto de nuevo suba al final y
+        // el historial quede en orden de visita, sin repetidos.
         documento.set(mapOf(HISTORIAL to FieldValue.arrayRemove(pelicula)), SetOptions.merge())
-            .addOnCompleteListener {
-                documento.set(mapOf(HISTORIAL to FieldValue.arrayUnion(pelicula)), SetOptions.merge())
-                    .addOnSuccessListener { alTerminar(true) }
-                    .addOnFailureListener { alTerminar(false) }
-            }
+        escribirSinEsperar(documento, mapOf(HISTORIAL to FieldValue.arrayUnion(pelicula)), alTerminar)
     }
 
     override fun borrarHistorial(alTerminar: (Boolean) -> Unit) {
