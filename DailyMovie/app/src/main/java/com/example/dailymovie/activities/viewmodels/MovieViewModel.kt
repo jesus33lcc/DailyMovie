@@ -104,6 +104,11 @@ class MovieViewModel(
         peliculaAbierta = pelicula
         usuario.esFavorita(pelicula.id) { favorita.empezarEn(it) }
         usuario.estaVista(pelicula.id) { vista.empezarEn(it) }
+
+        // Abrir la ficha es "haberla mirado". La seccion "Lo que has mirado antes" de Explorar
+        // llevaba desde siempre pintandose vacia porque nadie llamaba a esto: el repositorio,
+        // el ViewModel y la pantalla estaban, pero faltaba quien lo disparara.
+        usuario.anadirAlHistorial(pelicula) { }
     }
 
     /** Le da la vuelta a "favorita". El icono cambia ya; guardar es cosa de [Marcado]. */
