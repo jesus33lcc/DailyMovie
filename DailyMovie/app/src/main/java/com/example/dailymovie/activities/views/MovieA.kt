@@ -30,7 +30,7 @@ import com.example.dailymovie.utils.rebotar
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.adapters.ResenaAdapter
-import com.example.dailymovie.utils.abrirConCartel
+import com.example.dailymovie.utils.abrirFicha
 import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.databinding.ActivityMovieBinding
 import com.example.dailymovie.adapters.ImagenAdapter
@@ -163,13 +163,7 @@ class MovieA : AppCompatActivity() {
     }
 
     /** Abre otra pelicula desde las tiras de similares y recomendadas. */
-    private fun abrirOtra(hallazgo: Hallazgo, cartel: View) {
-        abrirConCartel(
-            Intent(this, MovieA::class.java).putExtra(EXTRA_MOVIE_ID, hallazgo.id),
-            cartel,
-            HallazgoAdapter.nombreDeTransicion(hallazgo)
-        )
-    }
+    private fun abrirOtra(hallazgo: Hallazgo, cartel: View) = abrirFicha(hallazgo, cartel)
 
     /**
      * El boton que lleva a la pelicula fuera de la app.

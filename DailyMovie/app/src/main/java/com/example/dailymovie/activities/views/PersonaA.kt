@@ -11,7 +11,7 @@ import com.example.dailymovie.utils.cargarFotoDePersona
 import com.example.dailymovie.activities.viewmodels.PersonaViewModel
 import com.example.dailymovie.adapters.ImagenAdapter
 import com.example.dailymovie.adapters.HallazgoAdapter
-import com.example.dailymovie.utils.abrirConCartel
+import com.example.dailymovie.utils.abrirFicha
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.data.Filmografia
@@ -159,15 +159,6 @@ class PersonaA : AppCompatActivity() {
         adaptador.submitList(trabajos.map { Hallazgo.de(it) })
     }
 
-    /** Las series abren la ficha de serie; todo lo demas, la de pelicula. */
-    private fun abrirFicha(hallazgo: Hallazgo, cartel: View) {
-        val destino = if (hallazgo.tipo == TipoDeHallazgo.SERIE) {
-            Intent(this, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, hallazgo.id)
-        } else {
-            Intent(this, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
-        }
-        abrirConCartel(destino, cartel, HallazgoAdapter.nombreDeTransicion(hallazgo))
-    }
 
     companion object {
         const val EXTRA_PERSONA_ID = "PERSONA_ID"

@@ -24,7 +24,7 @@ import com.example.dailymovie.activities.views.PersonaA
 import com.example.dailymovie.activities.views.SagaA
 import com.example.dailymovie.activities.views.SerieA
 import com.example.dailymovie.adapters.HallazgoAdapter
-import com.example.dailymovie.utils.abrirConCartel
+import com.example.dailymovie.utils.abrirFicha
 import com.example.dailymovie.utils.siLaVistaSigueAhi
 import com.example.dailymovie.databinding.FragmentExplorarBinding
 import com.example.dailymovie.fragments.viewmodels.ExplorarViewModel
@@ -458,33 +458,19 @@ class ExplorarF : Fragment() {
 
     // ---------------- Ir a la ficha ----------------
 
+    /**
+     * Abre lo que se ha tocado y lo apunta como buscado.
+     *
+     * Abrir un resultado tambien cuenta como buscar a proposito: hasta ahora solo se guardaba
+     * al pulsar la lupa del teclado, y casi nadie la pulsa. Se escribe, se mira lo que sale y
+     * se toca, asi que "lo ultimo que buscaste" salia casi siempre vacio.
+     */
     private fun abrir(hallazgo: Hallazgo, cartel: View? = null) {
-        // Abrir un resultado tambien cuenta como buscar a proposito: hasta ahora solo se
-        // guardaba al pulsar la lupa del teclado, y casi nadie la pulsa. Se escribe, se mira
-        // lo que sale y se toca, asi que "lo ultimo que buscaste" salia casi siempre vacio.
         val consulta = binding.searchInput.text.toString().trim()
         if (consulta.length >= MINIMO_PARA_GUARDAR) {
             BusquedasRecientes.guardar(requireContext(), consulta)
         }
-
-        val destino = when (hallazgo.tipo) {
-            TipoDeHallazgo.PELICULA ->
-                Intent(context, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
-            TipoDeHallazgo.SERIE ->
-                Intent(context, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, hallazgo.id)
-            TipoDeHallazgo.PERSONA ->
-                Intent(context, PersonaA::class.java).putExtra(PersonaA.EXTRA_PERSONA_ID, hallazgo.id)
-            TipoDeHallazgo.SAGA ->
-                Intent(context, SagaA::class.java)
-                    .putExtra(SagaA.EXTRA_SAGA_ID, hallazgo.id)
-                    .putExtra(SagaA.EXTRA_NOMBRE, hallazgo.titulo)
-        }
-        if (cartel == null) {
-            startActivity(destino)
-        } else {
-            requireActivity()
-                .abrirConCartel(destino, cartel, HallazgoAdapter.nombreDeTransicion(hallazgo))
-        }
+        requireActivity().abrirFicha(hallazgo, cartel)
     }
 
     private companion object {
