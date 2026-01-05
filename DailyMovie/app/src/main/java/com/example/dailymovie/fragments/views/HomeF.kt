@@ -17,7 +17,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.dailymovie.R
 import com.example.dailymovie.utils.cargarFotogramaDeUrl
 import com.example.dailymovie.adapters.HallazgoAdapter
-import com.example.dailymovie.utils.abrirConCartel
+import com.example.dailymovie.utils.abrirFicha
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -142,19 +142,10 @@ class HomeF : Fragment() {
             lista.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
         val adaptador = lista.adapter as? HallazgoAdapter
-            ?: HallazgoAdapter { hallazgo, cartel -> abrirFicha(hallazgo, cartel) }.also { lista.adapter = it }
+            ?: HallazgoAdapter { hallazgo, cartel -> requireActivity().abrirFicha(hallazgo, cartel) }.also { lista.adapter = it }
         adaptador.submitList(hallazgos)
     }
 
-    private fun abrirFicha(hallazgo: Hallazgo, cartel: View) {
-        val destino = when (hallazgo.tipo) {
-            TipoDeHallazgo.SERIE ->
-                Intent(context, SerieA::class.java).putExtra(SerieA.EXTRA_SERIE_ID, hallazgo.id)
-            else ->
-                Intent(context, MovieA::class.java).putExtra(MovieA.EXTRA_MOVIE_ID, hallazgo.id)
-        }
-        requireActivity().abrirConCartel(destino, cartel, HallazgoAdapter.nombreDeTransicion(hallazgo))
-    }
 
     /**
      * Quita el hueco con brillo de una fila, ya con sus peliculas dentro.
