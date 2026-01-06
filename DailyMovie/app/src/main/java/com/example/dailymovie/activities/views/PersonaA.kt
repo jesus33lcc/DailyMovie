@@ -17,6 +17,7 @@ import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.data.Filmografia
 import com.example.dailymovie.databinding.ActivityPersonaBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.graphics.pintarTira
 import com.example.dailymovie.models.PersonModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.Fechas
@@ -153,10 +154,9 @@ class PersonaA : AppCompatActivity() {
         lista: androidx.recyclerview.widget.RecyclerView,
         trabajos: List<com.example.dailymovie.client.response.PeliculaDePersona>
     ) {
-        val adaptador = lista.adapter as? HallazgoAdapter
-            ?: HallazgoAdapter { hallazgo, cartel -> abrirFicha(hallazgo, cartel) }
-                .also { lista.adapter = it }
-        adaptador.submitList(trabajos.map { Hallazgo.de(it) })
+        lista.pintarTira(trabajos.map { Hallazgo.de(it) }) { hallazgo, cartel ->
+            abrirFicha(hallazgo, cartel)
+        }
     }
 
 
