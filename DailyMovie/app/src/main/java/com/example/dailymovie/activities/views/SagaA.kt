@@ -12,6 +12,7 @@ import com.example.dailymovie.data.siFalla
 import com.example.dailymovie.data.siVaBien
 import com.example.dailymovie.databinding.ActivitySagaBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.graphics.columnasDeCarteles
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.utils.Avisos
 import com.example.dailymovie.utils.abrirFicha
@@ -40,7 +41,7 @@ class SagaA : AppCompatActivity() {
         binding.txtTituloSaga.text = intent.getStringExtra(EXTRA_NOMBRE).orEmpty()
 
         val adaptador = HallazgoAdapter { hallazgo, cartel -> abrirFicha(hallazgo, cartel) }
-        binding.rvPeliculasDeLaSaga.layoutManager = GridLayoutManager(this, columnasQueCaben())
+        binding.rvPeliculasDeLaSaga.layoutManager = GridLayoutManager(this, columnasDeCarteles())
         binding.rvPeliculasDeLaSaga.adapter = adaptador
         binding.rvPeliculasDeLaSaga.addItemDecoration(SpacingItemDecoration.deLista(this))
 
@@ -69,12 +70,6 @@ class SagaA : AppCompatActivity() {
         return if (primero == ultimo) "$cuantas · $primero" else "$cuantas · $primero - $ultimo"
     }
 
-    private fun columnasQueCaben(): Int {
-        val anchoPantalla = resources.displayMetrics.widthPixels
-        val anchoCartel = resources.getDimensionPixelSize(R.dimen.poster_ancho)
-        val separacion = resources.getDimensionPixelSize(R.dimen.recycler_view_spacing)
-        return ((anchoPantalla - separacion * 4) / (anchoCartel + separacion * 2)).coerceAtLeast(2)
-    }
 
     companion object {
         const val EXTRA_SAGA_ID = "SAGA_ID"

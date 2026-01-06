@@ -22,6 +22,7 @@ import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.graphics.pintarTira
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.utils.Trailers
 import com.example.dailymovie.utils.mensaje
@@ -71,19 +72,19 @@ class HomeF : Fragment() {
         // Cada fila apaga su propio hueco cuando le llegan sus peliculas, en vez de esperar
         // a que terminen las cuatro: si una tarda mas, las demas ya se ven.
         homeViewModel.nowPlayingMovies.observe(viewLifecycleOwner, Observer { movies ->
-            pintarTira(binding.recyclerViewNowPlaying, movies.map { Hallazgo.de(it) })
+            binding.recyclerViewNowPlaying.pintarTira(movies.map { Hallazgo.de(it) }) { h, c -> requireActivity().abrirFicha(h, c) }
             apagarFantasma(binding.fantasmaNowPlaying.root)
         })
         homeViewModel.popularMovies.observe(viewLifecycleOwner, Observer { movies ->
-            pintarTira(binding.recyclerViewPopular, movies.map { Hallazgo.de(it) })
+            binding.recyclerViewPopular.pintarTira(movies.map { Hallazgo.de(it) }) { h, c -> requireActivity().abrirFicha(h, c) }
             apagarFantasma(binding.fantasmaPopular.root)
         })
         homeViewModel.topRatedMovies.observe(viewLifecycleOwner, Observer { movies ->
-            pintarTira(binding.recyclerViewTopRated, movies.map { Hallazgo.de(it) })
+            binding.recyclerViewTopRated.pintarTira(movies.map { Hallazgo.de(it) }) { h, c -> requireActivity().abrirFicha(h, c) }
             apagarFantasma(binding.fantasmaTopRated.root)
         })
         homeViewModel.upcomingMovies.observe(viewLifecycleOwner, Observer { movies ->
-            pintarTira(binding.recyclerViewUpcoming, movies.map { Hallazgo.de(it) })
+            binding.recyclerViewUpcoming.pintarTira(movies.map { Hallazgo.de(it) }) { h, c -> requireActivity().abrirFicha(h, c) }
             apagarFantasma(binding.fantasmaUpcoming.root)
         })
 
@@ -102,13 +103,11 @@ class HomeF : Fragment() {
         })
 
         homeViewModel.seriesEmpezadas.observe(viewLifecycleOwner) { empezadas ->
-            binding.seccionSigueViendo.visibility =
-                if (empezadas.isEmpty()) View.GONE else View.VISIBLE
             // En esta fila el año de estreno no dice nada: lo que interesa es por donde vas.
-            pintarTira(
-                binding.recyclerSigueViendo,
-                empezadas.map { it.serie.copy(subtituloLibre = it.comoVas()) }
-            )
+            binding.recyclerSigueViendo.pintarTira(
+                empezadas.map { it.serie.copy(subtituloLibre = it.comoVas()) },
+                seccion = binding.seccionSigueViendo
+            ) { hallazgo, cartel -> requireActivity().abrirFicha(hallazgo, cartel) }
         }
 
         homeViewModel.cargando.observe(viewLifecycleOwner, Observer { cargando ->
@@ -132,19 +131,6 @@ class HomeF : Fragment() {
      * pelicula o serie y el aviso de "Proximamente" en lo que aun no ha salido. Antes cada
      * pantalla tenia su propio adaptador haciendo lo mismo con otro diseño.
      */
-    private fun pintarTira(lista: RecyclerView, hallazgos: List<Hallazgo>) {
-        if (lista.itemDecorationCount == 0) {
-            lista.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
-        }
-        // Las cuatro filas fijas lo tienen puesto arriba; "Sigue viendo" aparece y desaparece,
-        // asi que se le pone aqui la primera vez que le toca pintar algo.
-        if (lista.layoutManager == null) {
-            lista.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        }
-        val adaptador = lista.adapter as? HallazgoAdapter
-            ?: HallazgoAdapter { hallazgo, cartel -> requireActivity().abrirFicha(hallazgo, cartel) }.also { lista.adapter = it }
-        adaptador.submitList(hallazgos)
-    }
 
 
     /**

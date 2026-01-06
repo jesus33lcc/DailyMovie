@@ -18,6 +18,7 @@ import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.databinding.FragmentSeriesBinding
 import com.example.dailymovie.fragments.viewmodels.SeriesViewModel
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.graphics.pintarTira
 import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.utils.Avisos
 
@@ -44,13 +45,19 @@ class SeriesF : Fragment() {
         prepararLista(binding.recyclerSeriesMejorValoradas)
 
         viewModel.enEmision.observe(viewLifecycleOwner) {
-            pintarTira(binding.recyclerEnEmision, it.map { serie -> Hallazgo.de(serie) })
+            binding.recyclerEnEmision.pintarTira(it.map { serie -> Hallazgo.de(serie) }) { hallazgo, cartel ->
+                requireActivity().abrirFicha(hallazgo, cartel)
+            }
         }
         viewModel.populares.observe(viewLifecycleOwner) {
-            pintarTira(binding.recyclerSeriesPopulares, it.map { serie -> Hallazgo.de(serie) })
+            binding.recyclerSeriesPopulares.pintarTira(it.map { serie -> Hallazgo.de(serie) }) { hallazgo, cartel ->
+                requireActivity().abrirFicha(hallazgo, cartel)
+            }
         }
         viewModel.mejorValoradas.observe(viewLifecycleOwner) {
-            pintarTira(binding.recyclerSeriesMejorValoradas, it.map { serie -> Hallazgo.de(serie) })
+            binding.recyclerSeriesMejorValoradas.pintarTira(it.map { serie -> Hallazgo.de(serie) }) { hallazgo, cartel ->
+                requireActivity().abrirFicha(hallazgo, cartel)
+            }
         }
 
         viewModel.cargando.observe(viewLifecycleOwner) {
@@ -77,14 +84,6 @@ class SeriesF : Fragment() {
      * pelicula o serie y el aviso de "Proximamente" en lo que aun no ha salido. Antes cada
      * pantalla tenia su propio adaptador haciendo lo mismo con otro diseño.
      */
-    private fun pintarTira(lista: RecyclerView, hallazgos: List<Hallazgo>) {
-        if (lista.itemDecorationCount == 0) {
-            lista.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
-        }
-        val adaptador = lista.adapter as? HallazgoAdapter
-            ?: HallazgoAdapter { hallazgo, cartel -> requireActivity().abrirFicha(hallazgo, cartel) }.also { lista.adapter = it }
-        adaptador.submitList(hallazgos)
-    }
 
 
     private fun prepararLista(lista: androidx.recyclerview.widget.RecyclerView) {

@@ -12,6 +12,7 @@ import com.example.dailymovie.R
 import com.example.dailymovie.adapters.CustomMovieListAdapter
 import com.example.dailymovie.databinding.ActivityListMoviesBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.graphics.columnasDeCarteles
 import com.example.dailymovie.data.ListaFija
 import com.example.dailymovie.models.Guardado
 import com.example.dailymovie.models.MovieModel
@@ -48,26 +49,12 @@ class ListMoviesA : AppCompatActivity() {
             onOpciones = { elemento, boton, posicion -> mostrarOpciones(elemento, boton, posicion) }
         )
 
-        binding.recyclerViewMovies.layoutManager = GridLayoutManager(this, columnasQueCaben())
+        binding.recyclerViewMovies.layoutManager = GridLayoutManager(this, columnasDeCarteles())
         binding.recyclerViewMovies.adapter = movieListAdapter
         binding.recyclerViewMovies.addItemDecoration(SpacingItemDecoration.deLista(this))
         movieListAdapter.submitList(movieList.toList())
     }
 
-    /**
-     * Cuantos carteles caben a lo ancho.
-     *
-     * Se calcula en vez de fijar un numero porque la misma cuenta vale para un movil en
-     * vertical, para el mismo movil girado y para la tablet, donde el cartel ademas es mas
-     * grande porque sale de otro dimens.
-     */
-    private fun columnasQueCaben(): Int {
-        val anchoPantalla = resources.displayMetrics.widthPixels
-        val anchoCartel = resources.getDimensionPixelSize(R.dimen.poster_ancho)
-        val separacion = resources.getDimensionPixelSize(R.dimen.recycler_view_spacing)
-        val margenes = resources.getDimensionPixelSize(R.dimen.recycler_view_spacing) * 4
-        return ((anchoPantalla - margenes) / (anchoCartel + separacion * 2)).coerceAtLeast(2)
-    }
 
     override fun onResume() {
         super.onResume()

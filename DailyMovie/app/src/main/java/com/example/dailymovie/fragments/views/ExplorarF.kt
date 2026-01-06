@@ -30,6 +30,7 @@ import com.example.dailymovie.databinding.FragmentExplorarBinding
 import com.example.dailymovie.fragments.viewmodels.ExplorarViewModel
 import com.example.dailymovie.fragments.viewmodels.OrdenDeBusqueda
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.graphics.columnasDeCarteles
 import com.example.dailymovie.models.FiltrosAvanzados
 import com.example.dailymovie.models.GeneroExplorable
 import com.example.dailymovie.models.Hallazgo
@@ -143,7 +144,7 @@ class ExplorarF : Fragment() {
 
     private fun prepararResultados() {
         resultadosAdapter = HallazgoAdapter { hallazgo, cartel -> abrir(hallazgo, cartel) }
-        binding.rvListaBusqueda.layoutManager = GridLayoutManager(context, columnasQueCaben())
+        binding.rvListaBusqueda.layoutManager = GridLayoutManager(context, requireContext().columnasDeCarteles())
         binding.rvListaBusqueda.adapter = resultadosAdapter
         binding.rvListaBusqueda.addItemDecoration(SpacingItemDecoration.deLista(requireContext()))
 
@@ -161,13 +162,6 @@ class ExplorarF : Fragment() {
         })
     }
 
-    /** Las mismas columnas que en las listas: lo que quepa segun el ancho que haya. */
-    private fun columnasQueCaben(): Int {
-        val ancho = resources.displayMetrics.widthPixels
-        val cartel = resources.getDimensionPixelSize(R.dimen.poster_ancho)
-        val hueco = resources.getDimensionPixelSize(R.dimen.recycler_view_spacing)
-        return ((ancho - hueco * 4) / (cartel + hueco * 2)).coerceAtLeast(2)
-    }
 
     private fun prepararFiltros() {
         listOf(

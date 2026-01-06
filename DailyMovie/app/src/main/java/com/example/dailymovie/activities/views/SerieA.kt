@@ -30,10 +30,12 @@ import com.example.dailymovie.client.response.SerieDetailsResponse
 import com.example.dailymovie.databinding.ActivitySerieBinding
 import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.graphics.SpacingItemDecoration
+import com.example.dailymovie.graphics.pintarTira
 import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.DialogoDailyMovie
 import com.example.dailymovie.utils.abrirConCartel
+import com.example.dailymovie.utils.abrirFicha
 import com.example.dailymovie.utils.rebotar
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.utils.LocaleUtil
@@ -298,7 +300,7 @@ class SerieA : AppCompatActivity() {
     }
 
     /**
-     * Una tira de series con la tarjeta comun, y la seccion escondida si no hay nada.
+     * Una tira de series con la tarjeta comun.
      *
      * Al tocar una se abre su ficha, que es esta misma pantalla con otro id: se cierra la
      * actual para que el boton de atras no vaya dejando un rastro de fichas encadenadas.
@@ -308,22 +310,10 @@ class SerieA : AppCompatActivity() {
         lista: androidx.recyclerview.widget.RecyclerView,
         series: List<SerieModel>
     ) {
-        seccion.visibility = if (series.isEmpty()) View.GONE else View.VISIBLE
-        if (series.isEmpty()) return
-        lista.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        if (lista.itemDecorationCount == 0) {
-            lista.addItemDecoration(SpacingItemDecoration.deLista(this))
+        lista.pintarTira(series.map { Hallazgo.de(it) }, seccion) { hallazgo, cartel ->
+            abrirFicha(hallazgo, cartel)
+            finish()
         }
-        val adaptador = lista.adapter as? HallazgoAdapter
-            ?: HallazgoAdapter { hallazgo, cartel ->
-                abrirConCartel(
-                    Intent(this, SerieA::class.java).putExtra(EXTRA_SERIE_ID, hallazgo.id),
-                    cartel,
-                    HallazgoAdapter.nombreDeTransicion(hallazgo)
-                )
-                finish()
-            }.also { lista.adapter = it }
-        adaptador.submitList(series.map { Hallazgo.de(it) })
     }
 
     /** Cuantos episodios tiene la serie entera, para poder decir "llevas 12 de 62". */
