@@ -19,6 +19,7 @@ import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.utils.Avisos
 import com.example.dailymovie.utils.Constantes
+import com.example.dailymovie.utils.compartirRecomendacion
 
 class ListMoviesA : AppCompatActivity() {
 
@@ -139,13 +140,8 @@ class ListMoviesA : AppCompatActivity() {
     }
 
     private fun compartir(elemento: Guardado) {
-        val direccion = if (elemento.esSerie) Constantes.BASE_SERIE_URL else Constantes.BASE_MOVIE_URL
-        val queEs = if (elemento.esSerie) "esta serie" else "esta película"
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, "Te recomiendo $queEs: ${elemento.titulo}\n$direccion${elemento.id}")
-        }
-        startActivity(Intent.createChooser(intent, "Compartir"))
+        val base = if (elemento.esSerie) Constantes.BASE_SERIE_URL else Constantes.BASE_MOVIE_URL
+        compartirRecomendacion(elemento.titulo, "$base${elemento.id}")
     }
 
     /**
