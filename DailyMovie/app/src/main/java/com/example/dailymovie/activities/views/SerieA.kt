@@ -35,6 +35,10 @@ import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.DialogoDailyMovie
 import com.example.dailymovie.utils.abrirConCartel
+import com.example.dailymovie.utils.avisoDeListas
+import com.example.dailymovie.utils.elegirListas
+import com.example.dailymovie.utils.compartirRecomendacion
+import com.example.dailymovie.utils.menuDeEnlaces
 import com.example.dailymovie.utils.abrirFicha
 import com.example.dailymovie.utils.rebotar
 import com.example.dailymovie.utils.Fechas
@@ -269,33 +273,15 @@ class SerieA : AppCompatActivity() {
      * Lo mismo que en la ficha de pelicula: TMDB da el id de IMDb y la web oficial sin coste
      * extra, y es donde la gente va a mirar la ficha "de verdad".
      */
+    /** El boton que lleva la serie fuera de la app, igual que en la ficha de pelicula. */
     private fun prepararEnlaces(serie: SerieDetailsResponse) {
-        val enlaces = buildList {
-            serie.idsExternos?.imdb?.takeIf { it.isNotBlank() }
-                ?.let { add("Ver en IMDb" to "https://www.imdb.com/title/$it/") }
-            serie.web?.takeIf { it.isNotBlank() }?.let { add("Web oficial" to it) }
-            add("Ver en TMDB" to "https://www.themoviedb.org/tv/${serie.id}")
-        }
-
         binding.btnEnlacesSerie.setOnClickListener { boton ->
-            PopupMenu(ContextThemeWrapper(this, R.style.TemaPopupDailyMovie), boton).apply {
-                enlaces.forEachIndexed { posicion, (titulo, _) -> menu.add(0, posicion, posicion, titulo) }
-                setOnMenuItemClickListener { opcion ->
-                    abrirEnElNavegador(enlaces[opcion.itemId].second)
-                    true
-                }
-                show()
-            }
-        }
-    }
-
-    /** Puede no haber navegador, asi que se avisa en vez de dejar que reviente. */
-    private fun abrirEnElNavegador(direccion: String) {
-        val intento = Intent(Intent.ACTION_VIEW, Uri.parse(direccion))
-        if (intento.resolveActivity(packageManager) != null) {
-            startActivity(intento)
-        } else {
-            Avisos.breve(binding.root, "No hay ningún navegador para abrirlo")
+            menuDeEnlaces(
+                boton,
+                imdbId = serie.idsExternos?.imdb,
+                webOficial = serie.web,
+                enTmdb = "https://www.themoviedb.org/tv/${serie.id}"
+            )
         }
     }
 
@@ -434,69 +420,18 @@ class SerieA : AppCompatActivity() {
     /** El mismo dialogo de casillas que en peliculas, pero con las listas de la serie. */
     private fun elegirListas(serie: SerieModel) {
         viewModel.listasDelUsuario { nombres ->
-            if (nombres.isEmpty()) {
-                DialogoDailyMovie.mostrar(
-                    context = this,
-                    titulo = "Guardar en una lista",
-                    mensaje = "Todavía no tienes ninguna lista tuya. Créala en la pestaña " +
-                        "Listas y aquí podrás guardar lo que quieras.",
-                    textoAceptar = "Entendido",
-                    textoCancelar = null
-                ) { it.dismiss() }
-                return@listasDelUsuario
-            }
-
             viewModel.listasConLaSerie(serie.id) { yaEstaba ->
-                // Dos saltos a Firestore antes de abrir la ventana: si el usuario se ha ido
-                // mientras tanto, el contexto ya no vale y abrirla revienta.
-                if (isFinishing || isDestroyed) return@listasConLaSerie
-                val marcadas = yaEstaba.toMutableSet()
-                val contenido = layoutInflater.inflate(R.layout.dialogo_listas, null)
-                val lista = contenido.findViewById<RecyclerView>(R.id.dialogoListas)
-                lista.layoutManager = LinearLayoutManager(this)
-                lista.adapter = ListaCasillaAdapter(nombres, marcadas)
-
-                DialogoDailyMovie.mostrar(
-                    context = this,
-                    titulo = "Guardar en una lista",
-                    mensaje = serie.titulo,
-                    contenido = contenido,
-                    textoAceptar = "Guardar"
-                ) { dialogo ->
-                    dialogo.dismiss()
-                    aplicarCambiosDeListas(serie, yaEstaba, marcadas)
+                elegirListas(serie.titulo, nombres, yaEstaba) { meter, sacar ->
+                    meter.forEach { viewModel.anadirALista(it, serie) { } }
+                    sacar.forEach { viewModel.quitarDeLista(it, serie) { } }
+                    Avisos.breve(binding.root, avisoDeListas(meter, sacar))
                 }
             }
         }
     }
 
-    /** Solo se tocan las listas que han cambiado. */
-    private fun aplicarCambiosDeListas(serie: SerieModel, antes: Set<String>, ahora: Set<String>) {
-        val meter = ahora - antes
-        val sacar = antes - ahora
-        if (meter.isEmpty() && sacar.isEmpty()) return
-
-        meter.forEach { viewModel.anadirALista(it, serie) { } }
-        sacar.forEach { viewModel.quitarDeLista(it, serie) { } }
-
-        val aviso = when {
-            meter.isNotEmpty() && sacar.isEmpty() -> "Guardada en ${meter.joinToString(", ")}"
-            meter.isEmpty() && sacar.isNotEmpty() -> "Quitada de ${sacar.joinToString(", ")}"
-            else -> "Listas actualizadas"
-        }
-        Avisos.breve(binding.root, aviso)
-    }
-
-    private fun compartir(serie: SerieModel) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(
-                Intent.EXTRA_TEXT,
-                "Te recomiendo esta serie: ${serie.titulo}\n${Constantes.BASE_SERIE_URL}${serie.id}"
-            )
-        }
-        startActivity(Intent.createChooser(intent, "Compartir serie"))
-    }
+    private fun compartir(serie: SerieModel) =
+        compartirRecomendacion(serie.titulo, "https://www.themoviedb.org/tv/${serie.id}")
 
     companion object {
         const val EXTRA_SERIE_ID = "SERIE_ID"

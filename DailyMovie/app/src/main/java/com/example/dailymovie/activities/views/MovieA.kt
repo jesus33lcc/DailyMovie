@@ -30,6 +30,10 @@ import com.example.dailymovie.utils.rebotar
 import com.example.dailymovie.utils.Fechas
 import com.example.dailymovie.activities.viewmodels.MovieViewModel
 import com.example.dailymovie.adapters.ResenaAdapter
+import com.example.dailymovie.utils.avisoDeListas
+import com.example.dailymovie.utils.elegirListas
+import com.example.dailymovie.utils.compartirRecomendacion
+import com.example.dailymovie.utils.menuDeEnlaces
 import com.example.dailymovie.utils.abrirFicha
 import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.databinding.ActivityMovieBinding
@@ -172,51 +176,21 @@ class MovieA : AppCompatActivity() {
      * que no cuesta nada ofrecerlos: es donde la gente va a mirar la ficha "de verdad" o a
      * comprar la entrada. Si no viene ninguno de los dos, el boton ni aparece.
      */
+    /** El boton que lleva la pelicula fuera de la app. */
     private fun prepararEnlaces(movie: MovieDetailsModel) {
-        val enlaces = buildList {
-            movie.imdbId?.takeIf { it.isNotBlank() }
-                ?.let { add("Ver en IMDb" to "https://www.imdb.com/title/$it/") }
-            movie.homepage?.takeIf { it.isNotBlank() }
-                ?.let { add("Web oficial" to it) }
-            add("Ver en TMDB" to "${Constantes.BASE_MOVIE_URL}${movie.id}")
-        }
-
         binding.btnEnlaces.visibility = View.VISIBLE
         binding.btnEnlaces.setOnClickListener { boton ->
-            PopupMenu(ContextThemeWrapper(this, R.style.TemaPopupDailyMovie), boton).apply {
-                enlaces.forEachIndexed { posicion, (titulo, _) -> menu.add(0, posicion, posicion, titulo) }
-                setOnMenuItemClickListener { opcion ->
-                    abrirEnElNavegador(enlaces[opcion.itemId].second)
-                    true
-                }
-                show()
-            }
+            menuDeEnlaces(
+                boton,
+                imdbId = movie.imdbId,
+                webOficial = movie.homepage,
+                enTmdb = "${Constantes.BASE_MOVIE_URL}${movie.id}"
+            )
         }
     }
 
-    /**
-     * Abre una direccion fuera de la app.
-     *
-     * Puede no haber navegador (una tablet muy pelada, un perfil restringido), asi que se
-     * avisa en vez de dejar que reviente.
-     */
-    private fun abrirEnElNavegador(direccion: String) {
-        val intento = Intent(Intent.ACTION_VIEW, Uri.parse(direccion))
-        if (intento.resolveActivity(packageManager) != null) {
-            startActivity(intento)
-        } else {
-            Avisos.breve(binding.root, "No hay ningún navegador para abrirlo")
-        }
-    }
-
-    private fun shareMovie(movie: MovieModel) {
-        val shareIntent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, "Te recomiendo esta pelicula: ${movie.title}\n${Constantes.BASE_MOVIE_URL}${movie.id}")
-            type = "text/plain"
-        }
-        startActivity(Intent.createChooser(shareIntent, "Compartir pelicula via"))
-    }
+    private fun shareMovie(movie: MovieModel) =
+        compartirRecomendacion(movie.title, "${Constantes.BASE_MOVIE_URL}${movie.id}")
 
     /**
      * Pinta un boton de guardar y le da el saltito cuando cambia.
@@ -254,61 +228,14 @@ class MovieA : AppCompatActivity() {
      */
     private fun showListSelectionDialog(movie: MovieModel) {
         movieViewModel.getCustomLists { nombres ->
-            if (nombres.isEmpty()) {
-                DialogoDailyMovie.mostrar(
-                    context = this,
-                    titulo = "Guardar en una lista",
-                    mensaje = "Todavía no tienes ninguna lista tuya. Créala en la pestaña " +
-                        "Listas y aquí podrás guardar lo que quieras.",
-                    textoAceptar = "Entendido",
-                    textoCancelar = null
-                ) { it.dismiss() }
-                return@getCustomLists
-            }
-
             movieViewModel.listasConLaPelicula(movie.id) { yaEstaba ->
-                // Dos saltos a Firestore antes de abrir la ventana: si el usuario se ha ido
-                // mientras tanto, el contexto ya no vale y abrirla revienta.
-                if (isFinishing || isDestroyed) return@listasConLaPelicula
-                val marcadas = yaEstaba.toMutableSet()
-                val contenido = layoutInflater.inflate(R.layout.dialogo_listas, null)
-                val lista = contenido.findViewById<RecyclerView>(R.id.dialogoListas)
-                lista.layoutManager = LinearLayoutManager(this)
-                lista.adapter = ListaCasillaAdapter(nombres, marcadas)
-
-                DialogoDailyMovie.mostrar(
-                    context = this,
-                    titulo = "Guardar en una lista",
-                    mensaje = movie.title,
-                    contenido = contenido,
-                    textoAceptar = "Guardar"
-                ) { dialogo ->
-                    dialogo.dismiss()
-                    aplicarCambiosDeListas(movie, yaEstaba, marcadas)
+                elegirListas(movie.title, nombres, yaEstaba) { meter, sacar ->
+                    meter.forEach { movieViewModel.addMovieToList(it, movie) { } }
+                    sacar.forEach { movieViewModel.removeMovieFromList(it, movie) { } }
+                    showToast(avisoDeListas(meter, sacar))
                 }
             }
         }
-    }
-
-    /** Solo se toca lo que ha cambiado: lo que se ha marcado y lo que se ha desmarcado. */
-    private fun aplicarCambiosDeListas(
-        movie: MovieModel,
-        antes: Set<String>,
-        ahora: Set<String>
-    ) {
-        val meter = ahora - antes
-        val sacar = antes - ahora
-        if (meter.isEmpty() && sacar.isEmpty()) return
-
-        meter.forEach { movieViewModel.addMovieToList(it, movie) { } }
-        sacar.forEach { movieViewModel.removeMovieFromList(it, movie) { } }
-
-        val aviso = when {
-            meter.isNotEmpty() && sacar.isEmpty() -> "Guardada en ${meter.joinToString(", ")}"
-            meter.isEmpty() && sacar.isNotEmpty() -> "Quitada de ${sacar.joinToString(", ")}"
-            else -> "Listas actualizadas"
-        }
-        showToast(aviso)
     }
 
     private fun convertToMovieDetailsModel(response: MovieDetailsResponse): MovieDetailsModel {
