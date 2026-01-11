@@ -3,19 +3,19 @@ package com.example.dailymovie.activities.views
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dailymovie.R
+import com.example.dailymovie.activities.viewmodels.SagaViewModel
 import com.example.dailymovie.adapters.HallazgoAdapter
-import com.example.dailymovie.data.Dependencias
-import com.example.dailymovie.data.siFalla
-import com.example.dailymovie.data.siVaBien
 import com.example.dailymovie.databinding.ActivitySagaBinding
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.graphics.columnasDeCarteles
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.utils.Avisos
 import com.example.dailymovie.utils.abrirFicha
+import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.utils.Fechas
 
 /**
@@ -31,7 +31,8 @@ import com.example.dailymovie.utils.Fechas
 class SagaA : AppCompatActivity() {
 
     private lateinit var binding: ActivitySagaBinding
-    private val repositorio = Dependencias.peliculas
+    private val viewModel: SagaViewModel by viewModels()
+    private lateinit var adaptador: HallazgoAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,24 +41,26 @@ class SagaA : AppCompatActivity() {
 
         binding.txtTituloSaga.text = intent.getStringExtra(EXTRA_NOMBRE).orEmpty()
 
-        val adaptador = HallazgoAdapter { hallazgo, cartel -> abrirFicha(hallazgo, cartel) }
+        adaptador = HallazgoAdapter { hallazgo, cartel -> abrirFicha(hallazgo, cartel) }
         binding.rvPeliculasDeLaSaga.layoutManager = GridLayoutManager(this, columnasDeCarteles())
         binding.rvPeliculasDeLaSaga.adapter = adaptador
         binding.rvPeliculasDeLaSaga.addItemDecoration(SpacingItemDecoration.deLista(this))
 
-        val sagaId = intent.getIntExtra(EXTRA_SAGA_ID, 0)
-        repositorio.peliculasDeLaSaga(sagaId) { resultado ->
-            binding.progresoSaga.visibility = View.GONE
-            resultado.siVaBien { encontradas ->
-                // Por orden de estreno: TMDB no siempre las devuelve ordenadas, y una saga
-                // desordenada no sirve de nada.
-                val peliculas = encontradas.sortedBy { it.releaseDate }.map { Hallazgo.de(it) }
-                adaptador.submitList(peliculas)
-                binding.txtCuantas.text = resumen(peliculas)
-            }.siFalla {
-                Avisos.breve(binding.root, "No hemos podido cargar la saga")
+        viewModel.peliculasDeLaSaga.observe(this) { peliculas ->
+            adaptador.submitList(peliculas)
+            binding.txtCuantas.text = resumen(peliculas)
+        }
+        viewModel.cargando.observe(this) { cargando ->
+            binding.progresoSaga.visibility = if (cargando) View.VISIBLE else View.GONE
+        }
+        viewModel.error.observe(this) { error ->
+            error?.let {
+                Avisos.breve(binding.root, getString(it.mensaje()))
+                viewModel.errorMostrado()
             }
         }
+
+        viewModel.cargar(intent.getIntExtra(EXTRA_SAGA_ID, 0))
     }
 
     /** "3 películas · 1972 - 1990", que es lo que se quiere saber de un vistazo. */
