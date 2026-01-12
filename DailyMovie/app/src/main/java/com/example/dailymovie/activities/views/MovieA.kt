@@ -38,6 +38,8 @@ import com.example.dailymovie.utils.abrirFicha
 import com.example.dailymovie.client.response.ResenaResponse
 import com.example.dailymovie.databinding.ActivityMovieBinding
 import com.example.dailymovie.adapters.ImagenAdapter
+import com.example.dailymovie.graphics.mostrarSi
+import com.example.dailymovie.graphics.ponerOEsconder
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.utils.DialogoDailyMovie
 import com.example.dailymovie.utils.LocaleUtil
@@ -308,48 +310,38 @@ class MovieA : AppCompatActivity() {
 
     private fun displayMovieDetails(movie: MovieDetailsModel) {
         binding.txtTituloMovie.text = movie.title
-        binding.txtTaglineMovie.text = movie.tagline
-        binding.txtTaglineMovie.visibility = if (movie.tagline.isNullOrEmpty()) View.GONE else View.VISIBLE
+        binding.txtTaglineMovie.ponerOEsconder(movie.tagline)
 
         movieViewModel.movieCredits.value?.let { mostrarDirector(it) }
 
         // Si aun no ha salido se dice, y se enseña la fecha entera en vez del año suelto:
         // "2026" no aclara si ya se puede ver o si queda medio año.
         val porVenir = Fechas.estaPorVenir(movie.releaseDate)
-        val releaseYear = movie.releaseDate.take(4)
-        binding.txtAnioMovie.text = if (porVenir) {
-            getString(R.string.proximamente, Fechas.enLargo(movie.releaseDate))
-        } else {
-            releaseYear
-        }
+        val ano = movie.releaseDate.take(4)
+        binding.txtAnioMovie.ponerOEsconder(
+            if (porVenir) getString(R.string.proximamente, Fechas.enLargo(movie.releaseDate)) else ano
+        )
         // La etiqueta "Año:" sobra cuando el texto ya empieza por "Próximamente".
-        binding.txtAnioLabel.visibility =
-            if (releaseYear.isEmpty() || porVenir) View.GONE else View.VISIBLE
-        binding.txtAnioMovie.visibility = if (releaseYear.isEmpty()) View.GONE else View.VISIBLE
+        binding.txtAnioLabel.mostrarSi(ano.isNotEmpty() && !porVenir)
 
-        binding.txtValoracionLabel.visibility = if (movie.voteAverage == 0.0) View.GONE else View.VISIBLE
-        binding.txtValoracionMovie.text = getString(R.string.nota_estrella, movie.voteAverage)
-        binding.txtValoracionMovie.visibility = if (movie.voteAverage == 0.0) View.GONE else View.VISIBLE
-
-        binding.txtOverviewLabel.visibility = if (movie.overview.isNullOrEmpty()) View.GONE else View.VISIBLE
-        binding.txtOverviewMovie.text = movie.overview
-        binding.txtOverviewMovie.visibility = if (movie.overview.isNullOrEmpty()) View.GONE else View.VISIBLE
-
-        binding.txtGenresLabel.visibility = if (movie.genres.isEmpty()) View.GONE else View.VISIBLE
-        binding.txtGenresMovie.text = movie.genres.joinToString { it.name }
-        binding.txtGenresMovie.visibility = if (movie.genres.isEmpty()) View.GONE else View.VISIBLE
-
-        binding.txtRuntimeLabel.visibility = if (movie.runtime == 0) View.GONE else View.VISIBLE
-        binding.txtRuntimeMovie.text = Cifras.duracion(movie.runtime)
-        binding.txtRuntimeMovie.visibility = if (movie.runtime == 0) View.GONE else View.VISIBLE
-
-        binding.txtBudgetLabel.visibility = if (movie.budget == 0) View.GONE else View.VISIBLE
-        binding.txtBudgetMovie.text = Cifras.dinero(movie.budget.toLong())
-        binding.txtBudgetMovie.visibility = if (movie.budget == 0) View.GONE else View.VISIBLE
-
-        binding.txtRevenueLabel.visibility = if (movie.revenue == 0L) View.GONE else View.VISIBLE
-        binding.txtRevenueMovie.text = Cifras.dinero(movie.revenue.toLong())
-        binding.txtRevenueMovie.visibility = if (movie.revenue == 0L) View.GONE else View.VISIBLE
+        binding.txtValoracionMovie.ponerOEsconder(
+            getString(R.string.nota_estrella, movie.voteAverage).takeIf { movie.voteAverage > 0 },
+            binding.txtValoracionLabel
+        )
+        binding.txtOverviewMovie.ponerOEsconder(movie.overview, binding.txtOverviewLabel)
+        binding.txtGenresMovie.ponerOEsconder(
+            movie.genres.joinToString { it.name }.takeIf { movie.genres.isNotEmpty() },
+            binding.txtGenresLabel
+        )
+        binding.txtRuntimeMovie.ponerOEsconder(
+            Cifras.duracion(movie.runtime), binding.txtRuntimeLabel
+        )
+        binding.txtBudgetMovie.ponerOEsconder(
+            Cifras.dinero(movie.budget.toLong()), binding.txtBudgetLabel
+        )
+        binding.txtRevenueMovie.ponerOEsconder(
+            Cifras.dinero(movie.revenue), binding.txtRevenueLabel
+        )
 
         binding.imgPosterMovie.cargarCartel(movie.posterPath)
         mostrarSaga(movie.belongsToCollection)
@@ -364,7 +356,7 @@ class MovieA : AppCompatActivity() {
                 binding.txtBudgetMovie.text.isNotEmpty() ||
                 binding.txtRevenueMovie.text.isNotEmpty()
 
-        binding.sectionDetails.visibility = if (hasContent) View.VISIBLE else View.GONE
+        binding.sectionDetails.mostrarSi(hasContent)
     }
 
     /**

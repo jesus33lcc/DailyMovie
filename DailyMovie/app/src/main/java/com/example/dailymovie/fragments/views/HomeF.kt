@@ -21,6 +21,7 @@ import com.example.dailymovie.utils.abrirFicha
 import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.databinding.FragmentHomeBinding
 import com.facebook.shimmer.ShimmerFrameLayout
+import com.example.dailymovie.graphics.mostrarSi
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.graphics.pintarTira
 import com.example.dailymovie.models.MovieOfTheDay
@@ -159,20 +160,20 @@ class HomeF : Fragment() {
 
         // La fecha es la del dia que se curo; en una recomendada no significa nada.
         val esCurada = !movie.author.isNullOrBlank()
-        binding.lblFecha.visibility = if (esCurada) View.VISIBLE else View.GONE
-        binding.movieDate.visibility = if (esCurada) View.VISIBLE else View.GONE
+        binding.lblFecha.mostrarSi(esCurada)
+        binding.movieDate.mostrarSi(esCurada)
         binding.movieDate.text =
             if (esCurada) SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date()) else ""
 
         // La curada a mano la firma alguien; la recomendada no tiene autor, tiene motivo.
         // Solo se enseña lo que haya, y nunca los dos a la vez.
         val hayAutor = !movie.author.isNullOrBlank()
-        binding.lblAutor.visibility = if (hayAutor) View.VISIBLE else View.GONE
-        binding.movieAuthor.visibility = if (hayAutor) View.VISIBLE else View.GONE
+        binding.lblAutor.mostrarSi(hayAutor)
+        binding.movieAuthor.mostrarSi(hayAutor)
         binding.movieAuthor.text = movie.author.orEmpty()
 
         val hayMotivo = !movie.motivo.isNullOrBlank()
-        binding.txtMotivo.visibility = if (hayMotivo) View.VISIBLE else View.GONE
+        binding.txtMotivo.mostrarSi(hayMotivo)
         binding.txtMotivo.text = movie.motivo.orEmpty()
 
         mostrarTrailer(movie.videoId)

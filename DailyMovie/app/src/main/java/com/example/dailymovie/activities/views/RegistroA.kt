@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dailymovie.activities.viewmodels.RegistroViewModel
+import com.example.dailymovie.graphics.mostrarSi
 import com.example.dailymovie.databinding.ActivityRegistroBinding
 import com.example.dailymovie.utils.AccesoGoogle
 import com.example.dailymovie.utils.Avisos
@@ -69,7 +70,7 @@ class RegistroA : AppCompatActivity() {
         }
 
         viewModel.cargando.observe(this) { cargando ->
-            binding.registerProgress.visibility = if (cargando) View.VISIBLE else View.GONE
+            binding.registerProgress.mostrarSi(cargando)
             binding.registerBtn.isEnabled = !cargando
             binding.registerGoogleBtn.isEnabled = !cargando
         }

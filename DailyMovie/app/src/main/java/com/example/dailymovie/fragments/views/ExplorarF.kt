@@ -29,6 +29,7 @@ import com.example.dailymovie.utils.siLaVistaSigueAhi
 import com.example.dailymovie.databinding.FragmentExplorarBinding
 import com.example.dailymovie.fragments.viewmodels.ExplorarViewModel
 import com.example.dailymovie.fragments.viewmodels.OrdenDeBusqueda
+import com.example.dailymovie.graphics.mostrarSi
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.graphics.columnasDeCarteles
 import com.example.dailymovie.models.FiltrosAvanzados
@@ -114,8 +115,7 @@ class ExplorarF : Fragment() {
         // cuando salir a la red.
         binding.searchInput.doAfterTextChanged { texto ->
             val consulta = texto?.toString().orEmpty()
-            binding.clearSearchIcon.visibility =
-                if (consulta.isEmpty()) View.GONE else View.VISIBLE
+            binding.clearSearchIcon.mostrarSi(!(consulta.isEmpty()))
 
             if (textoPuestoPorCodigo) {
                 textoPuestoPorCodigo = false
@@ -310,7 +310,7 @@ class ExplorarF : Fragment() {
             chip.text = if (cuantos > 0) "$nombre · $cuantos" else nombre
             chip.isSelected = filtro == tipo
             // Un chip de un tipo del que no hay nada solo estorba.
-            chip.visibility = if (tipo == null || cuantos > 0) View.VISIBLE else View.GONE
+            chip.mostrarSi(tipo == null || cuantos > 0)
         }
     }
 
@@ -332,14 +332,13 @@ class ExplorarF : Fragment() {
         }
 
         explorarViewModel.cargando.observe(viewLifecycleOwner) { cargando ->
-            binding.progresoBusqueda.visibility = if (cargando) View.VISIBLE else View.GONE
+            binding.progresoBusqueda.mostrarSi(cargando)
         }
 
         explorarViewModel.sinResultados.observe(viewLifecycleOwner) { decidirQueSeVe() }
 
         explorarViewModel.tendencias.observe(viewLifecycleOwner) { tendencias ->
-            binding.seccionTendencias.visibility =
-                if (tendencias.isEmpty()) View.GONE else View.VISIBLE
+            binding.seccionTendencias.mostrarSi(!(tendencias.isEmpty()))
             binding.rvTendencias.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             if (binding.rvTendencias.itemDecorationCount == 0) {
@@ -353,8 +352,7 @@ class ExplorarF : Fragment() {
         explorarViewModel.generos.observe(viewLifecycleOwner) { pintarGeneros(it) }
 
         explorarViewModel.history.observe(viewLifecycleOwner) { historial ->
-            binding.seccionHistorial.visibility =
-                if (historial.isEmpty()) View.GONE else View.VISIBLE
+            binding.seccionHistorial.mostrarSi(!(historial.isEmpty()))
             binding.rvHistorial.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             if (binding.rvHistorial.itemDecorationCount == 0) {
@@ -384,12 +382,12 @@ class ExplorarF : Fragment() {
         val hayResultados = !explorarViewModel.resultados.value.isNullOrEmpty()
         val nadaEncontrado = explorarViewModel.sinResultados.value == true
 
-        binding.panelExplorar.visibility = if (buscando) View.GONE else View.VISIBLE
-        binding.barraFiltros.visibility = if (buscando && hayResultados) View.VISIBLE else View.GONE
-        binding.rvListaBusqueda.visibility = if (buscando && hayResultados) View.VISIBLE else View.GONE
+        binding.panelExplorar.mostrarSi(!(buscando))
+        binding.barraFiltros.mostrarSi(buscando && hayResultados)
+        binding.rvListaBusqueda.mostrarSi(buscando && hayResultados)
 
         val sinNada = buscando && nadaEncontrado && !hayResultados
-        binding.panelSinNada.visibility = if (sinNada) View.VISIBLE else View.GONE
+        binding.panelSinNada.mostrarSi(sinNada)
         if (sinNada) {
             binding.txtSinNada.text = getString(
                 R.string.busqueda_sin_resultados,
@@ -402,7 +400,7 @@ class ExplorarF : Fragment() {
 
     private fun pintarRecientes() {
         val recientes = BusquedasRecientes.todas(requireContext())
-        binding.seccionRecientes.visibility = if (recientes.isEmpty()) View.GONE else View.VISIBLE
+        binding.seccionRecientes.mostrarSi(!(recientes.isEmpty()))
         binding.contenedorRecientes.removeAllViews()
 
         recientes.forEach { consulta ->
@@ -415,7 +413,7 @@ class ExplorarF : Fragment() {
     }
 
     private fun pintarGeneros(generos: List<GeneroExplorable>) {
-        binding.seccionGeneros.visibility = if (generos.isEmpty()) View.GONE else View.VISIBLE
+        binding.seccionGeneros.mostrarSi(!(generos.isEmpty()))
         binding.contenedorGeneros.removeAllViews()
 
         generos.forEach { genero ->

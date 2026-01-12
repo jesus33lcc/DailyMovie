@@ -16,6 +16,7 @@ import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.data.Filmografia
 import com.example.dailymovie.databinding.ActivityPersonaBinding
+import com.example.dailymovie.graphics.mostrarSi
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.graphics.pintarTira
 import com.example.dailymovie.models.PersonModel
@@ -90,7 +91,7 @@ class PersonaA : AppCompatActivity() {
         // Muchas fichas no tienen biografia traducida al español, asi que se oculta en
         // vez de dejar un recuadro vacio.
         val hayBiografia = !persona.biografia.isNullOrBlank()
-        binding.seccionBiografia.visibility = if (hayBiografia) View.VISIBLE else View.GONE
+        binding.seccionBiografia.mostrarSi(hayBiografia)
         binding.txtBiografia.text = persona.biografia
     }
 
@@ -123,12 +124,10 @@ class PersonaA : AppCompatActivity() {
     }
 
     private fun pintarFilmografia(filmografia: Filmografia) {
-        binding.seccionActuando.visibility =
-            if (filmografia.actuando.isEmpty()) View.GONE else View.VISIBLE
+        binding.seccionActuando.mostrarSi(!(filmografia.actuando.isEmpty()))
         pintarFilmografia(binding.recyclerActuando, filmografia.actuando)
 
-        binding.seccionDirigiendo.visibility =
-            if (filmografia.dirigiendo.isEmpty()) View.GONE else View.VISIBLE
+        binding.seccionDirigiendo.mostrarSi(!(filmografia.dirigiendo.isEmpty()))
         pintarFilmografia(binding.recyclerDirigiendo, filmografia.dirigiendo)
     }
 
@@ -139,7 +138,7 @@ class PersonaA : AppCompatActivity() {
      * infinita de retratos no aporta nada.
      */
     private fun pintarFotos(rutas: List<String>) {
-        binding.seccionFotos.visibility = if (rutas.isEmpty()) View.GONE else View.VISIBLE
+        binding.seccionFotos.mostrarSi(!(rutas.isEmpty()))
         if (rutas.isEmpty()) return
         binding.recyclerFotos.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)

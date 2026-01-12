@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dailymovie.activities.viewmodels.OnboardingViewModel
 import com.example.dailymovie.adapters.Elegible
 import com.example.dailymovie.adapters.ElegibleAdapter
+import com.example.dailymovie.graphics.mostrarSi
 import com.example.dailymovie.databinding.ActivityOnboardingBinding
 import com.example.dailymovie.utils.Avisos
 
@@ -45,7 +46,7 @@ class OnboardingA : AppCompatActivity() {
         prepararBotonAtras()
 
         viewModel.cargando.observe(this) { cargando ->
-            binding.onboardingProgress.visibility = if (cargando) View.VISIBLE else View.GONE
+            binding.onboardingProgress.mostrarSi(cargando)
         }
 
         viewModel.generos.observe(this) { generos ->

@@ -29,6 +29,7 @@ import com.example.dailymovie.client.response.SeasonResponse
 import com.example.dailymovie.client.response.SerieDetailsResponse
 import com.example.dailymovie.databinding.ActivitySerieBinding
 import com.example.dailymovie.models.TipoDeHallazgo
+import com.example.dailymovie.graphics.mostrarSi
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.graphics.pintarTira
 import com.example.dailymovie.models.SerieModel
@@ -107,33 +108,30 @@ class SerieA : AppCompatActivity() {
 
         viewModel.reparto.observe(this) { creditos ->
             val hayReparto = creditos.cast.isNotEmpty()
-            binding.seccionRepartoSerie.visibility = if (hayReparto) View.VISIBLE else View.GONE
+            binding.seccionRepartoSerie.mostrarSi(hayReparto)
             binding.recyclerRepartoSerie.adapter = CreditAdapter(creditos.cast)
         }
 
         viewModel.videos.observe(this) { videos ->
-            binding.seccionVideosSerie.visibility = if (videos.isEmpty()) View.GONE else View.VISIBLE
+            binding.seccionVideosSerie.mostrarSi(!(videos.isEmpty()))
             binding.recyclerVideosSerie.adapter = VideoAdapter(videos)
         }
 
         viewModel.plataformas.observe(this) { respuesta ->
             val plataformas = respuesta.results[LocaleUtil.getDeviceCountry()]?.flatrate.orEmpty()
-            binding.seccionPlataformasSerie.visibility =
-                if (plataformas.isEmpty()) View.GONE else View.VISIBLE
+            binding.seccionPlataformasSerie.mostrarSi(!(plataformas.isEmpty()))
             binding.recyclerPlataformasSerie.adapter = ProviderAdapter(plataformas)
         }
 
         viewModel.clasificacionPorEdad.observe(this) { clasificacion ->
             // Si la serie no esta clasificada en este pais no se enseña nada: poner la de
             // otro pais confundiria mas de lo que aclara.
-            binding.txtClasificacionSerie.visibility =
-                if (clasificacion.isNullOrBlank()) View.GONE else View.VISIBLE
+            binding.txtClasificacionSerie.mostrarSi(!(clasificacion.isNullOrBlank()))
             binding.txtClasificacionSerie.text = clasificacion.orEmpty()
         }
 
         viewModel.resenas.observe(this) { resenas ->
-            binding.seccionResenasSerie.visibility =
-                if (resenas.isEmpty()) View.GONE else View.VISIBLE
+            binding.seccionResenasSerie.mostrarSi(!(resenas.isEmpty()))
             if (resenas.isEmpty()) return@observe
             binding.recyclerResenasSerie.layoutManager = LinearLayoutManager(this)
             // Como mucho cinco, igual que en peliculas: con mas, la ficha se convierte en un foro.
@@ -141,8 +139,7 @@ class SerieA : AppCompatActivity() {
         }
 
         viewModel.imagenes.observe(this) { rutas ->
-            binding.seccionImagenesSerie.visibility =
-                if (rutas.isEmpty()) View.GONE else View.VISIBLE
+            binding.seccionImagenesSerie.mostrarSi(!(rutas.isEmpty()))
             if (rutas.isEmpty()) return@observe
             binding.recyclerImagenesSerie.layoutManager =
                 LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -199,14 +196,13 @@ class SerieA : AppCompatActivity() {
     private fun pintarSerie(serie: SerieDetailsResponse) {
         binding.txtTituloSerie.text = serie.titulo
         binding.txtSinopsisSerie.text = serie.sinopsis.orEmpty()
-        binding.txtSinopsisSerie.visibility =
-            if (serie.sinopsis.isNullOrBlank()) View.GONE else View.VISIBLE
+        binding.txtSinopsisSerie.mostrarSi(!(serie.sinopsis.isNullOrBlank()))
 
         binding.txtGenerosSerie.text = serie.generos.joinToString { it.name }
         binding.txtDatosSerie.text = resumenDeLaSerie(serie)
 
         val estado = traducirEstado(serie.estado)
-        binding.txtEstadoSerie.visibility = if (estado.isBlank()) View.GONE else View.VISIBLE
+        binding.txtEstadoSerie.mostrarSi(!(estado.isBlank()))
         binding.txtEstadoSerie.text = estado
 
         binding.imgPosterSerie.cargarCartel(serie.poster)
@@ -219,7 +215,7 @@ class SerieA : AppCompatActivity() {
         // La temporada 0 son los especiales; no es por donde se empieza una serie, asi que
         // no aparece entre los botones.
         val temporadas = serie.temporadas.filter { it.numero > 0 }
-        binding.seccionTemporadas.visibility = if (temporadas.isEmpty()) View.GONE else View.VISIBLE
+        binding.seccionTemporadas.mostrarSi(!(temporadas.isEmpty()))
         binding.recyclerTemporadas.adapter = TemporadaAdapter(temporadas) { elegida ->
             viewModel.abrirTemporada(elegida.numero)
         }
