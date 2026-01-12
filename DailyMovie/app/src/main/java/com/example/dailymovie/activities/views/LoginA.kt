@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.dailymovie.activities.viewmodels.LoginViewModel
+import com.example.dailymovie.graphics.mostrarSi
 import com.example.dailymovie.databinding.ActivityLoginBinding
 import com.example.dailymovie.utils.AccesoGoogle
 import com.example.dailymovie.utils.Avisos
@@ -81,7 +82,7 @@ class LoginA : AppCompatActivity() {
         }
 
         viewModel.cargando.observe(this) { cargando ->
-            binding.loginProgress.visibility = if (cargando) View.VISIBLE else View.GONE
+            binding.loginProgress.mostrarSi(cargando)
             binding.loginIniciosesionBtn.isEnabled = !cargando
             binding.loginGoogleBtn.isEnabled = !cargando
         }

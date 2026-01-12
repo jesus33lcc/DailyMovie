@@ -10,6 +10,7 @@ import com.example.dailymovie.R
 import com.example.dailymovie.activities.viewmodels.SagaViewModel
 import com.example.dailymovie.adapters.HallazgoAdapter
 import com.example.dailymovie.databinding.ActivitySagaBinding
+import com.example.dailymovie.graphics.mostrarSi
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.graphics.columnasDeCarteles
 import com.example.dailymovie.models.Hallazgo
@@ -51,7 +52,7 @@ class SagaA : AppCompatActivity() {
             binding.txtCuantas.text = resumen(peliculas)
         }
         viewModel.cargando.observe(this) { cargando ->
-            binding.progresoSaga.visibility = if (cargando) View.VISIBLE else View.GONE
+            binding.progresoSaga.mostrarSi(cargando)
         }
         viewModel.error.observe(this) { error ->
             error?.let {

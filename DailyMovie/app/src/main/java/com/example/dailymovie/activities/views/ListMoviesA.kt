@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dailymovie.R
 import com.example.dailymovie.adapters.CustomMovieListAdapter
 import com.example.dailymovie.databinding.ActivityListMoviesBinding
+import com.example.dailymovie.graphics.mostrarSi
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.graphics.columnasDeCarteles
 import com.example.dailymovie.data.ListaFija
@@ -76,7 +77,7 @@ class ListMoviesA : AppCompatActivity() {
      */
     private fun pintarCuantasHay(guardados: List<Guardado>) {
         val cuantas = guardados.size
-        binding.listCuantas.visibility = if (cuantas == 0) View.GONE else View.VISIBLE
+        binding.listCuantas.mostrarSi(!(cuantas == 0))
         binding.listCuantas.text = when {
             guardados.any { it.esSerie } -> if (cuantas == 1) "1 título" else "$cuantas títulos"
             cuantas == 1 -> "1 película"
@@ -92,8 +93,8 @@ class ListMoviesA : AppCompatActivity() {
      */
     private fun decidirSiHayAlgo() {
         val vacia = movieList.isEmpty()
-        binding.panelListaVacia.visibility = if (vacia) View.VISIBLE else View.GONE
-        binding.recyclerViewMovies.visibility = if (vacia) View.GONE else View.VISIBLE
+        binding.panelListaVacia.mostrarSi(vacia)
+        binding.recyclerViewMovies.mostrarSi(!(vacia))
         if (!vacia) return
 
         val (texto, icono) = when (ListaFija.desdeTitulo(listName)) {

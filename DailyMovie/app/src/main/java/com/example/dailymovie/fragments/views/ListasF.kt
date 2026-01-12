@@ -18,6 +18,7 @@ import com.example.dailymovie.R
 import com.example.dailymovie.adapters.MovieListAdapter
 import com.example.dailymovie.data.ListaFija
 import com.example.dailymovie.databinding.FragmentListasBinding
+import com.example.dailymovie.graphics.mostrarSi
 import com.example.dailymovie.graphics.SpacingItemDecoration
 import com.example.dailymovie.models.ListaModel
 import com.example.dailymovie.models.MovieModel
@@ -60,8 +61,7 @@ class ListasF : Fragment() {
         viewModel.customLists.observe(viewLifecycleOwner, Observer { customLists ->
             customListsAdapter.submitList(customLists)
             // Sin esto, quien entra por primera vez ve un hueco y el boton + sin mas.
-            binding.txtSinListas.visibility =
-                if (customLists.isEmpty()) View.VISIBLE else View.GONE
+            binding.txtSinListas.mostrarSi(customLists.isEmpty())
         })
 
         binding.btnNewLista.setOnClickListener {
@@ -134,7 +134,7 @@ class ListasF : Fragment() {
         campo.doAfterTextChanged { texto ->
             val problema = porQueNoVale(texto.toString().trim())
             aviso.text = problema.orEmpty()
-            aviso.visibility = if (problema == null) View.GONE else View.VISIBLE
+            aviso.mostrarSi(!(problema == null))
         }
 
         DialogoDailyMovie.mostrar(
