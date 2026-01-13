@@ -118,7 +118,7 @@ class ListasF : Fragment() {
         val contenido = layoutInflater.inflate(R.layout.dialogo_campo_texto, null)
         val campo = contenido.findViewById<EditText>(R.id.dialogoCampo)
         val aviso = contenido.findViewById<TextView>(R.id.dialogoAviso)
-        campo.hint = "Nombre de la lista"
+        campo.hint = getString(R.string.listas_hint_nombre)
 
         // Los nombres que ya no estan libres: los de las listas del usuario y los dos fijos.
         val cogidos = (viewModel.customLists.value.orEmpty().map { it.nombre } +
@@ -139,10 +139,10 @@ class ListasF : Fragment() {
 
         DialogoDailyMovie.mostrar(
             context = requireContext(),
-            titulo = "Crear nueva lista",
-            mensaje = "Ponle un nombre y podrás guardar ahí las películas que quieras",
+            titulo = getString(R.string.listas_crear_titulo),
+            mensaje = getString(R.string.listas_crear_mensaje),
             contenido = contenido,
-            textoAceptar = "Crear"
+            textoAceptar = getString(R.string.boton_crear)
         ) { dialogo ->
             val nombre = campo.text.toString().trim()
             val problema = porQueNoVale(nombre)
@@ -193,16 +193,18 @@ class ListasF : Fragment() {
     private fun confirmarEliminar(lista: ListaModel) {
         DialogoDailyMovie.confirmar(
             context = requireContext(),
-            titulo = "Eliminar lista",
-            mensaje = "Se borra «${lista.nombre}» y las películas que tengas guardadas ahí. " +
-                "Esto no se puede deshacer.",
-            textoAceptar = "Eliminar",
+            titulo = getString(R.string.listas_eliminar_titulo),
+            mensaje = getString(R.string.listas_eliminar_mensaje, lista.nombre),
+            textoAceptar = getString(R.string.boton_eliminar),
             peligroso = true
         ) {
             viewModel.deleteCustomList(lista.nombre) { borrada ->
                 // No hay que sacar la fila a mano: al borrarla el ViewModel recarga las
                 // listas y el comparador ve que falta esa.
-                val texto = if (borrada) "Lista eliminada" else "No se ha podido eliminar"
+                val texto = getString(
+                    if (borrada) R.string.aviso_lista_eliminada
+                    else R.string.aviso_lista_no_eliminada
+                )
                 _binding.siLaVistaSigueAhi { vista -> Avisos.breve(vista.root, texto) }
             }
         }

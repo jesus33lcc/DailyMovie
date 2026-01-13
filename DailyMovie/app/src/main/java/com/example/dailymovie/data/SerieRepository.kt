@@ -12,7 +12,6 @@ import com.example.dailymovie.client.response.SerieDetailsResponse
 import com.example.dailymovie.models.GenreModel
 import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.models.VideoModel
-import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.LocaleUtil
 import retrofit2.Call
 
@@ -161,46 +160,43 @@ interface SerieRepository {
  * La implementacion de verdad: pide las series a TMDB.
  *
  * @param servicio quien habla con TMDB. Se puede cambiar por un doble en los tests.
- * @param apiKey la clave de TMDB. Se lee aqui, en el constructor, para que nadie de las capas
- *   de arriba tenga que conocerla ni pasarla.
  */
 class TmdbSerieRepository(
-    private val servicio: WebService = RetrofitClient.webService,
-    private val apiKey: String = Constantes.API_KEY
+    private val servicio: WebService = RetrofitClient.webService
 ) : SerieRepository {
 
     override fun populares(alTerminar: (Resultado<List<SerieModel>>) -> Unit) =
-        listaDeSeries(servicio.getSeriesPopulares(apiKey), alTerminar)
+        listaDeSeries(servicio.getSeriesPopulares(), alTerminar)
 
     override fun mejorValoradas(alTerminar: (Resultado<List<SerieModel>>) -> Unit) =
-        listaDeSeries(servicio.getSeriesMejorValoradas(apiKey), alTerminar)
+        listaDeSeries(servicio.getSeriesMejorValoradas(), alTerminar)
 
     override fun enEmision(alTerminar: (Resultado<List<SerieModel>>) -> Unit) =
-        listaDeSeries(servicio.getSeriesEnEmision(apiKey), alTerminar)
+        listaDeSeries(servicio.getSeriesEnEmision(), alTerminar)
 
     override fun detalles(serieId: Int, alTerminar: (Resultado<SerieDetailsResponse>) -> Unit) {
-        servicio.getSerieDetalles(serieId, apiKey).enqueueSimple(
+        servicio.getSerieDetalles(serieId).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
 
     override fun temporada(serieId: Int, numero: Int, alTerminar: (Resultado<SeasonResponse>) -> Unit) {
-        servicio.getTemporada(serieId, numero, apiKey).enqueueSimple(
+        servicio.getTemporada(serieId, numero).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
 
     override fun reparto(serieId: Int, alTerminar: (Resultado<CreditResponse>) -> Unit) {
-        servicio.getSerieCreditos(serieId, apiKey).enqueueSimple(
+        servicio.getSerieCreditos(serieId).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
 
     override fun videos(serieId: Int, alTerminar: (Resultado<List<VideoModel>>) -> Unit) {
-        servicio.getSerieVideos(serieId, apiKey).enqueueSimple(
+        servicio.getSerieVideos(serieId).enqueueSimple(
             onExito = { respuesta ->
                 val trailersPrimero = respuesta.results.filter { it.type == "Trailer" } +
                     respuesta.results.filter { it.type != "Trailer" }
@@ -211,21 +207,21 @@ class TmdbSerieRepository(
     }
 
     override fun similares(serieId: Int, alTerminar: (Resultado<List<SerieModel>>) -> Unit) {
-        servicio.getSeriesSimilares(serieId, apiKey).enqueueSimple(
+        servicio.getSeriesSimilares(serieId).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it.results)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
 
     override fun recomendadas(serieId: Int, alTerminar: (Resultado<List<SerieModel>>) -> Unit) {
-        servicio.getSeriesRecomendadas(serieId, apiKey).enqueueSimple(
+        servicio.getSeriesRecomendadas(serieId).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it.results)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
 
     override fun imagenes(serieId: Int, alTerminar: (List<String>) -> Unit) {
-        servicio.getImagenesDeSerie(serieId, apiKey).enqueueSimple(
+        servicio.getImagenesDeSerie(serieId).enqueueSimple(
             // Los fondos y no los carteles: son fotogramas de la serie, que es lo que
             // apetece mirar, y ademas cuadran con la tira apaisada.
             onExito = { respuesta -> alTerminar(respuesta.fondos.map { it.ruta }) },
@@ -234,7 +230,7 @@ class TmdbSerieRepository(
     }
 
     override fun clasificacionPorEdad(serieId: Int, alTerminar: (String?) -> Unit) {
-        servicio.getClasificacionSerie(serieId, apiKey).enqueueSimple(
+        servicio.getClasificacionSerie(serieId).enqueueSimple(
             onExito = { respuesta ->
                 alTerminar(
                     respuesta.resultados
@@ -250,7 +246,7 @@ class TmdbSerieRepository(
     }
 
     override fun resenas(serieId: Int, alTerminar: (Resultado<List<ResenaResponse>>) -> Unit) {
-        servicio.getResenasSerie(serieId, apiKey).enqueueSimple(
+        servicio.getResenasSerie(serieId).enqueueSimple(
             onExito = { respuesta ->
                 alTerminar(Resultado.Exito(respuesta.resultados.filter { it.texto.isNotBlank() }))
             },
@@ -259,7 +255,7 @@ class TmdbSerieRepository(
     }
 
     override fun plataformas(serieId: Int, alTerminar: (Resultado<ProviderResponse>) -> Unit) {
-        servicio.getSerieProviders(serieId, apiKey).enqueueSimple(
+        servicio.getSerieProviders(serieId).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
@@ -276,7 +272,7 @@ class TmdbSerieRepository(
     }
 
     override fun generos(alTerminar: (Resultado<List<GenreModel>>) -> Unit) {
-        servicio.getGenerosDeSeries(apiKey).enqueueSimple(
+        servicio.getGenerosDeSeries().enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it.generos)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
@@ -287,7 +283,7 @@ class TmdbSerieRepository(
         pagina: Int,
         alTerminar: (Resultado<List<SerieModel>>) -> Unit
     ) = listaDeSeries(
-        servicio.descubrirSeries(apiKey, generos.joinToString(","), page = pagina),
+        servicio.descubrirSeries(generos.joinToString(","), page = pagina),
         alTerminar
     )
 }

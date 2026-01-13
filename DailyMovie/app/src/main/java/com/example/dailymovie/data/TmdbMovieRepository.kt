@@ -15,7 +15,6 @@ import com.example.dailymovie.models.Hallazgo
 import com.example.dailymovie.models.TipoDeHallazgo
 import com.example.dailymovie.models.MovieModel
 import com.example.dailymovie.models.VideoModel
-import com.example.dailymovie.utils.Constantes
 import com.example.dailymovie.utils.LocaleUtil
 import retrofit2.Call
 
@@ -27,12 +26,9 @@ import retrofit2.Call
  *
  * @param servicio quien habla con TMDB. Se puede cambiar por un doble en los tests, que es
  *   justo para lo que existe la interfaz.
- * @param apiKey la clave de TMDB. Sale de local.properties via BuildConfig, asi que no esta en
- *   el codigo, y se lee aqui para que nadie de arriba tenga que pasarla.
  */
 class TmdbMovieRepository(
-    private val servicio: WebService = RetrofitClient.webService,
-    private val apiKey: String = Constantes.API_KEY
+    private val servicio: WebService = RetrofitClient.webService
 ) : MovieRepository {
 
     override fun buscarTodo(
@@ -40,7 +36,7 @@ class TmdbMovieRepository(
         pagina: Int,
         alTerminar: (Resultado<Pagina>) -> Unit
     ) {
-        servicio.buscarTodo(consulta, apiKey, page = pagina).enqueueSimple(
+        servicio.buscarTodo(consulta, page = pagina).enqueueSimple(
             onExito = { respuesta ->
                 val resultados = Pagina(
                     hallazgos = aHallazgos(respuesta.resultados),
@@ -53,7 +49,7 @@ class TmdbMovieRepository(
                     alTerminar(Resultado.Exito(resultados))
                     return@enqueueSimple
                 }
-                servicio.buscarSagas(consulta, apiKey).enqueueSimple(
+                servicio.buscarSagas(consulta).enqueueSimple(
                     onExito = { sagas ->
                         val encontradas = sagas.resultados.take(3).map { Hallazgo.de(it) }
                         alTerminar(
@@ -73,7 +69,7 @@ class TmdbMovieRepository(
         sagaId: Int,
         alTerminar: (Resultado<List<MovieModel>>) -> Unit
     ) {
-        servicio.getSaga(sagaId, apiKey).enqueueSimple(
+        servicio.getSaga(sagaId).enqueueSimple(
             onExito = { saga ->
                 alTerminar(
                     Resultado.Exito(
@@ -94,7 +90,7 @@ class TmdbMovieRepository(
     }
 
     override fun tendencias(alTerminar: (Resultado<List<Hallazgo>>) -> Unit) {
-        servicio.getTendencias(apiKey).enqueueSimple(
+        servicio.getTendencias().enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(aHallazgos(it.resultados))) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
@@ -154,22 +150,22 @@ class TmdbMovieRepository(
     }
 
     override fun enCartelera(alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
-        listaDePeliculas(servicio.getNowPlayingMovies(apiKey), alTerminar)
+        listaDePeliculas(servicio.getNowPlayingMovies(), alTerminar)
 
     override fun populares(alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
-        listaDePeliculas(servicio.getPopularMovies(apiKey), alTerminar)
+        listaDePeliculas(servicio.getPopularMovies(), alTerminar)
 
     override fun mejorValoradas(alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
-        listaDePeliculas(servicio.getTopRatedMovies(apiKey), alTerminar)
+        listaDePeliculas(servicio.getTopRatedMovies(), alTerminar)
 
     override fun proximamente(alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
-        listaDePeliculas(servicio.getUpcomingMovies(apiKey), alTerminar)
+        listaDePeliculas(servicio.getUpcomingMovies(), alTerminar)
 
     override fun similares(peliculaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
-        listaDePeliculas(servicio.getSimilarMovies(peliculaId, apiKey), alTerminar)
+        listaDePeliculas(servicio.getSimilarMovies(peliculaId), alTerminar)
 
     override fun recomendadas(peliculaId: Int, alTerminar: (Resultado<List<MovieModel>>) -> Unit) =
-        listaDePeliculas(servicio.getRecommendedMovies(peliculaId, apiKey), alTerminar)
+        listaDePeliculas(servicio.getRecommendedMovies(peliculaId), alTerminar)
 
     override fun porGeneros(
         generos: List<Int>,
@@ -179,27 +175,27 @@ class TmdbMovieRepository(
         // TMDB espera los generos separados por coma; con "|" seria "cualquiera de ellos"
         // y con "," "todos a la vez". Se usa la coma para afinar mas.
         listaDePeliculas(
-            servicio.descubrirPeliculas(apiKey, generos.joinToString(","), page = pagina),
+            servicio.descubrirPeliculas(generos.joinToString(","), page = pagina),
             alTerminar
         )
     }
 
     override fun detalles(peliculaId: Int, alTerminar: (Resultado<MovieDetailsResponse>) -> Unit) {
-        servicio.getMovieDetails(peliculaId, apiKey).enqueueSimple(
+        servicio.getMovieDetails(peliculaId).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
 
     override fun plataformas(peliculaId: Int, alTerminar: (Resultado<ProviderResponse>) -> Unit) {
-        servicio.getMovieProviders(peliculaId, apiKey).enqueueSimple(
+        servicio.getMovieProviders(peliculaId).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
 
     override fun reparto(peliculaId: Int, alTerminar: (Resultado<CreditResponse>) -> Unit) {
-        servicio.getMovieCredits(peliculaId, apiKey).enqueueSimple(
+        servicio.getMovieCredits(peliculaId).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
@@ -208,10 +204,10 @@ class TmdbMovieRepository(
     override fun videos(peliculaId: Int, alTerminar: (Resultado<List<VideoModel>>) -> Unit) {
         // Se piden dos veces, en el idioma del dispositivo y en ingles, porque TMDB tiene
         // muchos mas trailers en ingles. Si la segunda falla nos quedamos con la primera.
-        servicio.getMovieVideos(peliculaId, apiKey, LocaleUtil.getLanguageAndCountry()).enqueueSimple(
+        servicio.getMovieVideos(peliculaId, LocaleUtil.getLanguageAndCountry()).enqueueSimple(
             onExito = { enIdiomaLocal ->
                 val locales = trailersPrimero(enIdiomaLocal.results)
-                servicio.getMovieVideos(peliculaId, apiKey, "en-US").enqueueSimple(
+                servicio.getMovieVideos(peliculaId, "en-US").enqueueSimple(
                     onExito = { alTerminar(Resultado.Exito(locales + trailersPrimero(it.results))) },
                     onError = { alTerminar(Resultado.Exito(locales)) }
                 )
@@ -221,7 +217,7 @@ class TmdbMovieRepository(
     }
 
     override fun resenas(peliculaId: Int, alTerminar: (Resultado<List<ResenaResponse>>) -> Unit) {
-        servicio.getResenas(peliculaId, apiKey).enqueueSimple(
+        servicio.getResenas(peliculaId).enqueueSimple(
             onExito = { respuesta ->
                 alTerminar(Resultado.Exito(respuesta.resultados.filter { it.texto.isNotBlank() }))
             },
@@ -236,7 +232,7 @@ class TmdbMovieRepository(
         listaDePeliculas(
             // Con "|" vale con que salga cualquiera de ellos; con "," tendrian que estar
             // todos en la misma pelicula, que casi nunca pasa.
-            servicio.descubrirPeliculas(apiKey, gente = personas.joinToString("|")),
+            servicio.descubrirPeliculas(gente = personas.joinToString("|")),
             alTerminar
         )
     }
@@ -249,7 +245,6 @@ class TmdbMovieRepository(
     ) {
         listaDePeliculas(
             servicio.descubrirPeliculas(
-                apiKey = apiKey,
                 generos = generos.takeIf { it.isNotEmpty() }?.joinToString(","),
                 notaMinima = filtros.notaMinima,
                 ano = filtros.ano,
@@ -264,14 +259,14 @@ class TmdbMovieRepository(
     }
 
     override fun plataformasDisponibles(alTerminar: (Resultado<List<PlataformaDisponible>>) -> Unit) {
-        servicio.getPlataformasDisponibles(apiKey).enqueueSimple(
+        servicio.getPlataformasDisponibles().enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it.plataformas.sortedBy { p -> p.prioridad })) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
     }
 
     override fun generos(alTerminar: (Resultado<List<GenreModel>>) -> Unit) {
-        servicio.getGeneros(apiKey).enqueueSimple(
+        servicio.getGeneros().enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it.generos)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )

@@ -2,6 +2,7 @@ package com.example.dailymovie.client
 
 import com.example.dailymovie.utils.Constantes
 import com.google.gson.GsonBuilder
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -26,6 +27,7 @@ object RetrofitClient {
     val webService: WebService by lazy {
         Retrofit.Builder()
             .baseUrl(Constantes.BASE_URL)
+            .client(OkHttpClient.Builder().addInterceptor(ClaveEIdioma()).build())
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
             .build()
             .create(WebService::class.java)

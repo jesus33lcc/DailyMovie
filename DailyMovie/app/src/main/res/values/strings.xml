@@ -38,4 +38,150 @@
          persona, asi que el texto de accesibilidad no puede decir "de la pelicula" -->
     <string name="imagen_de_la_tira">Imagen, toca para verla grande</string>
     <string name="imagen_a_pantalla_completa">Imagen a pantalla completa</string>
+
+    <!-- Botones que salen en varios dialogos, con un solo texto para todos -->
+    <string name="boton_aplicar">Aplicar</string>
+    <string name="boton_cerrar">Cerrar</string>
+    <string name="boton_borrar">Borrar</string>
+    <string name="boton_cambiar">Cambiar</string>
+    <string name="boton_activar">Activar</string>
+    <string name="boton_desactivar">Desactivar</string>
+    <string name="boton_continuar">Continuar</string>
+    <string name="boton_crear">Crear</string>
+    <string name="boton_eliminar">Eliminar</string>
+    <string name="boton_enviar">Enviar</string>
+    <string name="boton_entendido">Entendido</string>
+    <string name="boton_siguiente">Siguiente</string>
+    <string name="boton_terminar">Terminar</string>
+
+    <!-- Cuentas de cosas. En español el nombre cambia con el numero, asi que va en plurals
+         en vez de con un if (uno == 1) escrito a mano en cada pantalla -->
+    <plurals name="peliculas_contadas">
+        <item quantity="one">%1$d película</item>
+        <item quantity="other">%1$d películas</item>
+    </plurals>
+    <plurals name="titulos_contados">
+        <item quantity="one">%1$d título</item>
+        <item quantity="other">%1$d títulos</item>
+    </plurals>
+    <plurals name="temporadas_contadas">
+        <item quantity="one">%1$d temporada</item>
+        <item quantity="other">%1$d temporadas</item>
+    </plurals>
+
+    <!-- Dos fechas o dos años seguidos: "2008 — 2013" -->
+    <string name="rango_desde_hasta">%1$s — %2$s</string>
+
+    <!-- Ajustes -->
+    <string name="ajustes_cuenta_google">Cuenta de Google</string>
+    <string name="ajustes_version">DailyMovie %1$s\nSoftware libre bajo licencia GPL-3.0\nDatos de películas: TMDB</string>
+    <string name="ajustes_idioma_titulo">Idioma de las películas</string>
+    <string name="ajustes_idioma_mensaje">En este idioma se piden los títulos, las sinopsis y los géneros. Los textos de la app se quedan en español.</string>
+    <string name="ajustes_region_titulo">Región e idioma</string>
+    <string name="ajustes_region_mensaje">Ahora mismo: %1$s · %2$s\n\nCon esto decidimos en qué idioma te enseñamos las películas y qué plataformas de streaming te salen, porque no son las mismas en cada país.\n\nSe coge de los ajustes del móvil. Si lo cambias ahí, la app te sigue.</string>
+    <string name="ajustes_region_aceptar">Abrir ajustes del móvil</string>
+    <string name="ajustes_borrar_historial_titulo">Borrar historial</string>
+    <string name="ajustes_borrar_historial_mensaje">Se borra todo lo que has buscado. Tus listas y favoritos no se tocan.</string>
+    <string name="aviso_historial_borrado">Historial borrado</string>
+    <string name="aviso_historial_no_borrado">No se ha podido borrar</string>
+    <string name="ajustes_contrasena_con_google">Entraste con Google, así que la contraseña se cambia desde tu cuenta de Google</string>
+    <string name="ajustes_cambiar_contrasena_titulo">Cambiar contraseña</string>
+    <string name="ajustes_contrasena_rellena">Rellena las dos contraseñas</string>
+    <string name="ajustes_contrasena_no_coinciden">Las dos contraseñas nuevas no coinciden</string>
+    <string name="ajustes_contrasena_corta">La contraseña necesita al menos 6 caracteres</string>
+    <string name="ajustes_cerrar_sesion">Cerrar sesión</string>
+    <string name="ajustes_cerrar_sesion_mensaje">¿Seguro? Tus listas se quedan guardadas para cuando vuelvas.</string>
+    <string name="ajustes_datos_uso_titulo">Datos de uso</string>
+    <string name="ajustes_datos_uso_mensaje">Recogemos datos anónimos de cómo se usa la app (qué pantallas se abren, si algo falla) para saber qué mejorar.\n\nNo incluye lo que ves ni tus listas, y puedes desactivarlo cuando quieras.\n\nAhora mismo está %1$s.</string>
+    <string name="ajustes_datos_uso_activado">activado</string>
+    <string name="ajustes_datos_uso_desactivado">desactivado</string>
+    <string name="aviso_datos_uso_activados">Datos de uso activados</string>
+    <string name="aviso_datos_uso_desactivados">Datos de uso desactivados</string>
+    <string name="ajustes_borrar_cuenta_titulo">Borrar mi cuenta</string>
+    <string name="ajustes_borrar_cuenta_mensaje">Se borra tu cuenta y todo lo que tenemos guardado: favoritos, vistos, listas, historial y tus gustos.\n\nEsto no se puede deshacer.</string>
+    <string name="ajustes_hint_contrasena">Tu contraseña</string>
+    <string name="ajustes_confirmar_identidad_titulo">Confirma que eres tú</string>
+    <string name="ajustes_confirmar_identidad_mensaje">Escribe tu contraseña para poder borrar la cuenta.</string>
+    <string name="ajustes_borrar_definitivamente">Borrar definitivamente</string>
+    <string name="ajustes_escribe_contrasena">Escribe tu contraseña</string>
+
+    <!-- Listas -->
+    <string name="listas_hint_nombre">Nombre de la lista</string>
+    <string name="listas_crear_titulo">Crear nueva lista</string>
+    <string name="listas_crear_mensaje">Ponle un nombre y podrás guardar ahí las películas que quieras</string>
+    <string name="listas_eliminar_titulo">Eliminar lista</string>
+    <string name="listas_eliminar_mensaje">Se borra «%1$s» y las películas que tengas guardadas ahí. Esto no se puede deshacer.</string>
+    <string name="aviso_lista_eliminada">Lista eliminada</string>
+    <string name="aviso_lista_no_eliminada">No se ha podido eliminar</string>
+
+    <!-- Una lista abierta -->
+    <string name="lista_elemento_fuera">%1$s fuera de %2$s</string>
+    <string name="aviso_no_se_ha_podido_quitar">No se ha podido quitar</string>
+
+    <!-- Explorar -->
+    <string name="explorar_filtrar_titulo">Filtrar</string>
+    <string name="explorar_quitar_filtros">Quitar filtros</string>
+    <string name="explorar_plataforma_cualquiera">Cualquiera</string>
+    <string name="explorar_chip_todo">Todo</string>
+    <string name="explorar_chip_peliculas">Películas</string>
+    <string name="explorar_chip_series">Series</string>
+    <string name="explorar_chip_sagas">Sagas</string>
+    <string name="explorar_chip_gente">Gente</string>
+    <string name="explorar_chip_con_cuenta">%1$s · %2$d</string>
+    <string name="explorar_nada_que_proponer">Todavía no hay nada que proponerte</string>
+
+    <!-- Ficha de pelicula -->
+    <string name="pelicula_no_se_puede_abrir">No hemos podido abrir esa película</string>
+
+    <!-- Ficha de serie -->
+    <string name="serie_no_se_puede_abrir">No se ha podido abrir la serie</string>
+    <string name="serie_episodios">%1$d episodios</string>
+    <string name="serie_estado_terminada">Terminada</string>
+    <string name="serie_estado_en_emision">En emisión</string>
+    <string name="serie_estado_cancelada">Cancelada</string>
+    <string name="serie_estado_en_produccion">En producción</string>
+    <string name="serie_estado_anunciada">Anunciada</string>
+    <string name="serie_estado_piloto">Piloto</string>
+    <string name="serie_vista_entera">La has visto entera</string>
+    <string name="serie_progreso">Llevas %1$d de %2$d episodios</string>
+    <string name="serie_temporada_episodios">%1$s · %2$d episodios</string>
+    <string name="serie_temporada_vistos">%1$s · %2$d de %3$d vistos</string>
+
+    <!-- Ficha de persona. TMDB devuelve el oficio en ingles -->
+    <string name="persona_no_se_puede_abrir">No se ha podido abrir la ficha</string>
+    <string name="oficio_actuando">Actor / Actriz</string>
+    <string name="oficio_direccion">Dirección</string>
+    <string name="oficio_guion">Guion</string>
+    <string name="oficio_produccion">Producción</string>
+    <string name="oficio_sonido">Sonido</string>
+    <string name="oficio_fotografia">Fotografía</string>
+    <string name="oficio_montaje">Montaje</string>
+
+    <!-- Saga -->
+    <string name="saga_resumen_un_ano">%1$s · %2$d</string>
+    <string name="saga_resumen_rango">%1$s · %2$d - %3$d</string>
+
+    <!-- Entrar -->
+    <string name="login_hint_correo">Tu correo electrónico</string>
+    <string name="login_recuperar_titulo">Recuperar contraseña</string>
+    <string name="login_recuperar_mensaje">Te mandamos un correo con un enlace para poner una contraseña nueva.\n\nSi no te llega en unos minutos, mira en la carpeta de spam.</string>
+    <string name="login_correo_enviado_titulo">Correo enviado</string>
+    <string name="login_correo_enviado_mensaje">Ya te hemos mandado el enlace. Ábrelo desde el móvil, elige tu contraseña nueva y vuelve aquí a iniciar sesión.</string>
+
+    <!-- Onboarding de gustos -->
+    <string name="onboarding_paso">Paso %1$d de %2$d</string>
+    <string name="onboarding_generos_titulo">¿Qué géneros te gustan?</string>
+    <string name="onboarding_generos_explicacion">Elige los que más veas. Con esto elegimos la película que te enseñamos al abrir la app.</string>
+    <string name="onboarding_peliculas_titulo">¿Alguna de estas te suena?</string>
+    <string name="onboarding_peliculas_explicacion">Marca las que ya has visto y te gustaron. Así no te las volvemos a recomendar y afinamos con las demás.</string>
+    <string name="onboarding_personas_titulo">¿A quién sigues?</string>
+    <string name="onboarding_personas_explicacion">Actores y directores que te gustan. Cuando estrenen algo nuevo, te lo enseñamos al abrir la app.</string>
+    <string name="onboarding_elige_un_genero">Elige al menos un género, o toca «Ahora no»</string>
+    <string name="onboarding_no_guardado">No se han podido guardar tus gustos</string>
+
+    <!-- Tus numeros -->
+    <string name="estadisticas_vacio">Todavía no hay nada que contar.\n\nMarca películas como vistas o guárdalas en favoritos y aquí verás en qué se te va el tiempo.</string>
+
+    <!-- Galeria -->
+    <string name="galeria_contador">%1$d / %2$d</string>
 </resources>

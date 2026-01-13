@@ -82,6 +82,9 @@ dependencies {
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    // Ya venia con Retrofit; se declara para poder usar interceptores sin depender de una
+    // dependencia transitiva que podria cambiar de version sin avisar.
+    implementation("com.squareup.okhttp3:okhttp:3.14.9")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     // Glide
