@@ -6,7 +6,6 @@ import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.PeliculaDePersona
 import com.example.dailymovie.client.response.PersonaPopular
 import com.example.dailymovie.models.PersonModel
-import com.example.dailymovie.utils.Constantes
 
 /** Fichas de actores y directores, con su filmografia. */
 interface PersonRepository {
@@ -71,16 +70,13 @@ private const val EPISODIOS_PARA_SER_FIJO = 4
  * puesta tal cual en la ficha da una idea equivocada de la carrera de la persona.
  *
  * @param servicio quien habla con TMDB. Se puede cambiar por un doble en los tests.
- * @param apiKey la clave de TMDB. Se lee aqui, en el constructor, para que nadie de las capas
- *   de arriba tenga que conocerla ni pasarla.
  */
 class TmdbPersonRepository(
-    private val servicio: WebService = RetrofitClient.webService,
-    private val apiKey: String = Constantes.API_KEY
+    private val servicio: WebService = RetrofitClient.webService
 ) : PersonRepository {
 
     override fun ficha(personaId: Int, alTerminar: (Resultado<PersonModel>) -> Unit) {
-        servicio.getPersona(personaId, apiKey).enqueueSimple(
+        servicio.getPersona(personaId).enqueueSimple(
             onExito = { alTerminar(Resultado.Exito(it)) },
             onError = { alTerminar(Resultado.Fallo(it)) }
         )
@@ -110,14 +106,14 @@ class TmdbPersonRepository(
     }
 
     override fun fotos(personaId: Int, alTerminar: (List<String>) -> Unit) {
-        servicio.getImagenesDePersona(personaId, apiKey).enqueueSimple(
+        servicio.getImagenesDePersona(personaId).enqueueSimple(
             onExito = { respuesta -> alTerminar(respuesta.fotos.map { it.ruta }) },
             onError = { alTerminar(emptyList()) }
         )
     }
 
     override fun populares(alTerminar: (Resultado<List<PersonaPopular>>) -> Unit) {
-        servicio.getPersonasPopulares(apiKey).enqueueSimple(
+        servicio.getPersonasPopulares().enqueueSimple(
             onExito = { respuesta ->
                 alTerminar(Resultado.Exito(respuesta.resultados.filter { !it.foto.isNullOrBlank() }))
             },
@@ -126,7 +122,7 @@ class TmdbPersonRepository(
     }
 
     override fun filmografia(personaId: Int, alTerminar: (Resultado<Filmografia>) -> Unit) {
-        servicio.getFilmografia(personaId, apiKey).enqueueSimple(
+        servicio.getFilmografia(personaId).enqueueSimple(
             onExito = { respuesta ->
                 alTerminar(
                     Resultado.Exito(

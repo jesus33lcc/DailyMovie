@@ -43,11 +43,11 @@ class Settings : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.txtCorreoUsuario.text = viewModel.correoDelUsuario() ?: "Cuenta de Google"
+        binding.txtCorreoUsuario.text =
+            viewModel.correoDelUsuario() ?: getString(R.string.ajustes_cuenta_google)
         // La GPL pide que el aviso se vea desde la propia app, no solo en el repositorio.
-        binding.txtVersion.text = "DailyMovie ${com.example.dailymovie.BuildConfig.VERSION_NAME}\n" +
-            "Software libre bajo licencia GPL-3.0\n" +
-            "Datos de películas: TMDB"
+        binding.txtVersion.text =
+            getString(R.string.ajustes_version, com.example.dailymovie.BuildConfig.VERSION_NAME)
 
         binding.btnEditarGustos.setOnClickListener {
             startActivity(Intent(requireContext(), OnboardingA::class.java).apply {
@@ -107,11 +107,10 @@ class Settings : Fragment() {
 
         DialogoDailyMovie.mostrar(
             context = requireContext(),
-            titulo = "Idioma de las películas",
-            mensaje = "En este idioma se piden los títulos, las sinopsis y los géneros. " +
-                "Los textos de la app se quedan en español.",
+            titulo = getString(R.string.ajustes_idioma_titulo),
+            mensaje = getString(R.string.ajustes_idioma_mensaje),
             contenido = contenido,
-            textoAceptar = "Aplicar"
+            textoAceptar = getString(R.string.boton_aplicar)
         ) { dialogo ->
             dialogo.dismiss()
             if (elegido == puesto) return@mostrar
@@ -130,13 +129,14 @@ class Settings : Fragment() {
     private fun mostrarRegion() {
         DialogoDailyMovie.mostrar(
             context = requireContext(),
-            titulo = "Región e idioma",
-            mensaje = "Ahora mismo: ${LocaleUtil.getDeviceCountry()} · ${LocaleUtil.getDeviceLanguage()}\n\n" +
-                "Con esto decidimos en qué idioma te enseñamos las películas y qué " +
-                "plataformas de streaming te salen, porque no son las mismas en cada país.\n\n" +
-                "Se coge de los ajustes del móvil. Si lo cambias ahí, la app te sigue.",
-            textoAceptar = "Abrir ajustes del móvil",
-            textoCancelar = "Cerrar"
+            titulo = getString(R.string.ajustes_region_titulo),
+            mensaje = getString(
+                R.string.ajustes_region_mensaje,
+                LocaleUtil.getDeviceCountry(),
+                LocaleUtil.getDeviceLanguage()
+            ),
+            textoAceptar = getString(R.string.ajustes_region_aceptar),
+            textoCancelar = getString(R.string.boton_cerrar)
         ) { dialogo ->
             dialogo.dismiss()
             startActivity(Intent(android.provider.Settings.ACTION_LOCALE_SETTINGS))
@@ -146,14 +146,20 @@ class Settings : Fragment() {
     private fun confirmarBorrarHistorial() {
         DialogoDailyMovie.confirmar(
             context = requireContext(),
-            titulo = "Borrar historial",
-            mensaje = "Se borra todo lo que has buscado. Tus listas y favoritos no se tocan.",
-            textoAceptar = "Borrar",
+            titulo = getString(R.string.ajustes_borrar_historial_titulo),
+            mensaje = getString(R.string.ajustes_borrar_historial_mensaje),
+            textoAceptar = getString(R.string.boton_borrar),
             peligroso = true
         ) {
             viewModel.borrarHistorial { bien ->
                 _binding.siLaVistaSigueAhi { vista ->
-                    Avisos.breve(vista.root, if (bien) "Historial borrado" else "No se ha podido borrar")
+                    Avisos.breve(
+                        vista.root,
+                        getString(
+                            if (bien) R.string.aviso_historial_borrado
+                            else R.string.aviso_historial_no_borrado
+                        )
+                    )
                 }
             }
         }
@@ -161,7 +167,7 @@ class Settings : Fragment() {
 
     private fun mostrarCambiarContrasena() {
         if (!viewModel.entroConCorreo()) {
-            Avisos.largo(binding.root, "Entraste con Google, así que la contraseña se cambia desde tu cuenta de Google")
+            Avisos.largo(binding.root, getString(R.string.ajustes_contrasena_con_google))
             return
         }
 
@@ -172,19 +178,19 @@ class Settings : Fragment() {
 
         DialogoDailyMovie.mostrar(
             context = requireContext(),
-            titulo = "Cambiar contraseña",
+            titulo = getString(R.string.ajustes_cambiar_contrasena_titulo),
             contenido = vista,
-            textoAceptar = "Cambiar"
+            textoAceptar = getString(R.string.boton_cambiar)
         ) { dialogo ->
             val laActual = actual.text.toString()
             val laNueva = nueva.text.toString()
             when {
                 laActual.isEmpty() || laNueva.isEmpty() ->
-                    avisar("Rellena las dos contraseñas")
+                    avisar(getString(R.string.ajustes_contrasena_rellena))
                 laNueva != repetida.text.toString() ->
-                    avisar("Las dos contraseñas nuevas no coinciden")
+                    avisar(getString(R.string.ajustes_contrasena_no_coinciden))
                 laNueva.length < 6 ->
-                    avisar("La contraseña necesita al menos 6 caracteres")
+                    avisar(getString(R.string.ajustes_contrasena_corta))
                 else -> {
                     dialogo.dismiss()
                     viewModel.cambiarContrasena(laActual, laNueva)
@@ -196,9 +202,9 @@ class Settings : Fragment() {
     private fun confirmarCerrarSesion() {
         DialogoDailyMovie.confirmar(
             context = requireContext(),
-            titulo = "Cerrar sesión",
-            mensaje = "¿Seguro? Tus listas se quedan guardadas para cuando vuelvas.",
-            textoAceptar = "Cerrar sesión"
+            titulo = getString(R.string.ajustes_cerrar_sesion),
+            mensaje = getString(R.string.ajustes_cerrar_sesion_mensaje),
+            textoAceptar = getString(R.string.ajustes_cerrar_sesion)
         ) {
             viewModel.cerrarSesion()
         }
@@ -221,15 +227,25 @@ class Settings : Fragment() {
         val activada = Analitica.estaActivada(requireContext())
         DialogoDailyMovie.confirmar(
             context = requireContext(),
-            titulo = "Datos de uso",
-            mensaje = "Recogemos datos anónimos de cómo se usa la app (qué pantallas se abren, " +
-                "si algo falla) para saber qué mejorar.\n\n" +
-                "No incluye lo que ves ni tus listas, y puedes desactivarlo cuando quieras.\n\n" +
-                "Ahora mismo está ${if (activada) "activado" else "desactivado"}.",
-            textoAceptar = if (activada) "Desactivar" else "Activar"
+            titulo = getString(R.string.ajustes_datos_uso_titulo),
+            mensaje = getString(
+                R.string.ajustes_datos_uso_mensaje,
+                getString(
+                    if (activada) R.string.ajustes_datos_uso_activado
+                    else R.string.ajustes_datos_uso_desactivado
+                )
+            ),
+            textoAceptar = getString(
+                if (activada) R.string.boton_desactivar else R.string.boton_activar
+            )
         ) {
             Analitica.activar(requireContext(), !activada)
-            avisar(if (activada) "Datos de uso desactivados" else "Datos de uso activados")
+            avisar(
+                getString(
+                    if (activada) R.string.aviso_datos_uso_desactivados
+                    else R.string.aviso_datos_uso_activados
+                )
+            )
         }
     }
 
@@ -240,11 +256,9 @@ class Settings : Fragment() {
     private fun confirmarBorrarCuenta() {
         DialogoDailyMovie.confirmar(
             context = requireContext(),
-            titulo = "Borrar mi cuenta",
-            mensaje = "Se borra tu cuenta y todo lo que tenemos guardado: favoritos, vistos, " +
-                "listas, historial y tus gustos.\n\n" +
-                "Esto no se puede deshacer.",
-            textoAceptar = "Continuar",
+            titulo = getString(R.string.ajustes_borrar_cuenta_titulo),
+            mensaje = getString(R.string.ajustes_borrar_cuenta_mensaje),
+            textoAceptar = getString(R.string.boton_continuar),
             peligroso = true
         ) {
             pedirContrasenaYBorrar()
@@ -261,24 +275,24 @@ class Settings : Fragment() {
         // El mismo campo que usa el dialogo de crear lista, para no montar otro a mano.
         val contenido = layoutInflater.inflate(R.layout.dialogo_campo_texto, null)
         val campo = contenido.findViewById<EditText>(R.id.dialogoCampo).apply {
-            hint = "Tu contraseña"
+            hint = getString(R.string.ajustes_hint_contrasena)
             inputType = android.text.InputType.TYPE_CLASS_TEXT or
                 android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
 
         DialogoDailyMovie.mostrar(
             context = requireContext(),
-            titulo = "Confirma que eres tú",
-            mensaje = "Escribe tu contraseña para poder borrar la cuenta.",
+            titulo = getString(R.string.ajustes_confirmar_identidad_titulo),
+            mensaje = getString(R.string.ajustes_confirmar_identidad_mensaje),
             contenido = contenido,
-            textoAceptar = "Borrar definitivamente",
+            textoAceptar = getString(R.string.ajustes_borrar_definitivamente),
             peligroso = true
         ) { dialogo ->
             val contrasena = campo.text.toString()
             if (contrasena.isEmpty()) {
                 // Se deja abierto: cerrarlo obligaria a empezar de cero.
                 contenido.findViewById<TextView>(R.id.dialogoAviso).apply {
-                    text = "Escribe tu contraseña"
+                    setText(R.string.ajustes_escribe_contrasena)
                     visibility = View.VISIBLE
                 }
             } else {
