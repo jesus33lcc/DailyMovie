@@ -2,6 +2,8 @@ package com.example.dailymovie.data
 
 import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.WebService
+import com.example.dailymovie.client.enqueueConvertido
+import com.example.dailymovie.client.enqueueResultado
 import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.CreditResponse
 import com.example.dailymovie.client.response.ImagenesResponse
@@ -175,24 +177,15 @@ class TmdbSerieRepository(
         listaDeSeries(servicio.getSeriesEnEmision(), alTerminar)
 
     override fun detalles(serieId: Int, alTerminar: (Resultado<SerieDetailsResponse>) -> Unit) {
-        servicio.getSerieDetalles(serieId).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getSerieDetalles(serieId).enqueueResultado(alTerminar)
     }
 
     override fun temporada(serieId: Int, numero: Int, alTerminar: (Resultado<SeasonResponse>) -> Unit) {
-        servicio.getTemporada(serieId, numero).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getTemporada(serieId, numero).enqueueResultado(alTerminar)
     }
 
     override fun reparto(serieId: Int, alTerminar: (Resultado<CreditResponse>) -> Unit) {
-        servicio.getSerieCreditos(serieId).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getSerieCreditos(serieId).enqueueResultado(alTerminar)
     }
 
     override fun videos(serieId: Int, alTerminar: (Resultado<List<VideoModel>>) -> Unit) {
@@ -207,17 +200,11 @@ class TmdbSerieRepository(
     }
 
     override fun similares(serieId: Int, alTerminar: (Resultado<List<SerieModel>>) -> Unit) {
-        servicio.getSeriesSimilares(serieId).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it.results)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getSeriesSimilares(serieId).enqueueConvertido({ it.results }, alTerminar)
     }
 
     override fun recomendadas(serieId: Int, alTerminar: (Resultado<List<SerieModel>>) -> Unit) {
-        servicio.getSeriesRecomendadas(serieId).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it.results)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getSeriesRecomendadas(serieId).enqueueConvertido({ it.results }, alTerminar)
     }
 
     override fun imagenes(serieId: Int, alTerminar: (List<String>) -> Unit) {
@@ -255,27 +242,18 @@ class TmdbSerieRepository(
     }
 
     override fun plataformas(serieId: Int, alTerminar: (Resultado<ProviderResponse>) -> Unit) {
-        servicio.getSerieProviders(serieId).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getSerieProviders(serieId).enqueueResultado(alTerminar)
     }
 
     private fun listaDeSeries(
         llamada: Call<com.example.dailymovie.client.response.SeriesResponse>,
         alTerminar: (Resultado<List<SerieModel>>) -> Unit
     ) {
-        llamada.enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it.results)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        llamada.enqueueConvertido({ it.results }, alTerminar)
     }
 
     override fun generos(alTerminar: (Resultado<List<GenreModel>>) -> Unit) {
-        servicio.getGenerosDeSeries().enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it.generos)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getGenerosDeSeries().enqueueConvertido({ it.generos }, alTerminar)
     }
 
     override fun porGeneros(

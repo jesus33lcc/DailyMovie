@@ -2,6 +2,8 @@ package com.example.dailymovie.data
 
 import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.WebService
+import com.example.dailymovie.client.enqueueConvertido
+import com.example.dailymovie.client.enqueueResultado
 import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.PeliculaDePersona
 import com.example.dailymovie.client.response.PersonaPopular
@@ -76,10 +78,7 @@ class TmdbPersonRepository(
 ) : PersonRepository {
 
     override fun ficha(personaId: Int, alTerminar: (Resultado<PersonModel>) -> Unit) {
-        servicio.getPersona(personaId).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getPersona(personaId).enqueueResultado(alTerminar)
     }
 
     /**
@@ -113,19 +112,15 @@ class TmdbPersonRepository(
     }
 
     override fun populares(alTerminar: (Resultado<List<PersonaPopular>>) -> Unit) {
-        servicio.getPersonasPopulares().enqueueSimple(
-            onExito = { respuesta ->
-                alTerminar(Resultado.Exito(respuesta.resultados.filter { !it.foto.isNullOrBlank() }))
-            },
-            onError = { alTerminar(Resultado.Fallo(it)) }
+        servicio.getPersonasPopulares().enqueueConvertido(
+            { respuesta -> respuesta.resultados.filter { !it.foto.isNullOrBlank() } },
+            alTerminar
         )
     }
 
     override fun filmografia(personaId: Int, alTerminar: (Resultado<Filmografia>) -> Unit) {
-        servicio.getFilmografia(personaId).enqueueSimple(
-            onExito = { respuesta ->
-                alTerminar(
-                    Resultado.Exito(
+        servicio.getFilmografia(personaId).enqueueConvertido(
+            { respuesta ->
                         Filmografia(
                             // Las mas valoradas primero: es lo que la gente busca de un actor.
                             actuando = respuesta.actuaciones
@@ -140,10 +135,8 @@ class TmdbPersonRepository(
                                 .filter { esEnseñable(it) && it.puesto == "Director" }
                                 .sortedByDescending { it.popularidad }
                         )
-                    )
-                )
             },
-            onError = { alTerminar(Resultado.Fallo(it)) }
+            alTerminar
         )
     }
 }

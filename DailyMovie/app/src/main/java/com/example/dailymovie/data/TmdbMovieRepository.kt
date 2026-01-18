@@ -2,6 +2,8 @@ package com.example.dailymovie.data
 
 import com.example.dailymovie.client.RetrofitClient
 import com.example.dailymovie.client.WebService
+import com.example.dailymovie.client.enqueueConvertido
+import com.example.dailymovie.client.enqueueResultado
 import com.example.dailymovie.client.enqueueSimple
 import com.example.dailymovie.client.response.CreditResponse
 import com.example.dailymovie.client.response.ResenaResponse
@@ -90,10 +92,7 @@ class TmdbMovieRepository(
     }
 
     override fun tendencias(alTerminar: (Resultado<List<Hallazgo>>) -> Unit) {
-        servicio.getTendencias().enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(aHallazgos(it.resultados))) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getTendencias().enqueueConvertido({ aHallazgos(it.resultados) }, alTerminar)
     }
 
     /**
@@ -181,24 +180,15 @@ class TmdbMovieRepository(
     }
 
     override fun detalles(peliculaId: Int, alTerminar: (Resultado<MovieDetailsResponse>) -> Unit) {
-        servicio.getMovieDetails(peliculaId).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getMovieDetails(peliculaId).enqueueResultado(alTerminar)
     }
 
     override fun plataformas(peliculaId: Int, alTerminar: (Resultado<ProviderResponse>) -> Unit) {
-        servicio.getMovieProviders(peliculaId).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getMovieProviders(peliculaId).enqueueResultado(alTerminar)
     }
 
     override fun reparto(peliculaId: Int, alTerminar: (Resultado<CreditResponse>) -> Unit) {
-        servicio.getMovieCredits(peliculaId).enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getMovieCredits(peliculaId).enqueueResultado(alTerminar)
     }
 
     override fun videos(peliculaId: Int, alTerminar: (Resultado<List<VideoModel>>) -> Unit) {
@@ -259,17 +249,11 @@ class TmdbMovieRepository(
     }
 
     override fun plataformasDisponibles(alTerminar: (Resultado<List<PlataformaDisponible>>) -> Unit) {
-        servicio.getPlataformasDisponibles().enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it.plataformas.sortedBy { p -> p.prioridad })) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getPlataformasDisponibles().enqueueConvertido({ it.plataformas.sortedBy { p -> p.prioridad } }, alTerminar)
     }
 
     override fun generos(alTerminar: (Resultado<List<GenreModel>>) -> Unit) {
-        servicio.getGeneros().enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it.generos)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        servicio.getGeneros().enqueueConvertido({ it.generos }, alTerminar)
     }
 
     /** Los trailers van delante; el resto (clips, featurettes) detras. */
@@ -280,9 +264,6 @@ class TmdbMovieRepository(
         llamada: Call<com.example.dailymovie.client.response.MoviesResponse>,
         alTerminar: (Resultado<List<MovieModel>>) -> Unit
     ) {
-        llamada.enqueueSimple(
-            onExito = { alTerminar(Resultado.Exito(it.results)) },
-            onError = { alTerminar(Resultado.Fallo(it)) }
-        )
+        llamada.enqueueConvertido({ it.results }, alTerminar)
     }
 }
