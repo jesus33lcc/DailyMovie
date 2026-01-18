@@ -1,5 +1,6 @@
 package com.example.dailymovie.client
 
+import com.example.dailymovie.data.Resultado
 import com.example.dailymovie.utils.ErrorCarga
 import retrofit2.Call
 import retrofit2.Callback
@@ -40,4 +41,40 @@ fun <T> Call<T>.enqueueSimple(
             onError(ErrorCarga.SIN_CONEXION)
         }
     })
+}
+
+/**
+ * Lo mismo que [enqueueSimple] pero devolviendo ya un [Resultado].
+ *
+ * Es lo que hacen casi todos los repositorios: envolver el cuerpo en `Resultado.Exito` y el
+ * motivo en `Resultado.Fallo`. Estaba escrito veinticuatro veces exactamente igual, y las
+ * cuatro lineas del `onError` no cambiaban ni una coma.
+ *
+ * @param alTerminar recibe los datos o el motivo por el que no hay ninguno.
+ */
+fun <T : Any> Call<T>.enqueueResultado(alTerminar: (Resultado<T>) -> Unit) {
+    enqueueSimple(
+        onExito = { alTerminar(Resultado.Exito(it)) },
+        onError = { alTerminar(Resultado.Fallo(it)) }
+    )
+}
+
+/**
+ * Como [enqueueResultado], pero pasando antes la respuesta por una conversion.
+ *
+ * Casi ninguna pantalla quiere el sobre de TMDB tal cual: quiere la lista de dentro, o el
+ * modelo de dominio. Con esto la conversion se escribe en una linea y el reparto de errores
+ * sigue siendo el mismo de siempre.
+ *
+ * @param convertir de la respuesta de TMDB a lo que de verdad se usa arriba.
+ * @param alTerminar recibe lo ya convertido, o el motivo del fallo.
+ */
+fun <T : Any, R : Any> Call<T>.enqueueConvertido(
+    convertir: (T) -> R,
+    alTerminar: (Resultado<R>) -> Unit
+) {
+    enqueueSimple(
+        onExito = { alTerminar(Resultado.Exito(convertir(it))) },
+        onError = { alTerminar(Resultado.Fallo(it)) }
+    )
 }
