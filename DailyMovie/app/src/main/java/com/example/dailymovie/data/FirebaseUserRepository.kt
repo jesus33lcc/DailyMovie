@@ -444,8 +444,10 @@ class FirebaseUserRepository(
         val documento = documentoDelUsuario() ?: return alTerminar(null)
         documento.get()
             .addOnSuccessListener { doc ->
-                @Suppress("UNCHECKED_CAST")
-                val mapa = doc.get(GUSTOS) as? Map<String, Any> ?: return@addOnSuccessListener alTerminar(null)
+                // Con Map<*, *> no hace falta el @Suppress: las claves se leen igual y no se
+                // promete nada sobre los tipos de dentro, que es lo unico que Kotlin no puede
+                // comprobar.
+                val mapa = doc.get(GUSTOS) as? Map<*, *> ?: return@addOnSuccessListener alTerminar(null)
                 alTerminar(
                     Gustos(
                         generos = aEnteros(mapa["generos"]),
@@ -539,11 +541,31 @@ class FirebaseUserRepository(
      * pintar (una lista vacia se ve igual de bien que un error), pero **no** para decidir que
      * se reescribe: para eso esta [leerListaOFallar].
      */
-    private fun leerLista(campo: String, alTerminar: (List<MovieModel>) -> Unit) {
-        val documento = documentoDelUsuario() ?: return alTerminar(emptyList())
+    /**
+     * Lee un campo del documento del usuario y lo convierte a lo que haga falta.
+     *
+     * Habia cuatro lectores calcados (peliculas y series, cada uno con su version que
+     * distingue el fallo) que solo cambiaban en el nombre del campo y en la conversion.
+     *
+     * @param campo el nombre del array en Firestore.
+     * @param convertir como se pasa de lo que guarda Firestore a modelos.
+     * @param alTerminar recibe la lista, o **null si la lectura fallo**. Distinguir las dos
+     *   cosas importa: confundir "no hay nada" con "no se ha podido leer" es lo que hacia que
+     *   quitar una pelicula de favoritos pudiera borrarlos todos.
+     */
+    private fun <T> leerCampo(
+        campo: String,
+        convertir: (Any?) -> List<T>,
+        alTerminar: (List<T>?) -> Unit
+    ) {
+        val documento = documentoDelUsuario() ?: return alTerminar(null)
         documento.get()
-            .addOnSuccessListener { alTerminar(aPeliculas(it.get(campo))) }
-            .addOnFailureListener { alTerminar(emptyList()) }
+            .addOnSuccessListener { alTerminar(convertir(it.get(campo))) }
+            .addOnFailureListener { alTerminar(null) }
+    }
+
+    private fun leerLista(campo: String, alTerminar: (List<MovieModel>) -> Unit) {
+        leerCampo(campo, ::aPeliculas) { alTerminar(it.orEmpty()) }
     }
 
     /**
@@ -555,20 +577,12 @@ class FirebaseUserRepository(
      *
      * @param alTerminar recibe null si la lectura fallo, y la lista si salio bien.
      */
-    private fun leerListaOFallar(campo: String, alTerminar: (List<MovieModel>?) -> Unit) {
-        val documento = documentoDelUsuario() ?: return alTerminar(null)
-        documento.get()
-            .addOnSuccessListener { alTerminar(aPeliculas(it.get(campo))) }
-            .addOnFailureListener { alTerminar(null) }
-    }
+    private fun leerListaOFallar(campo: String, alTerminar: (List<MovieModel>?) -> Unit) =
+        leerCampo(campo, ::aPeliculas, alTerminar)
 
     /** Lo mismo que [leerListaOFallar] pero con series. */
-    private fun leerSeriesOFallar(campo: String, alTerminar: (List<SerieModel>?) -> Unit) {
-        val documento = documentoDelUsuario() ?: return alTerminar(null)
-        documento.get()
-            .addOnSuccessListener { alTerminar(aSeries(it.get(campo))) }
-            .addOnFailureListener { alTerminar(null) }
-    }
+    private fun leerSeriesOFallar(campo: String, alTerminar: (List<SerieModel>?) -> Unit) =
+        leerCampo(campo, ::aSeries, alTerminar)
 
     private fun contiene(campo: String, peliculaId: Int, alTerminar: (Boolean) -> Unit) {
         leerLista(campo) { peliculas -> alTerminar(peliculas.any { it.id == peliculaId }) }
@@ -618,27 +632,32 @@ class FirebaseUserRepository(
      * Ojo: las claves guardadas son los nombres Kotlin (releaseDate, voteAverage...), no el
      * snake_case de TMDB, porque se guardo el objeto entero con arrayUnion.
      */
-    private fun aPeliculas(bruto: Any?): List<MovieModel> {
-        @Suppress("UNCHECKED_CAST")
-        val lista = bruto as? List<Map<String, Any?>> ?: return emptyList()
-        return lista.mapNotNull { mapa ->
-            val id = (mapa["id"] as? Number)?.toInt() ?: return@mapNotNull null
-            val titulo = mapa["title"] as? String ?: return@mapNotNull null
-            MovieModel(
-                id = id,
-                title = titulo,
-                releaseDate = mapa["releaseDate"] as? String ?: "",
-                voteAverage = (mapa["voteAverage"] as? Number)?.toDouble() ?: 0.0,
-                posterPath = mapa["posterPath"] as? String
-            )
-        }
+    private fun aPeliculas(bruto: Any?): List<MovieModel> = comoMapas(bruto).mapNotNull { mapa ->
+        val id = (mapa["id"] as? Number)?.toInt() ?: return@mapNotNull null
+        val titulo = mapa["title"] as? String ?: return@mapNotNull null
+        MovieModel(
+            id = id,
+            title = titulo,
+            releaseDate = mapa["releaseDate"] as? String ?: "",
+            voteAverage = (mapa["voteAverage"] as? Number)?.toDouble() ?: 0.0,
+            posterPath = mapa["posterPath"] as? String
+        )
     }
 
+    /**
+     * Pasa lo que devuelve Firestore a una lista de mapas, sin fiarse de nada.
+     *
+     * Antes se hacia `bruto as? List<Map<String, Any?>>`, y ese `as?` **solo comprueba que es
+     * una List**: lo de dentro no lo mira nadie, porque los genericos de Kotlin se borran al
+     * compilar. Con un dato antiguo o tocado a mano en la consola de Firebase, el primer
+     * `mapa["id"]` lanzaba ClassCastException dentro del callback y tiraba la app. El
+     * `@Suppress("UNCHECKED_CAST")` que habia justo encima tapaba exactamente eso.
+     */
+    private fun comoMapas(bruto: Any?): List<Map<*, *>> =
+        (bruto as? List<*>).orEmpty().mapNotNull { it as? Map<*, *> }
+
     private fun leerSeries(campo: String, alTerminar: (List<SerieModel>) -> Unit) {
-        val documento = documentoDelUsuario() ?: return alTerminar(emptyList())
-        documento.get()
-            .addOnSuccessListener { alTerminar(aSeries(it.get(campo))) }
-            .addOnFailureListener { alTerminar(emptyList()) }
+        leerCampo(campo, ::aSeries) { alTerminar(it.orEmpty()) }
     }
 
     /** Mete o saca la serie segun si ya estaba, igual que con las peliculas. */
@@ -670,27 +689,20 @@ class FirebaseUserRepository(
      * Ojo con los nombres: al guardar el objeto entero con arrayUnion, las claves que quedan
      * en Firestore son las de Kotlin (titulo, estreno, valoracion, poster), no las de TMDB.
      */
-    private fun aSeries(bruto: Any?): List<SerieModel> {
-        @Suppress("UNCHECKED_CAST")
-        val lista = bruto as? List<Map<String, Any?>> ?: return emptyList()
-        return lista.mapNotNull { mapa ->
-            val id = (mapa["id"] as? Number)?.toInt() ?: return@mapNotNull null
-            val titulo = mapa["titulo"] as? String ?: return@mapNotNull null
-            SerieModel(
-                id = id,
-                titulo = titulo,
-                estreno = mapa["estreno"] as? String,
-                valoracion = (mapa["valoracion"] as? Number)?.toDouble() ?: 0.0,
-                poster = mapa["poster"] as? String
-            )
-        }
+    private fun aSeries(bruto: Any?): List<SerieModel> = comoMapas(bruto).mapNotNull { mapa ->
+        val id = (mapa["id"] as? Number)?.toInt() ?: return@mapNotNull null
+        val titulo = mapa["titulo"] as? String ?: return@mapNotNull null
+        SerieModel(
+            id = id,
+            titulo = titulo,
+            estreno = mapa["estreno"] as? String,
+            valoracion = (mapa["valoracion"] as? Number)?.toDouble() ?: 0.0,
+            poster = mapa["poster"] as? String
+        )
     }
 
-    private fun aEnteros(bruto: Any?): List<Int> {
-        @Suppress("UNCHECKED_CAST")
-        val lista = bruto as? List<Any?> ?: return emptyList()
-        return lista.mapNotNull { (it as? Number)?.toInt() }
-    }
+    private fun aEnteros(bruto: Any?): List<Int> =
+        (bruto as? List<*>).orEmpty().mapNotNull { (it as? Number)?.toInt() }
 
     /** Los mensajes de Firebase vienen en ingles; se cambian por algo entendible. */
     private fun traducirError(error: Exception): String = when {
