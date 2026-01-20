@@ -73,7 +73,7 @@ class SerieA : AppCompatActivity() {
         // la imagen viaje hasta aqui en vez de aparecer de golpe.
         binding.imgPosterSerie.transitionName = "cartel_${TipoDeHallazgo.SERIE}_$serieId"
         if (serieId == -1) {
-            Avisos.breve(binding.root, "No se ha podido abrir la serie")
+            Avisos.breve(binding.root, getString(R.string.serie_no_se_puede_abrir))
             finish()
             return
         }
@@ -233,25 +233,29 @@ class SerieA : AppCompatActivity() {
             val desde = Fechas.soloElAno(serie.estreno)
             val hasta = Fechas.soloElAno(serie.ultimaEmision)
             if (desde.isNotBlank()) {
-                trozos += if (hasta.isBlank() || hasta == desde) desde else "$desde — $hasta"
+                trozos += if (hasta.isBlank() || hasta == desde) desde
+                else getString(R.string.rango_desde_hasta, desde, hasta)
             }
         }
         if (serie.numeroDeTemporadas > 0) {
-            trozos += if (serie.numeroDeTemporadas == 1) "1 temporada"
-            else "${serie.numeroDeTemporadas} temporadas"
+            trozos += resources.getQuantityString(
+                R.plurals.temporadas_contadas, serie.numeroDeTemporadas, serie.numeroDeTemporadas
+            )
         }
-        if (serie.numeroDeEpisodios > 0) trozos += "${serie.numeroDeEpisodios} episodios"
+        if (serie.numeroDeEpisodios > 0) {
+            trozos += getString(R.string.serie_episodios, serie.numeroDeEpisodios)
+        }
 
         return trozos.joinToString(" · ")
     }
 
     private fun traducirEstado(estado: String?): String = when (estado) {
-        "Ended" -> "Terminada"
-        "Returning Series" -> "En emisión"
-        "Canceled" -> "Cancelada"
-        "In Production" -> "En producción"
-        "Planned" -> "Anunciada"
-        "Pilot" -> "Piloto"
+        "Ended" -> getString(R.string.serie_estado_terminada)
+        "Returning Series" -> getString(R.string.serie_estado_en_emision)
+        "Canceled" -> getString(R.string.serie_estado_cancelada)
+        "In Production" -> getString(R.string.serie_estado_en_produccion)
+        "Planned" -> getString(R.string.serie_estado_anunciada)
+        "Pilot" -> getString(R.string.serie_estado_piloto)
         else -> ""
     }
 
@@ -315,9 +319,9 @@ class SerieA : AppCompatActivity() {
         }
         binding.txtProgresoSerie.visibility = View.VISIBLE
         binding.txtProgresoSerie.text = if (vistos >= totalDeEpisodios) {
-            "La has visto entera"
+            getString(R.string.serie_vista_entera)
         } else {
-            "Llevas $vistos de $totalDeEpisodios episodios"
+            getString(R.string.serie_progreso, vistos, totalDeEpisodios)
         }
     }
 
@@ -349,9 +353,16 @@ class SerieA : AppCompatActivity() {
             .toSet()
 
         binding.txtTemporadaAbierta.text = if (vistosDeEstaTemporada.isEmpty()) {
-            "${temporada.nombre} · ${temporada.episodios.size} episodios"
+            getString(
+                R.string.serie_temporada_episodios, temporada.nombre, temporada.episodios.size
+            )
         } else {
-            "${temporada.nombre} · ${vistosDeEstaTemporada.size} de ${temporada.episodios.size} vistos"
+            getString(
+                R.string.serie_temporada_vistos,
+                temporada.nombre,
+                vistosDeEstaTemporada.size,
+                temporada.episodios.size
+            )
         }
 
         binding.recyclerEpisodios.adapter = EpisodioAdapter(

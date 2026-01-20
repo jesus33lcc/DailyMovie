@@ -45,9 +45,7 @@ class EstadisticasA : AppCompatActivity() {
         if (numeros.all { it.numero == "0" }) {
             binding.contenedorNumeros.addView(
                 TextView(this).apply {
-                    text = "Todavía no hay nada que contar.\n\n" +
-                        "Marca películas como vistas o guárdalas en favoritos y aquí verás " +
-                        "en qué se te va el tiempo."
+                    setText(R.string.estadisticas_vacio)
                     textSize = 17f
                     setPadding(24, 48, 24, 24)
                     gravity = android.view.Gravity.CENTER

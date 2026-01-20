@@ -44,7 +44,7 @@ class PersonaA : AppCompatActivity() {
 
         val personaId = intent.getIntExtra(EXTRA_PERSONA_ID, -1)
         if (personaId == -1) {
-            Avisos.breve(binding.root, "No se ha podido abrir la ficha")
+            Avisos.breve(binding.root, getString(R.string.persona_no_se_puede_abrir))
             finish()
             return
         }
@@ -97,13 +97,13 @@ class PersonaA : AppCompatActivity() {
 
     /** TMDB devuelve el oficio en ingles: Acting, Directing, Writing... */
     private fun traducirOficio(oficio: String?): String = when (oficio) {
-        "Acting" -> "Actor / Actriz"
-        "Directing" -> "Dirección"
-        "Writing" -> "Guion"
-        "Production" -> "Producción"
-        "Sound" -> "Sonido"
-        "Camera" -> "Fotografía"
-        "Editing" -> "Montaje"
+        "Acting" -> getString(R.string.oficio_actuando)
+        "Directing" -> getString(R.string.oficio_direccion)
+        "Writing" -> getString(R.string.oficio_guion)
+        "Production" -> getString(R.string.oficio_produccion)
+        "Sound" -> getString(R.string.oficio_sonido)
+        "Camera" -> getString(R.string.oficio_fotografia)
+        "Editing" -> getString(R.string.oficio_montaje)
         null -> ""
         else -> oficio
     }
@@ -116,7 +116,11 @@ class PersonaA : AppCompatActivity() {
             trozos += if (fallecimiento == null) {
                 Fechas.enLargo(nacimiento)
             } else {
-                "${Fechas.enLargo(nacimiento)} — ${Fechas.enLargo(fallecimiento)}"
+                getString(
+                    R.string.rango_desde_hasta,
+                    Fechas.enLargo(nacimiento),
+                    Fechas.enLargo(fallecimiento)
+                )
             }
         }
         persona.lugarDeNacimiento?.takeIf { it.isNotBlank() }?.let { trozos += it }

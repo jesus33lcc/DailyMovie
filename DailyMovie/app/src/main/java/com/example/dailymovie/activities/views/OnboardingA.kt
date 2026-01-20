@@ -7,6 +7,7 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.dailymovie.R
 import com.example.dailymovie.activities.viewmodels.OnboardingViewModel
 import com.example.dailymovie.adapters.Elegible
 import com.example.dailymovie.adapters.ElegibleAdapter
@@ -69,7 +70,7 @@ class OnboardingA : AppCompatActivity() {
 
         viewModel.guardado.observe(this) { guardado ->
             if (guardado == null) return@observe
-            if (!guardado) Avisos.breve(binding.root, "No se han podido guardar tus gustos")
+            if (!guardado) Avisos.breve(binding.root, getString(R.string.onboarding_no_guardado))
             salir()
         }
 
@@ -83,30 +84,24 @@ class OnboardingA : AppCompatActivity() {
     private fun mostrarPaso() {
         when (paso) {
             PASO_GENEROS -> {
-                binding.onboardingPaso.text = "Paso 1 de 3"
-                binding.onboardingTitulo.text = "¿Qué géneros te gustan?"
-                binding.onboardingExplicacion.text =
-                    "Elige los que más veas. Con esto elegimos la película que te " +
-                        "enseñamos al abrir la app."
-                binding.onboardingSiguiente.text = "Siguiente"
+                binding.onboardingPaso.text = getString(R.string.onboarding_paso, 1, PASOS)
+                binding.onboardingTitulo.setText(R.string.onboarding_generos_titulo)
+                binding.onboardingExplicacion.setText(R.string.onboarding_generos_explicacion)
+                binding.onboardingSiguiente.setText(R.string.boton_siguiente)
                 viewModel.cargarGeneros()
             }
             PASO_PELICULAS -> {
-                binding.onboardingPaso.text = "Paso 2 de 3"
-                binding.onboardingTitulo.text = "¿Alguna de estas te suena?"
-                binding.onboardingExplicacion.text =
-                    "Marca las que ya has visto y te gustaron. Así no te las volvemos a " +
-                        "recomendar y afinamos con las demás."
-                binding.onboardingSiguiente.text = "Siguiente"
+                binding.onboardingPaso.text = getString(R.string.onboarding_paso, 2, PASOS)
+                binding.onboardingTitulo.setText(R.string.onboarding_peliculas_titulo)
+                binding.onboardingExplicacion.setText(R.string.onboarding_peliculas_explicacion)
+                binding.onboardingSiguiente.setText(R.string.boton_siguiente)
                 viewModel.cargarPeliculasSugeridas()
             }
             PASO_PERSONAS -> {
-                binding.onboardingPaso.text = "Paso 3 de 3"
-                binding.onboardingTitulo.text = "¿A quién sigues?"
-                binding.onboardingExplicacion.text =
-                    "Actores y directores que te gustan. Cuando estrenen algo nuevo, te lo " +
-                        "enseñamos al abrir la app."
-                binding.onboardingSiguiente.text = "Terminar"
+                binding.onboardingPaso.text = getString(R.string.onboarding_paso, 3, PASOS)
+                binding.onboardingTitulo.setText(R.string.onboarding_personas_titulo)
+                binding.onboardingExplicacion.setText(R.string.onboarding_personas_explicacion)
+                binding.onboardingSiguiente.setText(R.string.boton_terminar)
                 viewModel.cargarPersonasSugeridas()
             }
         }
@@ -116,7 +111,7 @@ class OnboardingA : AppCompatActivity() {
         when (paso) {
             PASO_GENEROS -> {
                 if (!viewModel.hayAlgunGenero()) {
-                    Avisos.breve(binding.root, "Elige al menos un género, o toca «Ahora no»")
+                    Avisos.breve(binding.root, getString(R.string.onboarding_elige_un_genero))
                     return
                 }
                 paso = PASO_PELICULAS
@@ -173,5 +168,8 @@ class OnboardingA : AppCompatActivity() {
         private const val PASO_GENEROS = 0
         private const val PASO_PELICULAS = 1
         private const val PASO_PERSONAS = 2
+
+        /** Cuantos pasos tiene el onboarding, para el "Paso 1 de 3" de la cabecera. */
+        private const val PASOS = 3
     }
 }

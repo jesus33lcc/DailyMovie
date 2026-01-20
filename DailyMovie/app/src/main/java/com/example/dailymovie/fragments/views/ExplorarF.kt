@@ -247,7 +247,7 @@ class ExplorarF : Fragment() {
             contenedor.addView(chip)
         }
 
-        anadirChipDePlataforma(null, "Cualquiera")
+        anadirChipDePlataforma(null, getString(R.string.explorar_plataforma_cualquiera))
         explorarViewModel.plataformas.value.orEmpty().take(12).forEach {
             anadirChipDePlataforma(it.id, it.nombre)
         }
@@ -257,10 +257,10 @@ class ExplorarF : Fragment() {
 
         DialogoDailyMovie.mostrar(
             context = requireContext(),
-            titulo = "Filtrar",
+            titulo = getString(R.string.explorar_filtrar_titulo),
             contenido = contenido,
-            textoAceptar = "Aplicar",
-            textoCancelar = "Quitar filtros",
+            textoAceptar = getString(R.string.boton_aplicar),
+            textoCancelar = getString(R.string.explorar_quitar_filtros),
             alCancelar = {
                 explorarViewModel.cambiarFiltrosAvanzados(FiltrosAvanzados())
                 pintarBotonDeFiltros()
@@ -300,14 +300,16 @@ class ExplorarF : Fragment() {
     private fun pintarChips() {
         val filtro = explorarViewModel.filtro.tipo
         listOf(
-            Triple(binding.chipTodo, null as TipoDeHallazgo?, "Todo"),
-            Triple(binding.chipPeliculas, TipoDeHallazgo.PELICULA, "Películas"),
-            Triple(binding.chipSeries, TipoDeHallazgo.SERIE, "Series"),
-            Triple(binding.chipSagas, TipoDeHallazgo.SAGA, "Sagas"),
-            Triple(binding.chipPersonas, TipoDeHallazgo.PERSONA, "Gente")
+            Triple(binding.chipTodo, null as TipoDeHallazgo?, getString(R.string.explorar_chip_todo)),
+            Triple(binding.chipPeliculas, TipoDeHallazgo.PELICULA, getString(R.string.explorar_chip_peliculas)),
+            Triple(binding.chipSeries, TipoDeHallazgo.SERIE, getString(R.string.explorar_chip_series)),
+            Triple(binding.chipSagas, TipoDeHallazgo.SAGA, getString(R.string.explorar_chip_sagas)),
+            Triple(binding.chipPersonas, TipoDeHallazgo.PERSONA, getString(R.string.explorar_chip_gente))
         ).forEach { (chip, tipo, nombre) ->
             val cuantos = explorarViewModel.cuantosHayDe(tipo)
-            chip.text = if (cuantos > 0) "$nombre · $cuantos" else nombre
+            chip.text =
+                if (cuantos > 0) getString(R.string.explorar_chip_con_cuenta, nombre, cuantos)
+                else nombre
             chip.isSelected = filtro == tipo
             // Un chip de un tipo del que no hay nada solo estorba.
             chip.mostrarSi(tipo == null || cuantos > 0)
@@ -442,7 +444,7 @@ class ExplorarF : Fragment() {
     private fun sorprender() {
         val elegida = explorarViewModel.unaAlAzar()
         if (elegida == null) {
-            Avisos.breve(binding.root, "Todavía no hay nada que proponerte")
+            Avisos.breve(binding.root, getString(R.string.explorar_nada_que_proponer))
             return
         }
         abrir(elegida)

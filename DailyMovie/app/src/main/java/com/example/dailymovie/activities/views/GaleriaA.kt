@@ -47,7 +47,7 @@ class GaleriaA : AppCompatActivity() {
     }
 
     private fun actualizarContador(posicion: Int, total: Int) {
-        binding.contadorImagenes.text = "${posicion + 1} / $total"
+        binding.contadorImagenes.text = getString(R.string.galeria_contador, posicion + 1, total)
     }
 
     private class Adaptador(private val rutas: List<String>) :
