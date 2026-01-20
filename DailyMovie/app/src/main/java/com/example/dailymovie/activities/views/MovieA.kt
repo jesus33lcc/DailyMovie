@@ -60,7 +60,7 @@ class MovieA : AppCompatActivity() {
         // Sin un id no hay nada que enseñar. Antes se avisaba y se dejaba una pantalla vacia
         // y muerta; las fichas de serie y de persona ya cerraban en este caso.
         if (movieId == -1) {
-            showToast("No hemos podido abrir esa película")
+            showToast(getString(R.string.pelicula_no_se_puede_abrir))
             finish()
             return
         }

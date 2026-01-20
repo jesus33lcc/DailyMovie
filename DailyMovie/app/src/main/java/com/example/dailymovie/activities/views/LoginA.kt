@@ -97,18 +97,17 @@ class LoginA : AppCompatActivity() {
         // El mismo campo que el resto de dialogos, en vez de un EditText suelto sin margenes.
         val contenido = layoutInflater.inflate(R.layout.dialogo_campo_texto, null)
         val campo = contenido.findViewById<android.widget.EditText>(R.id.dialogoCampo).apply {
-            hint = "Tu correo electrónico"
+            hint = getString(R.string.login_hint_correo)
             inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
             setText(binding.loginEmailEdittxt.text.toString())
         }
 
         DialogoDailyMovie.mostrar(
             context = this,
-            titulo = "Recuperar contraseña",
-            mensaje = "Te mandamos un correo con un enlace para poner una contraseña nueva.\n\n" +
-                "Si no te llega en unos minutos, mira en la carpeta de spam.",
+            titulo = getString(R.string.login_recuperar_titulo),
+            mensaje = getString(R.string.login_recuperar_mensaje),
             contenido = contenido,
-            textoAceptar = "Enviar"
+            textoAceptar = getString(R.string.boton_enviar)
         ) { dialogo ->
             dialogo.dismiss()
             viewModel.recuperarContrasena(campo.text.toString())
@@ -118,10 +117,9 @@ class LoginA : AppCompatActivity() {
     private fun mostrarCorreoEnviado() {
         DialogoDailyMovie.mostrar(
             context = this,
-            titulo = "Correo enviado",
-            mensaje = "Ya te hemos mandado el enlace. Ábrelo desde el móvil, elige tu contraseña " +
-                "nueva y vuelve aquí a iniciar sesión.",
-            textoAceptar = "Entendido",
+            titulo = getString(R.string.login_correo_enviado_titulo),
+            mensaje = getString(R.string.login_correo_enviado_mensaje),
+            textoAceptar = getString(R.string.boton_entendido),
             textoCancelar = null
         ) { it.dismiss() }
     }

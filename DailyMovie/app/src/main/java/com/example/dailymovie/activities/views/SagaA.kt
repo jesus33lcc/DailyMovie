@@ -66,12 +66,15 @@ class SagaA : AppCompatActivity() {
 
     /** "3 películas · 1972 - 1990", que es lo que se quiere saber de un vistazo. */
     private fun resumen(peliculas: List<Hallazgo>): String {
-        val cuantas = if (peliculas.size == 1) "1 película" else "${peliculas.size} películas"
+        val cuantas = resources.getQuantityString(
+            R.plurals.peliculas_contadas, peliculas.size, peliculas.size
+        )
         val anos = peliculas.mapNotNull { Fechas.soloElAno(it.subtitulo).toIntOrNull() }
         if (anos.isEmpty()) return cuantas
         val primero = anos.min()
         val ultimo = anos.max()
-        return if (primero == ultimo) "$cuantas · $primero" else "$cuantas · $primero - $ultimo"
+        return if (primero == ultimo) getString(R.string.saga_resumen_un_ano, cuantas, primero)
+        else getString(R.string.saga_resumen_rango, cuantas, primero, ultimo)
     }
 
 

@@ -78,10 +78,10 @@ class ListMoviesA : AppCompatActivity() {
     private fun pintarCuantasHay(guardados: List<Guardado>) {
         val cuantas = guardados.size
         binding.listCuantas.mostrarSi(!(cuantas == 0))
-        binding.listCuantas.text = when {
-            guardados.any { it.esSerie } -> if (cuantas == 1) "1 título" else "$cuantas títulos"
-            cuantas == 1 -> "1 película"
-            else -> "$cuantas películas"
+        binding.listCuantas.text = if (guardados.any { it.esSerie }) {
+            resources.getQuantityString(R.plurals.titulos_contados, cuantas, cuantas)
+        } else {
+            resources.getQuantityString(R.plurals.peliculas_contadas, cuantas, cuantas)
         }
     }
 
@@ -157,7 +157,7 @@ class ListMoviesA : AppCompatActivity() {
 
         Avisos.conDeshacer(
             vista = binding.root,
-            texto = "${elemento.titulo} fuera de $listName",
+            texto = getString(R.string.lista_elemento_fuera, elemento.titulo, listName),
             alDeshacer = {
                 movieList.add(position.coerceAtMost(movieList.size), elemento)
                 movieListAdapter.submitList(movieList.toList())
@@ -177,7 +177,7 @@ class ListMoviesA : AppCompatActivity() {
             if (!bien) {
                 // No se pudo guardar, asi que la pelicula vuelve a su sitio: dejarla fuera
                 // seria mentirle al usuario, porque al volver a entrar reapareceria.
-                Avisos.breve(binding.root, "No se ha podido quitar")
+                Avisos.breve(binding.root, getString(R.string.aviso_no_se_ha_podido_quitar))
                 movieList.add(position.coerceAtMost(movieList.size), elemento)
                 movieListAdapter.submitList(movieList.toList())
             }
