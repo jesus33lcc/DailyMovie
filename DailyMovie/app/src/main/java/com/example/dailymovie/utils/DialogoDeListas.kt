@@ -37,10 +37,9 @@ fun AppCompatActivity.elegirListas(
     if (listasDelUsuario.isEmpty()) {
         DialogoDailyMovie.mostrar(
             context = this,
-            titulo = "Guardar en una lista",
-            mensaje = "Todavía no tienes ninguna lista tuya. Créala en la pestaña " +
-                "Listas y aquí podrás guardar lo que quieras.",
-            textoAceptar = "Entendido",
+            titulo = getString(R.string.listas_guardar_titulo),
+            mensaje = getString(R.string.listas_sin_ninguna),
+            textoAceptar = getString(R.string.boton_entendido),
             textoCancelar = null
         ) { it.dismiss() }
         return
@@ -55,10 +54,10 @@ fun AppCompatActivity.elegirListas(
 
     DialogoDailyMovie.mostrar(
         context = this,
-        titulo = "Guardar en una lista",
+        titulo = getString(R.string.listas_guardar_titulo),
         mensaje = titulo,
         contenido = contenido,
-        textoAceptar = "Guardar"
+        textoAceptar = getString(R.string.boton_guardar)
     ) { dialogo ->
         dialogo.dismiss()
         val meter = marcadas - yaGuardadaEn
@@ -76,8 +75,10 @@ fun AppCompatActivity.elegirListas(
  * @param sacar de cuáles ha salido.
  * @return el texto para el aviso.
  */
-fun avisoDeListas(meter: Set<String>, sacar: Set<String>): String = when {
-    meter.isNotEmpty() && sacar.isEmpty() -> "Guardada en ${meter.joinToString(", ")}"
-    meter.isEmpty() && sacar.isNotEmpty() -> "Quitada de ${sacar.joinToString(", ")}"
-    else -> "Listas actualizadas"
+fun AppCompatActivity.avisoDeListas(meter: Set<String>, sacar: Set<String>): String = when {
+    meter.isNotEmpty() && sacar.isEmpty() ->
+        getString(R.string.listas_guardada_en, meter.joinToString(", "))
+    meter.isEmpty() && sacar.isNotEmpty() ->
+        getString(R.string.listas_quitada_de, sacar.joinToString(", "))
+    else -> getString(R.string.listas_actualizadas)
 }

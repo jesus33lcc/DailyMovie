@@ -99,7 +99,7 @@ object Avisos {
     fun conDeshacer(
         vista: View,
         texto: String,
-        textoAccion: String = "Deshacer",
+        textoAccion: String = vista.context.getString(R.string.boton_deshacer),
         alDeshacer: () -> Unit,
         alConfirmar: () -> Unit
     ) {
