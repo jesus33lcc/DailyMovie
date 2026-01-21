@@ -47,8 +47,8 @@ object DialogoDailyMovie {
         titulo: String,
         mensaje: String? = null,
         contenido: View? = null,
-        textoAceptar: String = "Aceptar",
-        textoCancelar: String? = "Cancelar",
+        textoAceptar: String = context.getString(R.string.boton_aceptar_comun),
+        textoCancelar: String? = context.getString(R.string.boton_cancelar_comun),
         peligroso: Boolean = false,
         alCancelar: (() -> Unit)? = null,
         alAceptar: (AlertDialog) -> Unit
@@ -109,7 +109,7 @@ object DialogoDailyMovie {
         context: Context,
         titulo: String,
         mensaje: String,
-        textoAceptar: String = "Aceptar",
+        textoAceptar: String = context.getString(R.string.boton_aceptar_comun),
         peligroso: Boolean = false,
         alCancelar: (() -> Unit)? = null,
         alConfirmar: () -> Unit

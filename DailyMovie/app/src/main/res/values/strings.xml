@@ -184,4 +184,21 @@
 
     <!-- Galeria -->
     <string name="galeria_contador">%1$d / %2$d</string>
+
+    <!-- Textos de utils/: dialogos comunes, enlaces y compartir -->
+    <string name="boton_aceptar_comun">Aceptar</string>
+    <string name="boton_cancelar_comun">Cancelar</string>
+    <string name="boton_deshacer">Deshacer</string>
+    <string name="enlace_imdb">Ver en IMDb</string>
+    <string name="enlace_web_oficial">Web oficial</string>
+    <string name="enlace_tmdb">Ver en TMDB</string>
+    <string name="enlace_sin_navegador">No hay ningún navegador para abrirlo</string>
+    <string name="compartir_texto">Te recomiendo esto: %1$s\n%2$s</string>
+    <string name="compartir_con">Compartir con</string>
+    <string name="listas_guardar_titulo">Guardar en una lista</string>
+    <string name="listas_sin_ninguna">Todavía no tienes ninguna lista tuya. Créala en la pestaña Listas y aquí podrás guardar lo que quieras.</string>
+    <string name="listas_guardada_en">Guardada en %1$s</string>
+    <string name="listas_quitada_de">Quitada de %1$s</string>
+    <string name="listas_actualizadas">Listas actualizadas</string>
+    <string name="boton_guardar">Guardar</string>
 </resources>

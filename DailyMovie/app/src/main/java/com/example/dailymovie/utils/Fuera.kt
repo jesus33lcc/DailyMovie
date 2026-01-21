@@ -38,9 +38,9 @@ fun AppCompatActivity.menuDeEnlaces(
 ) {
     val enlaces = buildList {
         imdbId?.takeIf { it.isNotBlank() }
-            ?.let { add("Ver en IMDb" to "https://www.imdb.com/title/$it/") }
-        webOficial?.takeIf { it.isNotBlank() }?.let { add("Web oficial" to it) }
-        add("Ver en TMDB" to enTmdb)
+            ?.let { add(getString(R.string.enlace_imdb) to "https://www.imdb.com/title/$it/") }
+        webOficial?.takeIf { it.isNotBlank() }?.let { add(getString(R.string.enlace_web_oficial) to it) }
+        add(getString(R.string.enlace_tmdb) to enTmdb)
     }
 
     PopupMenu(ContextThemeWrapper(this, R.style.TemaPopupDailyMovie), boton).apply {
@@ -67,7 +67,7 @@ fun Activity.abrirEnElNavegador(direccion: String, dondeAvisar: View? = null) {
     if (intento.resolveActivity(packageManager) != null) {
         startActivity(intento)
     } else {
-        dondeAvisar?.let { Avisos.breve(it, "No hay ningún navegador para abrirlo") }
+        dondeAvisar?.let { Avisos.breve(it, getString(R.string.enlace_sin_navegador)) }
     }
 }
 
@@ -79,8 +79,8 @@ fun Activity.abrirEnElNavegador(direccion: String, dondeAvisar: View? = null) {
  */
 fun Activity.compartirRecomendacion(titulo: String, direccion: String) {
     val intento = Intent(Intent.ACTION_SEND).apply {
-        putExtra(Intent.EXTRA_TEXT, "Te recomiendo esto: $titulo\n$direccion")
+        putExtra(Intent.EXTRA_TEXT, getString(R.string.compartir_texto, titulo, direccion))
         type = "text/plain"
     }
-    startActivity(Intent.createChooser(intento, "Compartir con"))
+    startActivity(Intent.createChooser(intento, getString(R.string.compartir_con)))
 }
