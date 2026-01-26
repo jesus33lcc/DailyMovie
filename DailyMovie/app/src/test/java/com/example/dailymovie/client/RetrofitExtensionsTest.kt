@@ -99,4 +99,21 @@ class RetrofitExtensionsTest {
         assertNull(recibido)
         assertEquals(ErrorCarga.SIN_CONEXION, error)
     }
+
+    @Test
+    fun `si convertir la respuesta revienta, se avisa en vez de cerrar la app`() {
+        // Gson construye por reflexion y no aplica los valores por defecto de Kotlin salvo
+        // que TODOS los parametros tengan uno, asi que una lista que aqui se cree no-nula
+        // puede llegar a null. Antes eso era una excepcion en el hilo principal, o sea, la
+        // app cerrandose.
+        var motivo: ErrorCarga? = null
+        val llamada = CallFalsa(Response.success("da igual"))
+
+        llamada.enqueueSimple(
+            onExito = { throw NullPointerException("el campo llego a null") },
+            onError = { motivo = it }
+        )
+
+        assertEquals(ErrorCarga.RESPUESTA_INVALIDA, motivo)
+    }
 }

@@ -18,5 +18,5 @@ data class VideoResponse(
     val id: Int,
 
     @SerializedName("results")
-    val results: List<VideoModel>
+    val results: List<VideoModel> = emptyList()
 )
