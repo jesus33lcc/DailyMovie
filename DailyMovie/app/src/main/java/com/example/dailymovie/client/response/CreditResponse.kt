@@ -15,7 +15,7 @@ data class CreditResponse(
     @SerializedName("id")
     val id: Int,
     @SerializedName("cast")
-    val cast: List<CastMemberModel>,
+    val cast: List<CastMemberModel> = emptyList(),
     @SerializedName("crew")
-    val crew: List<CrewMemberModel>
+    val crew: List<CrewMemberModel> = emptyList()
 )

@@ -14,10 +14,10 @@ typealias PersonResponse = com.example.dailymovie.models.PersonModel
  */
 data class PersonCreditsResponse(
     @SerializedName("cast")
-    val actuaciones: List<PeliculaDePersona>,
+    val actuaciones: List<PeliculaDePersona> = emptyList(),
 
     @SerializedName("crew")
-    val trabajos: List<PeliculaDePersona>
+    val trabajos: List<PeliculaDePersona> = emptyList()
 )
 
 /**
@@ -116,5 +116,5 @@ data class PeliculaDePersona(
 /** Lista de generos de TMDB, para el onboarding y la recomendacion. */
 data class GenresResponse(
     @SerializedName("genres")
-    val generos: List<GenreModel>
+    val generos: List<GenreModel> = emptyList()
 )

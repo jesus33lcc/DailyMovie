@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName
 /** Listas de series: populares, mejor valoradas, en emision y busqueda. */
 data class SeriesResponse(
     @SerializedName("results")
-    val results: List<SerieModel>
+    val results: List<SerieModel> = emptyList()
 )
 
 /** Ficha completa de una serie, con sus temporadas. */
@@ -45,7 +45,7 @@ data class SerieDetailsResponse(
     val estado: String?,
 
     @SerializedName("genres")
-    val generos: List<GenreModel>,
+    val generos: List<GenreModel> = emptyList(),
 
     /** La web oficial de la serie, si la tiene. Muchas llegan con la cadena vacia. */
     @SerializedName("homepage")
@@ -61,7 +61,7 @@ data class SerieDetailsResponse(
     val idsExternos: IdsExternosResponse? = null,
 
     @SerializedName("seasons")
-    val temporadas: List<TemporadaModel>
+    val temporadas: List<TemporadaModel> = emptyList()
 )
 
 /** Una temporada con sus episodios dentro. */
@@ -79,5 +79,5 @@ data class SeasonResponse(
     val sinopsis: String?,
 
     @SerializedName("episodes")
-    val episodios: List<EpisodioModel>
+    val episodios: List<EpisodioModel> = emptyList()
 )

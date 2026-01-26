@@ -1,5 +1,6 @@
 package com.example.dailymovie.client
 
+import android.util.Log
 import com.example.dailymovie.data.Resultado
 import com.example.dailymovie.utils.ErrorCarga
 import retrofit2.Call
@@ -30,9 +31,23 @@ fun <T> Call<T>.enqueueSimple(
     enqueue(object : Callback<T> {
         override fun onResponse(call: Call<T>, response: Response<T>) {
             val cuerpo = response.body()
-            if (response.isSuccessful && cuerpo != null) {
+            if (!response.isSuccessful || cuerpo == null) {
+                onError(ErrorCarga.RESPUESTA_INVALIDA)
+                return
+            }
+            // Lo que pasa dentro de onExito puede reventar sin que sea culpa de nadie de
+            // arriba: Gson construye los objetos por reflexion y **no aplica los valores por
+            // defecto de Kotlin** salvo que TODOS los parametros tengan uno. Basta con que
+            // TMDB se deje un campo para que una lista que Kotlin cree no-nula llegue a null,
+            // y el primer recorrido lance una excepcion dentro del callback, que es hilo
+            // principal: la app se cierra sin mas.
+            //
+            // Se trata como respuesta invalida, que es lo que es: los datos no sirven. La
+            // pantalla enseña su error de siempre en vez de desaparecer.
+            try {
                 onExito(cuerpo)
-            } else {
+            } catch (e: RuntimeException) {
+                Log.w(TAG, "Respuesta de TMDB que no se ha podido usar", e)
                 onError(ErrorCarga.RESPUESTA_INVALIDA)
             }
         }
@@ -78,3 +93,5 @@ fun <T : Any, R : Any> Call<T>.enqueueConvertido(
         onError = { alTerminar(Resultado.Fallo(it)) }
     )
 }
+
+private const val TAG = "DailyMovie/Retrofit"

@@ -24,6 +24,16 @@ android {
     namespace = "com.example.dailymovie"
     compileSdk = 34
 
+    testOptions {
+        unitTests {
+            // Los tests de JVM no llevan Android de verdad, asi que cualquier llamada a
+            // android.util.Log revienta con "not mocked". Con esto devuelven el valor por
+            // defecto y ya: no queremos comprobar que se escribe en el log, solo que un fallo
+            // al convertir la respuesta no cierra la app.
+            isReturnDefaultValues = true
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.dailymovie"
         minSdk = 33

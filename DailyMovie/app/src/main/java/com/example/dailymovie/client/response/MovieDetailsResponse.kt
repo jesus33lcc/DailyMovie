@@ -33,7 +33,7 @@ data class MovieDetailsResponse(
     val budget: Int,
 
     @SerializedName("genres")
-    val genres: List<GenreModel>,
+    val genres: List<GenreModel> = emptyList(),
 
     @SerializedName("homepage")
     val homepage: String?,
@@ -45,7 +45,7 @@ data class MovieDetailsResponse(
     val imdbId: String?,
 
     @SerializedName("origin_country")
-    val originCountry: List<String>,
+    val originCountry: List<String> = emptyList(),
 
     @SerializedName("original_language")
     val originalLanguage: String,
@@ -63,7 +63,7 @@ data class MovieDetailsResponse(
     val posterPath: String?,
 
     @SerializedName("production_companies")
-    val productionCompanies: List<ProductionCompanyModel>,
+    val productionCompanies: List<ProductionCompanyModel> = emptyList(),
 
     @SerializedName("release_date")
     val releaseDate: String,
@@ -90,8 +90,7 @@ data class MovieDetailsResponse(
     val voteAverage: Double,
 
     @SerializedName("vote_count")
-    val voteCount: Int
-,
+    val voteCount: Int,
 
     // ---- Extras que llegan con append_to_response ----
 
@@ -108,13 +107,13 @@ data class MovieDetailsResponse(
 /** Fondos, carteles y logos que TMDB tiene de una pelicula. */
 data class ImagenesResponse(
     @SerializedName("backdrops")
-    val fondos: List<ImagenTmdb>,
+    val fondos: List<ImagenTmdb> = emptyList(),
 
     @SerializedName("posters")
-    val carteles: List<ImagenTmdb>,
+    val carteles: List<ImagenTmdb> = emptyList(),
 
     @SerializedName("logos")
-    val logos: List<ImagenTmdb>
+    val logos: List<ImagenTmdb> = emptyList()
 )
 
 /**
@@ -144,7 +143,7 @@ data class ImagenTmdb(
  */
 data class FechasDeEstrenoResponse(
     @SerializedName("results")
-    val porPais: List<EstrenoEnPais>
+    val porPais: List<EstrenoEnPais> = emptyList()
 )
 
 /**
@@ -158,7 +157,7 @@ data class EstrenoEnPais(
     val pais: String,
 
     @SerializedName("release_dates")
-    val estrenos: List<EstrenoConClasificacion>
+    val estrenos: List<EstrenoConClasificacion> = emptyList()
 )
 
 /**
