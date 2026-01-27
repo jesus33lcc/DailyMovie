@@ -395,6 +395,14 @@ class ExplorarViewModel(
         _cargando.value = true
         val mia = nuevaGeneracion()
 
+        // Con filtros puestos, la pagina 1 salia por aqui (sin filtrar) y la 2 en adelante por
+        // discover (filtrada): la rejilla mezclaba las dos cosas. Si hay filtros, esto entra
+        // por el mismo camino que la paginacion.
+        if (!filtrosAvanzados.estanVacios()) {
+            pedirConFiltros(mia, genero)
+            return
+        }
+
         cargarGeneroEnPagina(genero, 1) { hallazgos, quedanMas ->
             if (mia != generacionDeBusqueda) return@cargarGeneroEnPagina
             _cargando.value = false
@@ -402,6 +410,32 @@ class ExplorarViewModel(
             hayMasPaginas = quedanMas
             aplicarFiltro()
             _sinResultados.value = hallazgos.isEmpty()
+        }
+    }
+
+    /**
+     * Pide la primera pagina de un genero pero respetando los filtros finos.
+     *
+     * Es el mismo camino que usa [cargarMas], asi que las paginas siguientes salen de donde
+     * salio esta.
+     */
+    private fun pedirConFiltros(mia: Int, genero: GeneroExplorable?) {
+        peliculas.descubrir(
+            generos = listOfNotNull(genero?.idPelicula),
+            filtros = filtrosAvanzados,
+            pagina = 1
+        ) { resultado ->
+            if (mia != generacionDeBusqueda) return@descubrir
+            _cargando.value = false
+            when (resultado) {
+                is Resultado.Exito -> {
+                    todosLosResultados = resultado.datos.map { Hallazgo.de(it) }
+                    hayMasPaginas = resultado.datos.size >= POR_PAGINA
+                    aplicarFiltro()
+                    _sinResultados.value = todosLosResultados.isEmpty()
+                }
+                is Resultado.Fallo -> _error.value = resultado.motivo
+            }
         }
     }
 
