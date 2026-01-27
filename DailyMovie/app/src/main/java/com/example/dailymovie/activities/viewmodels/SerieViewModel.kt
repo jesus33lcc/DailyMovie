@@ -117,10 +117,17 @@ class SerieViewModel(
     fun abrirTemporada(numero: Int) {
         if (serieId == -1) return
         _temporadaAbierta.value = null
+        temporadaPedida = numero
         series.temporada(serieId, numero) { resultado ->
+            // Dos toques rapidos en el selector lanzaban dos peticiones, y se pintaba la que
+            // contestara la ultima, que no tiene por que ser la que el usuario eligio.
+            if (numero != temporadaPedida) return@temporada
             if (resultado is Resultado.Exito) _temporadaAbierta.value = resultado.datos
         }
     }
+
+    /** La ultima temporada que ha pedido el usuario, para descartar las respuestas viejas. */
+    private var temporadaPedida = -1
 
     /**
      * Marca o desmarca un episodio.

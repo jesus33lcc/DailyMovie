@@ -192,13 +192,32 @@ class TmdbMovieRepository(
     }
 
     override fun videos(peliculaId: Int, alTerminar: (Resultado<List<VideoModel>>) -> Unit) {
-        // Se piden dos veces, en el idioma del dispositivo y en ingles, porque TMDB tiene
-        // muchos mas trailers en ingles. Si la segunda falla nos quedamos con la primera.
-        servicio.getMovieVideos(peliculaId, LocaleUtil.getLanguageAndCountry()).enqueueSimple(
+        val idioma = LocaleUtil.getLanguageAndCountry()
+        servicio.getMovieVideos(peliculaId, idioma).enqueueSimple(
             onExito = { enIdiomaLocal ->
                 val locales = trailersPrimero(enIdiomaLocal.results)
+
+                // Con la app ya en ingles, la segunda peticion seria la misma que la primera
+                // y los trailers salian repetidos en la ficha.
+                if (idioma.startsWith("en")) {
+                    alTerminar(Resultado.Exito(locales))
+                    return@enqueueSimple
+                }
+
+                // Se piden tambien en ingles porque TMDB tiene muchos mas trailers ahi. Si
+                // esa falla, nos quedamos con los del idioma del usuario.
                 servicio.getMovieVideos(peliculaId, "en-US").enqueueSimple(
-                    onExito = { alTerminar(Resultado.Exito(locales + trailersPrimero(it.results))) },
+                    onExito = { enIngles ->
+                        // Deduplicado por la clave de YouTube: un mismo trailer puede venir
+                        // en las dos listas si TMDB lo tiene marcado en los dos idiomas.
+                        val yaEstan = locales.map { it.key }.toSet()
+                        alTerminar(
+                            Resultado.Exito(
+                                locales + trailersPrimero(enIngles.results)
+                                    .filterNot { it.key in yaEstan }
+                            )
+                        )
+                    },
                     onError = { alTerminar(Resultado.Exito(locales)) }
                 )
             },
