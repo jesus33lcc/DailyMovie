@@ -3,7 +3,6 @@ package com.example.dailymovie.fragments.views
 import android.content.Intent
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -29,9 +28,6 @@ import com.example.dailymovie.utils.Trailers
 import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.fragments.viewmodels.HomeViewModel
 import com.example.dailymovie.activities.views.MovieA
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import com.example.dailymovie.utils.Avisos
 
 class HomeF : Fragment() {
@@ -90,10 +86,7 @@ class HomeF : Fragment() {
         })
 
         homeViewModel.movieOfTheDay.observe(viewLifecycleOwner, Observer { movie ->
-            movie?.let {
-                Log.d("HomeF", "La pelicula del dia es: ${it.title}")
-                displayMovieOfTheDay(it)
-            } ?: Log.d("HomeF", "No hay pelicula del dia")
+            movie?.let { displayMovieOfTheDay(it) }
         })
 
         homeViewModel.error.observe(viewLifecycleOwner, Observer { error ->
@@ -162,8 +155,10 @@ class HomeF : Fragment() {
         val esCurada = !movie.author.isNullOrBlank()
         binding.lblFecha.mostrarSi(esCurada)
         binding.movieDate.mostrarSi(esCurada)
-        binding.movieDate.text =
-            if (esCurada) SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date()) else ""
+        // La fecha viene ya formateada en el propio dato. Antes se pintaba la de HOY con un
+        // SimpleDateFormat, y coincidia de casualidad porque la consulta acota al dia: el
+        // campo cruzaba tres capas para que nadie lo leyera.
+        binding.movieDate.text = if (esCurada) movie.date else ""
 
         // La curada a mano la firma alguien; la recomendada no tiene autor, tiene motivo.
         // Solo se enseña lo que haya, y nunca los dos a la vez.
