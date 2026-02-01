@@ -21,9 +21,10 @@ class ListasViewModel(
     private val _customLists = MutableLiveData<List<ListaModel>>()
     val customLists: LiveData<List<ListaModel>> get() = _customLists
 
-    init {
-        recargar()
-    }
+    // Sin init a proposito: la vista llama a recargar() en cada onResume, y el primero llega
+    // justo despues de crear el ViewModel. Con los dos, al entrar en la pestaña se pedian dos
+    // veces las favoritas, las vistas, las listas y el contenido de cada lista: con seis
+    // listas eran 28 lecturas de Firestore en vez de 14.
 
     /**
      * Vuelve a pedirlo todo.
