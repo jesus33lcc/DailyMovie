@@ -367,7 +367,10 @@ class MovieA : AppCompatActivity() {
      */
     private fun mostrarDirector(creditos: CreditResponse) {
         val director = creditos.crew.firstOrNull { it.job == "Director" }
-        binding.txtDirectorMovie.text = director?.name ?: getDirectorName(creditos)
+        // Antes, si no habia director se llamaba a un getDirectorName que volvia a recorrer
+        // el mismo "crew" buscando lo mismo (imposible que encontrara nada) y de reserva
+        // buscaba un actor cuyo PERSONAJE se llamara "Director". Era codigo del TFG.
+        binding.txtDirectorMovie.ponerOEsconder(director?.name)
 
         if (director != null) {
             binding.txtDirectorMovie.setOnClickListener {
@@ -379,32 +382,25 @@ class MovieA : AppCompatActivity() {
         }
     }
 
-    private fun getDirectorName(credits: CreditResponse?): String {
-        credits?.let {
-            it.crew.forEach { crewMember ->
-                if (crewMember.job == "Director") {
-                    return crewMember.name
-                }
-            }
-            it.cast.forEach { castMember ->
-                if (castMember.character == "Director") {
-                    return castMember.name
-                }
-            }
-        }
-        return ""
-    }
-
+    /**
+     * Donde se puede ver la pelicula.
+     *
+     * Se enseñan solo las de suscripcion (`flatrate`), no las de alquiler ni compra: es lo que
+     * de verdad responde a "puedo verla esta noche". Y se buscan por el pais del aparato,
+     * porque las mismas plataformas no estan en todos los sitios.
+     */
     private fun displayProviders(providerResponse: ProviderResponse) {
-        val providers = providerResponse.results[LocaleUtil.getDeviceCountry()]?.flatrate ?: emptyList()
-        if (providers.isNotEmpty()) {
-            val adapter = ProviderAdapter(providers)
-            binding.recyclerViewProviders.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-            binding.recyclerViewProviders.adapter = adapter
-            binding.sectionProviders.visibility = View.VISIBLE
+        val providers = providerResponse.results[LocaleUtil.getDeviceCountry()]?.flatrate.orEmpty()
+        binding.sectionProviders.mostrarSi(providers.isNotEmpty())
+        if (providers.isEmpty()) return
+
+        binding.recyclerViewProviders.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.recyclerViewProviders.adapter = ProviderAdapter(providers)
+        // Solo la primera vez: este metodo se llama cada vez que llega la respuesta, y
+        // añadirla siempre hacia crecer el hueco entre logos.
+        if (binding.recyclerViewProviders.itemDecorationCount == 0) {
             binding.recyclerViewProviders.addItemDecoration(SpacingItemDecoration.deLista(this))
-        } else {
-            binding.sectionProviders.visibility = View.GONE
         }
     }
 
