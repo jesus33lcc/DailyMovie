@@ -27,6 +27,7 @@ import com.example.dailymovie.models.PersonModel
 import com.example.dailymovie.models.SerieModel
 import com.example.dailymovie.models.VideoModel
 import com.example.dailymovie.utils.ErrorCarga
+import com.example.dailymovie.utils.ErrorDeCuenta
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -157,13 +158,13 @@ class OnboardingViewModelTest {
 
         override fun haySesion(): Boolean = true
         override fun correoDelUsuario(): String? = "prueba@dailymovie.test"
-        override fun registrar(correo: String, contrasena: String, alTerminar: (Boolean, String?) -> Unit) = Unit
-        override fun entrar(correo: String, contrasena: String, alTerminar: (Boolean, String?) -> Unit) = Unit
-        override fun entrarConGoogle(idToken: String, alTerminar: (Boolean, String?) -> Unit) = Unit
+        override fun registrar(correo: String, contrasena: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) = Unit
+        override fun entrar(correo: String, contrasena: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) = Unit
+        override fun entrarConGoogle(idToken: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) = Unit
         override fun salir(alTerminar: (Boolean) -> Unit) = Unit
-        override fun mandarCorreoDeRecuperacion(correo: String, alTerminar: (Boolean, String?) -> Unit) = Unit
-        override fun cambiarContrasena(actual: String, nueva: String, alTerminar: (Boolean, String) -> Unit) = Unit
-        override fun borrarCuenta(contrasena: String?, alTerminar: (Boolean, String) -> Unit) = Unit
+        override fun mandarCorreoDeRecuperacion(correo: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) = Unit
+        override fun cambiarContrasena(actual: String, nueva: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) = Unit
+        override fun borrarCuenta(contrasena: String?, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) = Unit
         override fun favoritas(alTerminar: (List<MovieModel>) -> Unit) = Unit
         override fun vistas(alTerminar: (List<MovieModel>) -> Unit) = Unit
         override fun esFavorita(peliculaId: Int, alTerminar: (Boolean) -> Unit) = Unit

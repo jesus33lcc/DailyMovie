@@ -201,4 +201,18 @@
     <string name="listas_quitada_de">Quitada de %1$s</string>
     <string name="listas_actualizadas">Listas actualizadas</string>
     <string name="boton_guardar">Guardar</string>
+
+    <!-- Fallos al entrar, registrarse o tocar la cuenta -->
+    <string name="error_credenciales">El correo o la contraseña no son correctos</string>
+    <string name="error_correo_cogido">Ya hay una cuenta con ese correo</string>
+    <string name="error_correo_mal_escrito">Ese correo no tiene buena pinta, revísalo</string>
+    <string name="error_contrasena_corta">La contraseña necesita al menos 6 caracteres</string>
+    <string name="error_cuenta_no_existe">No hay ninguna cuenta con ese correo</string>
+    <string name="error_sin_conexion_cuenta">No hay conexión. Revisa tu internet</string>
+    <string name="error_sesion_vieja">Por seguridad, vuelve a iniciar sesión antes de hacer esto</string>
+    <string name="error_desconocido">Algo ha fallado, inténtalo de nuevo</string>
+    <string name="ajustes_contrasena_cambiada">Contraseña cambiada</string>
+    <string name="ajustes_cuenta_borrada">Cuenta borrada</string>
+    <string name="error_campos_vacios">Rellena el correo y la contraseña</string>
+    <string name="error_contrasenas_distintas">Las dos contraseñas no coinciden</string>
 </resources>

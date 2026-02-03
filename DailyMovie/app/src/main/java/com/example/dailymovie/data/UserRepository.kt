@@ -1,6 +1,7 @@
 package com.example.dailymovie.data
 
 import com.example.dailymovie.models.MovieModel
+import com.example.dailymovie.utils.ErrorDeCuenta
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.models.SerieModel
 
@@ -66,7 +67,7 @@ interface UserRepository {
      * @param alTerminar recibe si salio bien y, si no, el motivo ya traducido a español y
      *   listo para enseñar: los mensajes de Firebase vienen en ingles y no se entienden.
      */
-    fun registrar(correo: String, contrasena: String, alTerminar: (Boolean, String?) -> Unit)
+    fun registrar(correo: String, contrasena: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit)
 
     /**
      * Abre sesion con correo y contraseña.
@@ -77,7 +78,7 @@ interface UserRepository {
      *   dice si lo que falla es el correo o la contraseña: eso serviria para adivinar quien
      *   tiene cuenta.
      */
-    fun entrar(correo: String, contrasena: String, alTerminar: (Boolean, String?) -> Unit)
+    fun entrar(correo: String, contrasena: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit)
 
     /**
      * Abre sesion con la cuenta de Google que el usuario haya elegido.
@@ -86,7 +87,7 @@ interface UserRepository {
      *   nada al usuario, solo se canjea.
      * @param alTerminar recibe si salio bien y, si no, el motivo ya en español.
      */
-    fun entrarConGoogle(idToken: String, alTerminar: (Boolean, String?) -> Unit)
+    fun entrarConGoogle(idToken: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit)
 
     /**
      * Cierra la sesion.
@@ -102,7 +103,7 @@ interface UserRepository {
      * @param correo a donde se manda.
      * @param alTerminar recibe si se pudo mandar y, si no, el motivo ya en español.
      */
-    fun mandarCorreoDeRecuperacion(correo: String, alTerminar: (Boolean, String?) -> Unit)
+    fun mandarCorreoDeRecuperacion(correo: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit)
 
     /**
      * Cambia la contraseña del usuario que tiene la sesion abierta.
@@ -113,7 +114,7 @@ interface UserRepository {
      * @param alTerminar recibe si salio bien y un mensaje que hay siempre, tanto para decir
      *   que se cambio como para explicar por que no.
      */
-    fun cambiarContrasena(actual: String, nueva: String, alTerminar: (Boolean, String) -> Unit)
+    fun cambiarContrasena(actual: String, nueva: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit)
 
     /**
      * Borra los datos del usuario y despues la cuenta. Obligatorio para Google Play.
@@ -122,7 +123,7 @@ interface UserRepository {
      *   Google, que ahi no hay contraseña que pedir y basta con que la sesion sea reciente.
      * @param alTerminar recibe si se borro todo y un mensaje que hay siempre, para enseñar.
      */
-    fun borrarCuenta(contrasena: String?, alTerminar: (Boolean, String) -> Unit)
+    fun borrarCuenta(contrasena: String?, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit)
 
     // ---- Listas ----
 

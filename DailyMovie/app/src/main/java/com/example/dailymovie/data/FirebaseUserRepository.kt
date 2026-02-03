@@ -1,10 +1,13 @@
 package com.example.dailymovie.data
 
 import com.example.dailymovie.models.MovieModel
+import com.example.dailymovie.utils.ErrorDeCuenta
 import com.example.dailymovie.models.MovieOfTheDay
 import com.example.dailymovie.models.SerieModel
 import com.google.firebase.auth.EmailAuthProvider
 import android.util.Log
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.DocumentReference
@@ -47,9 +50,9 @@ class FirebaseUserRepository(
 
     override fun correoDelUsuario() = auth.currentUser?.email
 
-    override fun registrar(correo: String, contrasena: String, alTerminar: (Boolean, String?) -> Unit) {
+    override fun registrar(correo: String, contrasena: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) {
         if (correo.isBlank() || contrasena.isBlank()) {
-            alTerminar(false, "El correo y la contraseña no pueden estar vacíos")
+            alTerminar(false, ErrorDeCuenta.DESCONOCIDO)
             return
         }
         auth.createUserWithEmailAndPassword(correo, contrasena)
@@ -57,13 +60,13 @@ class FirebaseUserRepository(
             .addOnFailureListener { alTerminar(false, traducirError(it)) }
     }
 
-    override fun entrar(correo: String, contrasena: String, alTerminar: (Boolean, String?) -> Unit) {
+    override fun entrar(correo: String, contrasena: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) {
         auth.signInWithEmailAndPassword(correo, contrasena)
             .addOnSuccessListener { alTerminar(true, null) }
             .addOnFailureListener { alTerminar(false, traducirError(it)) }
     }
 
-    override fun entrarConGoogle(idToken: String, alTerminar: (Boolean, String?) -> Unit) {
+    override fun entrarConGoogle(idToken: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) {
         val credencial = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credencial)
             .addOnSuccessListener { alTerminar(true, null) }
@@ -75,9 +78,9 @@ class FirebaseUserRepository(
         alTerminar(true)
     }
 
-    override fun mandarCorreoDeRecuperacion(correo: String, alTerminar: (Boolean, String?) -> Unit) {
+    override fun mandarCorreoDeRecuperacion(correo: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) {
         if (correo.isBlank()) {
-            alTerminar(false, "Escribe tu correo para poder mandarte el enlace")
+            alTerminar(false, ErrorDeCuenta.DESCONOCIDO)
             return
         }
         auth.sendPasswordResetEmail(correo)
@@ -85,27 +88,27 @@ class FirebaseUserRepository(
             .addOnFailureListener { alTerminar(false, traducirError(it)) }
     }
 
-    override fun cambiarContrasena(actual: String, nueva: String, alTerminar: (Boolean, String) -> Unit) {
+    override fun cambiarContrasena(actual: String, nueva: String, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) {
         val usuario = auth.currentUser
         val correo = usuario?.email
         if (usuario == null || correo == null) {
-            alTerminar(false, "No hay ninguna sesión iniciada")
+            alTerminar(false, ErrorDeCuenta.DESCONOCIDO)
             return
         }
         // Firebase obliga a volver a identificarse antes de tocar la contraseña.
         usuario.reauthenticate(EmailAuthProvider.getCredential(correo, actual))
             .addOnSuccessListener {
                 usuario.updatePassword(nueva)
-                    .addOnSuccessListener { alTerminar(true, "Contraseña actualizada") }
+                    .addOnSuccessListener { alTerminar(true, null) }
                     .addOnFailureListener { alTerminar(false, traducirError(it)) }
             }
-            .addOnFailureListener { alTerminar(false, "La contraseña actual no es correcta") }
+            .addOnFailureListener { alTerminar(false, ErrorDeCuenta.DESCONOCIDO) }
     }
 
-    override fun borrarCuenta(contrasena: String?, alTerminar: (Boolean, String) -> Unit) {
+    override fun borrarCuenta(contrasena: String?, alTerminar: (Boolean, ErrorDeCuenta?) -> Unit) {
         val usuario = auth.currentUser
         if (usuario == null) {
-            alTerminar(false, "No hay ninguna sesión iniciada")
+            alTerminar(false, ErrorDeCuenta.DESCONOCIDO)
             return
         }
 
@@ -113,7 +116,7 @@ class FirebaseUserRepository(
         // de Firestore ya no dejarian tocar el documento y quedaria basura para siempre.
         fun borrarLaCuenta() {
             usuario.delete()
-                .addOnSuccessListener { alTerminar(true, "Cuenta y datos borrados") }
+                .addOnSuccessListener { alTerminar(true, null) }
                 .addOnFailureListener { alTerminar(false, traducirError(it)) }
         }
 
@@ -150,7 +153,7 @@ class FirebaseUserRepository(
         if (contrasena != null && correo != null) {
             usuario.reauthenticate(EmailAuthProvider.getCredential(correo, contrasena))
                 .addOnSuccessListener { borrarLosDatos() }
-                .addOnFailureListener { alTerminar(false, "La contraseña no es correcta") }
+                .addOnFailureListener { alTerminar(false, ErrorDeCuenta.DESCONOCIDO) }
         } else {
             borrarLosDatos()
         }
@@ -694,23 +697,26 @@ class FirebaseUserRepository(
         (bruto as? List<*>).orEmpty().mapNotNull { (it as? Number)?.toInt() }
 
     /** Los mensajes de Firebase vienen en ingles; se cambian por algo entendible. */
-    private fun traducirError(error: Exception): String = when {
-        error.message?.contains("password is invalid", true) == true ||
-            error.message?.contains("credential is incorrect", true) == true ->
-            "El correo o la contraseña no son correctos"
-        error.message?.contains("email address is already", true) == true ->
-            "Ya hay una cuenta con ese correo"
-        error.message?.contains("badly formatted", true) == true ->
-            "Ese correo no tiene buena pinta, revísalo"
-        error.message?.contains("at least 6 characters", true) == true ->
-            "La contraseña necesita al menos 6 caracteres"
-        error.message?.contains("no user record", true) == true ->
-            "No hay ninguna cuenta con ese correo"
-        error.message?.contains("network", true) == true ->
-            "No hay conexión. Revisa tu internet"
-        error.message?.contains("recent", true) == true ->
-            "Por seguridad, vuelve a iniciar sesión antes de hacer esto"
-        else -> "Algo ha fallado, inténtalo de nuevo"
+    /**
+     * Traduce el fallo de Firebase a algo que la pantalla pueda contar.
+     *
+     * Se mira el `errorCode`, que es una constante del SDK y no cambia, en vez del `message`,
+     * que es una frase en ingles pensada para el que programa. Antes se comparaba ese texto
+     * contra siete trozos ("password is invalid", "badly formatted"...), asi que cualquier
+     * cambio de redaccion en el SDK mandaba todo al mensaje generico sin que nadie se enterara.
+     */
+    private fun traducirError(error: Exception): ErrorDeCuenta {
+        if (error is FirebaseNetworkException) return ErrorDeCuenta.SIN_CONEXION
+        return when ((error as? FirebaseAuthException)?.errorCode) {
+            "ERROR_INVALID_CREDENTIAL", "ERROR_WRONG_PASSWORD" -> ErrorDeCuenta.CREDENCIALES
+            "ERROR_EMAIL_ALREADY_IN_USE", "ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL" ->
+                ErrorDeCuenta.CORREO_COGIDO
+            "ERROR_INVALID_EMAIL" -> ErrorDeCuenta.CORREO_MAL_ESCRITO
+            "ERROR_WEAK_PASSWORD" -> ErrorDeCuenta.CONTRASENA_CORTA
+            "ERROR_USER_NOT_FOUND" -> ErrorDeCuenta.NO_EXISTE
+            "ERROR_REQUIRES_RECENT_LOGIN" -> ErrorDeCuenta.SESION_VIEJA
+            else -> ErrorDeCuenta.DESCONOCIDO
+        }
     }
 
     private companion object {

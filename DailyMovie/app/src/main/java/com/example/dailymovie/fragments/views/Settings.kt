@@ -68,9 +68,9 @@ class Settings : Fragment() {
         binding.btnConsentimientoAnalytics.setOnClickListener { mostrarConsentimiento() }
         binding.btnBorrarCuenta.setOnClickListener { confirmarBorrarCuenta() }
 
-        viewModel.mensaje.observe(viewLifecycleOwner) { texto ->
-            texto?.let {
-                avisar(it)
+        viewModel.mensaje.observe(viewLifecycleOwner) { recurso ->
+            recurso?.let {
+                avisar(getString(it))
                 viewModel.mensajeMostrado()
             }
         }
