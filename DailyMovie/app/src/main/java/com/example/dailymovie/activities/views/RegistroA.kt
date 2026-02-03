@@ -62,9 +62,9 @@ class RegistroA : AppCompatActivity() {
             }
         }
 
-        viewModel.mensaje.observe(this) { texto ->
-            texto?.let {
-                avisar(it)
+        viewModel.mensaje.observe(this) { recurso ->
+            recurso?.let {
+                avisar(getString(it))
                 viewModel.mensajeMostrado()
             }
         }

@@ -3,6 +3,8 @@ package com.example.dailymovie.activities.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.dailymovie.R
+import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.data.Dependencias
 import com.example.dailymovie.data.UserRepository
 
@@ -14,8 +16,14 @@ class LoginViewModel(
     private val _sesionIniciada = MutableLiveData<Boolean?>()
     val sesionIniciada: LiveData<Boolean?> get() = _sesionIniciada
 
-    private val _mensaje = MutableLiveData<String?>()
-    val mensaje: LiveData<String?> get() = _mensaje
+    /**
+     * Que avisarle al usuario, ya como recurso de texto.
+     *
+     * Es un @StringRes y no una cadena porque el texto lo elige la vista: aqui solo se dice
+     * que ha pasado. Antes el repositorio devolvia castellano escrito a pelo.
+     */
+    private val _mensaje = MutableLiveData<Int?>()
+    val mensaje: LiveData<Int?> get() = _mensaje
 
     private val _correoDeRecuperacionEnviado = MutableLiveData<Boolean?>()
     val correoDeRecuperacionEnviado: LiveData<Boolean?> get() = _correoDeRecuperacionEnviado
@@ -25,7 +33,7 @@ class LoginViewModel(
 
     fun entrar(correo: String, contrasena: String) {
         if (correo.isBlank() || contrasena.isBlank()) {
-            _mensaje.value = "Rellena el correo y la contraseña"
+            _mensaje.value = R.string.error_campos_vacios
             return
         }
         _cargando.value = true
@@ -34,7 +42,7 @@ class LoginViewModel(
             if (bien) {
                 _sesionIniciada.value = true
             } else {
-                _mensaje.value = error
+                _mensaje.value = error?.mensaje() ?: R.string.error_desconocido
             }
         }
     }
@@ -47,7 +55,7 @@ class LoginViewModel(
             if (bien) {
                 _sesionIniciada.value = true
             } else {
-                _mensaje.value = error
+                _mensaje.value = error?.mensaje() ?: R.string.error_desconocido
             }
         }
     }
@@ -59,7 +67,7 @@ class LoginViewModel(
             if (bien) {
                 _correoDeRecuperacionEnviado.value = true
             } else {
-                _mensaje.value = error
+                _mensaje.value = error?.mensaje() ?: R.string.error_desconocido
             }
         }
     }
