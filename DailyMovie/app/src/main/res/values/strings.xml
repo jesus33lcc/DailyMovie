@@ -215,4 +215,11 @@
     <string name="ajustes_cuenta_borrada">Cuenta borrada</string>
     <string name="error_campos_vacios">Rellena el correo y la contraseña</string>
     <string name="error_contrasenas_distintas">Las dos contraseñas no coinciden</string>
+
+    <!-- Por que la portada enseña esa pelicula -->
+    <string name="motivo_gente_que_sigues">Porque sigues a %1$s</string>
+    <string name="motivo_gente_sin_nombre">De alguien a quien sigues</string>
+    <string name="motivo_como_tu_favorita">Porque te gustó %1$s</string>
+    <string name="motivo_tus_generos">Porque te gusta este tipo de cine</string>
+    <string name="motivo_lo_popular">De lo más visto ahora mismo</string>
 </resources>

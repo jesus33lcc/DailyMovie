@@ -231,7 +231,8 @@ class RecomendadorTest {
         val salida = recomendar(peliculas, personas, usuario, semilla = 0)
 
         assertEquals(10, salida?.pelicula?.id)
-        assertEquals("Porque sigues a Tom Hardy", salida?.motivo)
+        assertEquals(TipoDeMotivo.GENTE_QUE_SIGUES, salida?.motivo?.tipo)
+        assertEquals("Tom Hardy", salida?.motivo?.nombre)
         // Se pregunta por una sola persona: con todas de golpe TMDB devolveria un saco
         // enorme y el motivo dejaria de ser verdad.
         assertEquals(listOf(500), peliculas.gentePedida)
@@ -248,7 +249,7 @@ class RecomendadorTest {
         val salida = recomendar(peliculas, personas, usuario, semilla = 0)
 
         assertEquals(10, salida?.pelicula?.id)
-        assertEquals("De alguien a quien sigues", salida?.motivo)
+        assertEquals(TipoDeMotivo.GENTE_SIN_NOMBRE, salida?.motivo?.tipo)
     }
 
     @Test
@@ -263,7 +264,7 @@ class RecomendadorTest {
         val salida = recomendar(peliculas, PersonasFalsas(), usuario, semilla = 0)
 
         assertEquals(99, salida?.pelicula?.id)
-        assertEquals(Recomendador.MOTIVO_POPULAR, salida?.motivo)
+        assertEquals(TipoDeMotivo.LO_POPULAR, salida?.motivo?.tipo)
     }
 
     @Test
@@ -295,8 +296,8 @@ class RecomendadorTest {
         val lunes = recomendar(peliculas, PersonasFalsas(), usuario, semilla = 0)
         val miercoles = recomendar(peliculas, PersonasFalsas(), usuario, semilla = 2)
 
-        assertEquals(Recomendador.MOTIVO_GENEROS, lunes?.motivo)
-        assertEquals(Recomendador.MOTIVO_GENEROS, miercoles?.motivo)
+        assertEquals(TipoDeMotivo.TUS_GENEROS, lunes?.motivo?.tipo)
+        assertEquals(TipoDeMotivo.TUS_GENEROS, miercoles?.motivo?.tipo)
         assertEquals(1, lunes?.pelicula?.id)
         assertEquals(3, miercoles?.pelicula?.id)
         assertNotEquals(lunes?.pelicula?.id, miercoles?.pelicula?.id)
@@ -313,7 +314,8 @@ class RecomendadorTest {
         val salida = recomendar(peliculas, PersonasFalsas(), usuario, semilla = 0)
 
         assertEquals(20, salida?.pelicula?.id)
-        assertEquals("Porque te gustó Origen", salida?.motivo)
+        assertEquals(TipoDeMotivo.COMO_TU_FAVORITA, salida?.motivo?.tipo)
+        assertEquals("Origen", salida?.motivo?.nombre)
         assertEquals(1, peliculas.referenciaPedida)
     }
 
@@ -326,7 +328,7 @@ class RecomendadorTest {
         val salida = recomendar(peliculas, PersonasFalsas(), usuario, semilla = 5)
 
         assertEquals(7, salida?.pelicula?.id)
-        assertEquals(Recomendador.MOTIVO_POPULAR, salida?.motivo)
+        assertEquals(TipoDeMotivo.LO_POPULAR, salida?.motivo?.tipo)
     }
 
     @Test

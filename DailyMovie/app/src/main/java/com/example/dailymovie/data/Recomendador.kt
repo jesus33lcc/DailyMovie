@@ -9,7 +9,38 @@ import com.example.dailymovie.models.MovieModel
  * usuario entiende que la app le ha entendido, y si no le encaja sabe qué cambiar en sus
  * gustos.
  */
-data class Recomendacion(val pelicula: MovieModel, val motivo: String)
+data class Recomendacion(val pelicula: MovieModel, val motivo: MotivoDeRecomendacion)
+
+/**
+ * Por qué se le enseña esa película.
+ *
+ * Era una cadena en castellano fabricada aquí ("Porque sigues a Nolan"), o sea texto de
+ * pantalla dentro de la capa de datos: no se podía traducir ni probar sin comparar frases.
+ * Ahora el recomendador dice **qué** motivo es y el texto lo pone la vista, igual que con
+ * `ErrorCarga`.
+ *
+ * @property nombre el actor, el director o la película de la que sale la propuesta. Null en
+ *   los motivos que no hablan de nada concreto.
+ */
+data class MotivoDeRecomendacion(val tipo: TipoDeMotivo, val nombre: String? = null)
+
+/** Por qué vía salió la recomendación. */
+enum class TipoDeMotivo {
+    /** De alguien que el usuario sigue. Lleva su nombre. */
+    GENTE_QUE_SIGUES,
+
+    /** De alguien que sigue, pero no se pudo saber cómo se llama. */
+    GENTE_SIN_NOMBRE,
+
+    /** Parecida a una de sus favoritas. Lleva el título de esa. */
+    COMO_TU_FAVORITA,
+
+    /** De los géneros que marcó en el onboarding. */
+    TUS_GENEROS,
+
+    /** Lo más visto del momento, para quien no ha dicho nada. */
+    LO_POPULAR
+}
 
 /**
  * Elige la película que se enseña al abrir la app.
@@ -137,8 +168,11 @@ class Recomendador(
                 alTerminar(
                     Recomendacion(
                         candidata,
-                        if (nombre.isNullOrBlank()) "De alguien a quien sigues"
-                        else "Porque sigues a $nombre"
+                        if (nombre.isNullOrBlank()) {
+                            MotivoDeRecomendacion(TipoDeMotivo.GENTE_SIN_NOMBRE)
+                        } else {
+                            MotivoDeRecomendacion(TipoDeMotivo.GENTE_QUE_SIGUES, nombre)
+                        }
                     )
                 )
             }
@@ -159,7 +193,12 @@ class Recomendador(
         peliculas.recomendadas(referencia.id) { resultado ->
             val candidata = elegir(resultado, semilla, descartadas)
             alTerminar(
-                candidata?.let { Recomendacion(it, "Porque te gustó ${referencia.title}") }
+                candidata?.let {
+                    Recomendacion(
+                        it,
+                        MotivoDeRecomendacion(TipoDeMotivo.COMO_TU_FAVORITA, referencia.title)
+                    )
+                }
             )
         }
     }
@@ -177,7 +216,7 @@ class Recomendador(
         }
         peliculas.porGeneros(generos) { resultado ->
             val candidata = elegir(resultado, semilla, descartadas)
-            alTerminar(candidata?.let { Recomendacion(it, MOTIVO_GENEROS) })
+            alTerminar(candidata?.let { Recomendacion(it, MotivoDeRecomendacion(TipoDeMotivo.TUS_GENEROS)) })
         }
     }
 
@@ -190,7 +229,7 @@ class Recomendador(
             // Pasa por el mismo filtro que las demás: esta vía existe para que la portada
             // nunca falle, así que es la última que puede permitirse devolver algo sin cartel.
             val candidata = elegir(resultado, semilla, descartadas)
-            alTerminar(candidata?.let { Recomendacion(it, MOTIVO_POPULAR) })
+            alTerminar(candidata?.let { Recomendacion(it, MotivoDeRecomendacion(TipoDeMotivo.LO_POPULAR)) })
         }
     }
 
@@ -214,8 +253,4 @@ class Recomendador(
 
     private enum class Via { GENTE, FAVORITAS, GENEROS, POPULARES }
 
-    companion object {
-        const val MOTIVO_GENEROS = "Porque te gusta este tipo de cine"
-        const val MOTIVO_POPULAR = "De lo más visto ahora mismo"
-    }
 }
