@@ -29,6 +29,7 @@ import com.example.dailymovie.utils.mensaje
 import com.example.dailymovie.fragments.viewmodels.HomeViewModel
 import com.example.dailymovie.activities.views.MovieA
 import com.example.dailymovie.utils.Avisos
+import com.example.dailymovie.utils.comoTexto
 
 class HomeF : Fragment() {
 
@@ -167,9 +168,11 @@ class HomeF : Fragment() {
         binding.movieAuthor.mostrarSi(hayAutor)
         binding.movieAuthor.text = movie.author.orEmpty()
 
-        val hayMotivo = !movie.motivo.isNullOrBlank()
+        val hayMotivo = movie.motivo != null
         binding.txtMotivo.mostrarSi(hayMotivo)
-        binding.txtMotivo.text = movie.motivo.orEmpty()
+        // El motivo llega en crudo desde el recomendador; la frase se monta aqui, que es
+        // donde se puede tocar recursos.
+        binding.txtMotivo.text = movie.motivo?.comoTexto(requireContext()).orEmpty()
 
         mostrarTrailer(movie.videoId)
 

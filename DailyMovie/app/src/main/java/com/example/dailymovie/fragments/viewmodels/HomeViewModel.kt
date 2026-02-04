@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dailymovie.data.Dependencias
+import com.example.dailymovie.data.MotivoDeRecomendacion
 import com.example.dailymovie.data.Recomendador
 import com.example.dailymovie.data.MovieRepository
 import com.example.dailymovie.data.Resultado
@@ -182,7 +183,11 @@ class HomeViewModel(
      * recomendada no, asi que se rellena con lo que da TMDB para que la portada se vea
      * igual de completa venga de donde venga.
      */
-    private fun publicarRecomendada(generacion: Int, pelicula: MovieModel, motivo: String) {
+    private fun publicarRecomendada(
+        generacion: Int,
+        pelicula: MovieModel,
+        motivo: MotivoDeRecomendacion
+    ) {
         peliculas.detalles(pelicula.id) { detalles ->
             if (generacion != generacionDeCarga) return@detalles
             val sinopsis = (detalles as? Resultado.Exito)?.datos?.overview.orEmpty()

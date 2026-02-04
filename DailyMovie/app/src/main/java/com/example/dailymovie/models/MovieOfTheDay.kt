@@ -20,7 +20,14 @@ data class MovieOfTheDay(
     val author: String? = null,
 
     /** Por que se te enseña esta. Solo en las recomendadas. */
-    val motivo: String? = null,
+    /**
+     * Por que se enseña esta pelicula, cuando es recomendada.
+     *
+     * Es el motivo "en crudo" y no una frase: el texto lo monta la pantalla con
+     * `MotivoDeRecomendacion.comoTexto()`. Null en la curada a mano, que en vez de motivo
+     * tiene reseña y autor.
+     */
+    val motivo: com.example.dailymovie.data.MotivoDeRecomendacion? = null,
 
     val videoId: String
 )
