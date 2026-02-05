@@ -125,9 +125,16 @@ Y lo pegas en la consola de Firebase, en la configuración del proyecto. Sin ese
 
 ## De dónde viene esto
 
-DailyMovie empezó como proyecto final del ciclo de **Desarrollo de Aplicaciones Multiplataforma**, en 2024. El código de aquella entrega está congelado en la rama `checkpoint-DAM`, por si quieres ver de dónde salió.
+DailyMovie es mi proyecto final del ciclo de grado superior de **Desarrollo de Aplicaciones Multiplataforma (DAM)**, que cursé en el **IES Comercio** de Logroño y presenté en **2024**. El código de aquella entrega está congelado en la rama `checkpoint-DAM`, por si quieres ver de dónde salió.
 
 Lo que hay en `main` es la continuación: arreglar lo que estaba mal, rehacer la arquitectura para que se pueda probar y crecer, y añadir lo que le faltaba para ser una app de verdad.
+
+## Autor
+
+**Jesús Luis Condori Chambi** (`jesus33lcc`) — desarrollador web y .NET en Logroño, La Rioja, especializado en Big Data e Inteligencia Artificial.
+
+- GitHub: [@jesus33lcc](https://github.com/jesus33lcc)
+- LinkedIn: [Jesús Luis Condori Chambi](https://www.linkedin.com/in/jesus-luis-condori-chambi)
 
 ## Licencia
 
@@ -137,7 +144,7 @@ En cristiano: puedes mirar el código, aprender de él, cambiarlo y usarlo. Lo �
 
 ```
 DailyMovie — una app de cine para Android
-Copyright (C) 2024-2026 jesus33lcc
+Copyright (C) 2024-2026 Jesús Luis Condori Chambi (jesus33lcc)
 
 Este programa es software libre: puedes redistribuirlo y/o modificarlo bajo los
 términos de la GNU General Public License publicada por la Free Software
